@@ -1,0 +1,241 @@
+[
+  {
+    "text": "다음 주 퇴사하는데, 반도체 설계도 USB에 백업해두려고 합니다.",
+    "risk_score": 100.0,
+    "risk_level": "CRITICAL",
+    "violations": [
+      "POL-013",
+      "POL-036",
+      "POL-025"
+    ],
+    "threats": [
+      "내부자 위협 - 퇴사",
+      "외부 반출",
+      "기밀 설계도 유출"
+    ],
+    "explanation": "3개 위협 탐지 | 3개 정책 위반 | 주요 키워드: 퇴사, USB, 설계도 | 평균 정책 유사도: 0.39",
+    "related_policies": [
+      "POL-013",
+      "POL-036",
+      "POL-025"
+    ],
+    "policy_similarities": {
+      "POL-013": 0.394771671295166,
+      "POL-036": 0.39174884259700776,
+      "POL-025": 0.37153948605060577
+    },
+    "processing_time": 0.256683,
+    "timestamp": "2025-10-21T11:49:46.669414"
+  },
+  {
+    "text": "고객 개인정보 1만 건을 개인 이메일로 전송했습니다.",
+    "risk_score": 93.4,
+    "risk_level": "CRITICAL",
+    "violations": [
+      "POL-002",
+      "POL-006",
+      "POL-033"
+    ],
+    "threats": [
+      "개인정보 침해",
+      "외부 전송 위험"
+    ],
+    "explanation": "2개 위협 탐지 | 3개 정책 위반 | 주요 키워드: 개인정보, 이메일 | 평균 정책 유사도: 0.35",
+    "related_policies": [
+      "POL-002",
+      "POL-006",
+      "POL-033"
+    ],
+    "policy_similarities": {
+      "POL-002": 0.38345028758049005,
+      "POL-006": 0.3397833466529846,
+      "POL-033": 0.31379426717758174
+    },
+    "processing_time": 0.211707,
+    "timestamp": "2025-10-21T11:49:46.625774"
+  },
+  {
+    "text": "협력업체와 배터리 배합비 공유하는데 NDA 안 맺었어요.",
+    "risk_score": 48.1,
+    "risk_level": "HIGH",
+    "violations": [
+      "POL-018",
+      "POL-001"
+    ],
+    "threats": [],
+    "explanation": "2개 정책 위반 | 평균 정책 유사도: 0.33",
+    "related_policies": [
+      "POL-018",
+      "POL-001",
+      "POL-036"
+    ],
+    "policy_similarities": {
+      "POL-018": 0.4099633991718292,
+      "POL-001": 0.3006850983415331,
+      "POL-036": 0.27283340990543364
+    },
+    "processing_time": 0.220722,
+    "timestamp": "2025-10-21T11:49:46.636260"
+  },
+  {
+    "text": "일반 업무 보고서 작성했습니다.",
+    "risk_score": 45.0,
+    "risk_level": "HIGH",
+    "violations": [
+      "POL-030",
+      "POL-019",
+      "POL-010"
+    ],
+    "threats": [],
+    "explanation": "3개 정책 위반 | 평균 정책 유사도: 0.30",
+    "related_policies": [
+      "POL-030",
+      "POL-019",
+      "POL-010"
+    ],
+    "policy_similarities": {
+      "POL-030": 0.307975280880928,
+      "POL-019": 0.30193221032619477,
+      "POL-010": 0.29090906381607057
+    },
+    "processing_time": 0.168264,
+    "timestamp": "2025-10-21T11:49:46.584759"
+  },
+  {
+    "text": "경쟁사로 이직하는데 고객 리스트 가져가도 되나요?",
+    "risk_score": 93.0,
+    "risk_level": "CRITICAL",
+    "violations": [
+      "POL-003"
+    ],
+    "threats": [
+      "내부자 위협 - 이직",
+      "정보 유출 위험"
+    ],
+    "explanation": "2개 위협 탐지 | 1개 정책 위반 | 주요 키워드: 이직, 경쟁사 | 평균 정책 유사도: 0.33",
+    "related_policies": [
+      "POL-004",
+      "POL-003",
+      "POL-011"
+    ],
+    "policy_similarities": {
+      "POL-004": 0.3973853051662445,
+      "POL-003": 0.32283968542303354,
+      "POL-011": 0.2681414425373077
+    },
+    "processing_time": 0.174981,
+    "timestamp": "2025-10-21T11:49:46.592356"
+  },
+  {
+    "text": "회사 회계 자료를 외부 구글 드라이브로 공유했습니다.",
+    "risk_score": 18.5,
+    "risk_level": "LOW",
+    "violations": [
+      "POL-017"
+    ],
+    "threats": [],
+    "explanation": "1개 정책 위반 | 평균 정책 유사도: 0.34",
+    "related_policies": [
+      "POL-017",
+      "POL-038",
+      "POL-006"
+    ],
+    "policy_similarities": {
+      "POL-017": 0.4286143183708191,
+      "POL-038": 0.2983284443616867,
+      "POL-006": 0.2961919218301773
+    },
+    "processing_time": 0.175595,
+    "timestamp": "2025-10-21T11:49:46.760983"
+  },
+  {
+    "text": "퇴사 예정자가 대량 다운로드를 시도했습니다.",
+    "risk_score": 85.5,
+    "risk_level": "CRITICAL",
+    "violations": [
+      "POL-003"
+    ],
+    "threats": [
+      "내부자 위협 - 퇴사",
+      "데이터 반출"
+    ],
+    "explanation": "2개 위협 탐지 | 1개 정책 위반 | 주요 키워드: 퇴사, 다운로드 | 평균 정책 유사도: 0.36",
+    "related_policies": [
+      "POL-003",
+      "POL-005",
+      "POL-041"
+    ],
+    "policy_similarities": {
+      "POL-003": 0.43704262886728557,
+      "POL-005": 0.3284980684518814,
+      "POL-041": 0.3138951182365417
+    },
+    "processing_time": 0.183781,
+    "timestamp": "2025-10-21T11:49:46.777174"
+  },
+  {
+    "text": "R&D 핵심 기술 문서를 메신저로 전송했습니다.",
+    "risk_score": 63.0,
+    "risk_level": "CRITICAL",
+    "violations": [
+      "POL-033"
+    ],
+    "threats": [
+      "연구개발 자료 유출",
+      "외부 전송 위험"
+    ],
+    "explanation": "2개 위협 탐지 | 1개 정책 위반 | 주요 키워드: R&D, 메신저 | 평균 정책 유사도: 0.33",
+    "related_policies": [
+      "POL-033",
+      "POL-028",
+      "POL-022"
+    ],
+    "policy_similarities": {
+      "POL-033": 0.39065139591693876,
+      "POL-028": 0.3040944308042526,
+      "POL-022": 0.2847568720579147
+    },
+    "processing_time": 0.160214,
+    "timestamp": "2025-10-21T11:49:46.788430"
+  },
+  {
+    "text": "고객사 담당자 연락처를 엑셀로 정리했습니다.",
+    "risk_score": 0.0,
+    "risk_level": "LOW",
+    "violations": [],
+    "threats": [],
+    "explanation": "평균 정책 유사도: 0.32",
+    "related_policies": [
+      "POL-011",
+      "POL-035",
+      "POL-045"
+    ],
+    "policy_similarities": {
+      "POL-011": 0.338146071434021,
+      "POL-035": 0.31894352912902835,
+      "POL-045": 0.30681898176670075
+    },
+    "processing_time": 0.152993,
+    "timestamp": "2025-10-21T11:49:46.793863"
+  },
+  {
+    "text": "신제품 출시 전략을 협력사와 논의했습니다.",
+    "risk_score": 0.0,
+    "risk_level": "LOW",
+    "violations": [],
+    "threats": [],
+    "explanation": "평균 정책 유사도: 0.19",
+    "related_policies": [
+      "POL-050",
+      "POL-044",
+      "POL-022"
+    ],
+    "policy_similarities": {
+      "POL-050": 0.21014925241470336,
+      "POL-044": 0.1854227602481842,
+      "POL-022": 0.1853306144475937
+    },
+    "processing_time": 0.114117,
+    "timestamp": "2025-10-21T11:49:46.791738"
+  }
+]
