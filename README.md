@@ -660,20 +660,20 @@ Simply add new policies to `data/security_policies.json`:
 
 ## 🚧 Roadmap
 
-### Phase 1: Core Enhancement (Q2 2025)
+### Phase 1: Core Enhancement (Q1 2026)
 - [ ] Multi-LLM support (Claude 3.5, Gemini Pro, Llama 3)
 - [ ] Real-time streaming analysis
 - [ ] Enhanced policy templates
 - [ ] Advanced caching strategies
 
-### Phase 2: Enterprise Features (Q3 2025)
+### Phase 2: Enterprise Features (Q2 2026)
 - [ ] REST API server (FastAPI)
 - [ ] Web dashboard (React + TypeScript)
 - [ ] SIEM integration (Splunk, ELK)
 - [ ] Active Directory sync
 - [ ] Role-based access control
 
-### Phase 3: Advanced Analytics (Q4 2025)
+### Phase 3: Advanced Analytics (Q3 2026)
 - [ ] Time-series risk trending
 - [ ] User behavior profiling
 - [ ] Anomaly detection with ML
