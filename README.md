@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-orange.svg)](https://openai.com/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/yourusername/aegisrag/graphs/commit-activity)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Navy10021/aegisrag/graphs/commit-activity)
 
 > **AegisRAG is a retrieval-augmented intelligence framework for hybrid security risk assessment and policy-aware threat analysis.**
 
@@ -156,7 +156,7 @@ graph TB
 
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/aegisrag.git
+git clone https://github.com/Navy10021/aegisrag.git
 cd aegisrag
 
 # Install dependencies
@@ -766,11 +766,11 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
 
 ## 📧 Contact & Support
 
-- **Author:** Your Name
-- **Email:** your.email@example.com
-- **GitHub:** [@yourusername](https://github.com/yourusername)
-- **Issues:** [Report Bug](https://github.com/yourusername/aegisrag/issues)
-- **Discussions:** [GitHub Discussions](https://github.com/yourusername/aegisrag/discussions)
+- **Author:** NAVY LEE
+- **Email:** iyunseob4@gmail.com
+- **GitHub:** [@Navy10021](https://github.com/Navy10021)
+- **Issues:** [Report Bug](https://github.com/Navy10021/aegisrag/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/Navy10021/aegisrag/discussions)
 
 ---
 
