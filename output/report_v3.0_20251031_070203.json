@@ -1,0 +1,1726 @@
+{
+  "metadata": {
+    "version": "3.0 (Self-RAG)",
+    "generated": "2025-10-31T07:02:03.284772",
+    "total": 20,
+    "features": [
+      "self_rag",
+      "hybrid_search",
+      "xai"
+    ]
+  },
+  "summary": {
+    "avg_risk": 42.1,
+    "avg_confidence": 0.6661324680662307,
+    "risk_dist": {
+      "LOW": 9,
+      "CRITICAL": 6,
+      "MEDIUM": 3,
+      "HIGH": 2
+    },
+    "high_risk": 6,
+    "top_violations": {
+      "POL-003": 3,
+      "POL-030": 2,
+      "POL-001": 2,
+      "POL-026": 1,
+      "POL-007": 1,
+      "POL-002": 1,
+      "POL-005": 1,
+      "POL-029": 1,
+      "POL-013": 1
+    },
+    "self_rag_count": 20,
+    "avg_confidence_boost": 0.05500000000000001
+  },
+  "user_profiles": {
+    "user_001": {
+      "analyses_count": 2,
+      "avg_risk_score": 50.0,
+      "behavior_trend": "stable",
+      "top_violations": [
+        [
+          "POL-026",
+          1
+        ],
+        [
+          "POL-007",
+          1
+        ],
+        [
+          "POL-002",
+          1
+        ]
+      ],
+      "recent_level": "CRITICAL"
+    },
+    "user_003": {
+      "analyses_count": 5,
+      "avg_risk_score": 40.0,
+      "behavior_trend": "stable",
+      "top_violations": [
+        [
+          "POL-003",
+          2
+        ]
+      ],
+      "recent_level": "LOW"
+    },
+    "user_005": {
+      "analyses_count": 4,
+      "avg_risk_score": 43.25,
+      "behavior_trend": "stable",
+      "top_violations": [
+        [
+          "POL-030",
+          1
+        ],
+        [
+          "POL-001",
+          1
+        ]
+      ],
+      "recent_level": "MEDIUM"
+    },
+    "user_004": {
+      "analyses_count": 3,
+      "avg_risk_score": 49.333333333333336,
+      "behavior_trend": "stable",
+      "top_violations": [
+        [
+          "POL-013",
+          1
+        ],
+        [
+          "POL-003",
+          1
+        ]
+      ],
+      "recent_level": "CRITICAL"
+    },
+    "user_002": {
+      "analyses_count": 5,
+      "avg_risk_score": 38.2,
+      "behavior_trend": "stable",
+      "top_violations": [
+        [
+          "POL-030",
+          1
+        ],
+        [
+          "POL-001",
+          1
+        ],
+        [
+          "POL-005",
+          1
+        ],
+        [
+          "POL-029",
+          1
+        ]
+      ],
+      "recent_level": "HIGH"
+    }
+  },
+  "compound_threats": [],
+  "results": [
+    {
+      "text": "내부 회계 자료를 개인 이메일로 전송했습니다.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-002",
+        "POL-026",
+        "POL-003"
+      ],
+      "policy_similarities": {
+        "POL-002": 0.5214285714285715,
+        "POL-026": 0.47844181060791013,
+        "POL-003": 0.4069520831108093
+      },
+      "processing_time": 0.072317,
+      "timestamp": "2025-10-31T07:01:59.691210",
+      "confidence_score": 0.640682246514729,
+      "remediation_suggestions": [],
+      "user_id": "user_002",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "퇴사 예정 직원이 회사 서버에서 대량 데이터를 다운로드했습니다.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-003"
+      ],
+      "threats": [
+        "내부자 위협 - 퇴사",
+        "대량 데이터 처리"
+      ],
+      "explanation": "2 threat(s) | 1 violation(s) | Keywords: 퇴사, 대량",
+      "related_policies": [
+        "POL-003",
+        "POL-002",
+        "POL-012"
+      ],
+      "policy_similarities": {
+        "POL-003": 0.7499999999934921,
+        "POL-002": 0.4371492266654968,
+        "POL-012": 0.331393301486969
+      },
+      "processing_time": 0.05671,
+      "timestamp": "2025-10-31T07:01:59.747927",
+      "confidence_score": 0.9018542528145957,
+      "remediation_suggestions": [
+        "HR 및 보안팀에 즉시 보고하세요",
+        "계정 접근 권한을 제한하세요"
+      ],
+      "user_id": "user_003",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "퇴사": 40.0,
+            "대량": 23.0
+          },
+          "policy_similarities": {
+            "POL-003": 33.74999999970714
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "퇴사",
+            40.0,
+            "CRITICAL",
+            "'퇴사' 키워드 감지"
+          ],
+          [
+            "POL-003",
+            33.74999999970714,
+            "HIGH",
+            "정책 POL-003 매칭"
+          ],
+          [
+            "대량",
+            23.0,
+            "HIGH",
+            "'대량' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 '퇴사' 키워드가 없었다면: 60.0점"
+        ],
+        "similar_cases": []
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "고객 계약서를 외부 파트너에게 메신저로 공유했습니다.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-030",
+        "POL-004",
+        "POL-002"
+      ],
+      "policy_similarities": {
+        "POL-030": 0.5,
+        "POL-004": 0.4667981266975403,
+        "POL-002": 0.46400186419487
+      },
+      "processing_time": 0.023249,
+      "timestamp": "2025-10-31T07:01:59.771606",
+      "confidence_score": 0.6430799990892411,
+      "remediation_suggestions": [],
+      "user_id": "user_004",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "신제품 디자인 도면을 개인 클라우드에 업로드했습니다.",
+      "risk_score": 38.0,
+      "risk_level": "MEDIUM",
+      "violations": [],
+      "threats": [
+        "신제품 정보"
+      ],
+      "explanation": "1 threat(s) | Keywords: 신제품",
+      "related_policies": [
+        "POL-009",
+        "POL-024",
+        "POL-001"
+      ],
+      "policy_similarities": {
+        "POL-009": 0.5333333333333333,
+        "POL-024": 0.4954275250434875,
+        "POL-001": 0.3813011050224304
+      },
+      "processing_time": 0.058269,
+      "timestamp": "2025-10-31T07:01:59.830132",
+      "confidence_score": 0.6410061963399252,
+      "remediation_suggestions": [],
+      "user_id": "user_005",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "신제품": 38.0
+          },
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 38.0
+        },
+        "key_factors": [
+          [
+            "신제품",
+            38.0,
+            "CRITICAL",
+            "'신제품' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 '신제품' 키워드가 없었다면: 0.0점"
+        ],
+        "similar_cases": []
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "회사 정책 문서를 외부에 유출하지 않도록 검토했습니다.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-022",
+        "POL-011",
+        "POL-004"
+      ],
+      "policy_similarities": {
+        "POL-022": 0.5,
+        "POL-011": 0.4270493686199188,
+        "POL-004": 0.4238109588623047
+      },
+      "processing_time": 0.068527,
+      "timestamp": "2025-10-31T07:01:59.898733",
+      "confidence_score": 0.6350860327482224,
+      "remediation_suggestions": [],
+      "user_id": "user_001",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "R&D 실험 데이터 일부를 외부 USB에 저장했습니다.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-030",
+        "POL-001"
+      ],
+      "threats": [
+        "R&D 자료 유출",
+        "실험 데이터 유출"
+      ],
+      "explanation": "2 threat(s) | 2 violation(s) | Keywords: R&D, 실험 데이터",
+      "related_policies": [
+        "POL-030",
+        "POL-001",
+        "POL-013"
+      ],
+      "policy_similarities": {
+        "POL-030": 0.7374999999945429,
+        "POL-001": 0.581330901652916,
+        "POL-013": 0.5336996734142303
+      },
+      "processing_time": 0.052327,
+      "timestamp": "2025-10-31T07:01:59.950965",
+      "confidence_score": 1.0,
+      "remediation_suggestions": [
+        "협업 접근 권한을 제한하세요",
+        "데이터 공유 계약을 확인하세요",
+        "즉시 보안팀에 보고하세요",
+        "데이터 전송을 중단하고 증거를 보존하세요"
+      ],
+      "user_id": "user_002",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "R&D": 45.0,
+            "자료유출": 35.0,
+            "실험데이터": 40.0,
+            "실험 데이터": 40.0,
+            "데이터유출": 35.0,
+            "데이터 유출": 35.0
+          },
+          "policy_similarities": {
+            "POL-030": 17.69999999986903,
+            "POL-001": 26.15989057438122
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "R&D",
+            45.0,
+            "CRITICAL",
+            "'R&D' 키워드 감지"
+          ],
+          [
+            "실험데이터",
+            40.0,
+            "CRITICAL",
+            "'실험데이터' 키워드 감지"
+          ],
+          [
+            "실험 데이터",
+            40.0,
+            "CRITICAL",
+            "'실험 데이터' 키워드 감지"
+          ],
+          [
+            "자료유출",
+            35.0,
+            "CRITICAL",
+            "'자료유출' 키워드 감지"
+          ],
+          [
+            "데이터유출",
+            35.0,
+            "CRITICAL",
+            "'데이터유출' 키워드 감지"
+          ],
+          [
+            "데이터 유출",
+            35.0,
+            "CRITICAL",
+            "'데이터 유출' 키워드 감지"
+          ],
+          [
+            "POL-001",
+            26.15989057438122,
+            "HIGH",
+            "정책 POL-001 매칭"
+          ],
+          [
+            "POL-030",
+            17.69999999986903,
+            "HIGH",
+            "정책 POL-030 매칭"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'R&D' 키워드가 없었다면: 55.0점"
+        ],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "영업 고객 리스트를 개인 노트북으로 복사했습니다.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-002",
+        "POL-022",
+        "POL-004"
+      ],
+      "policy_similarities": {
+        "POL-002": 0.5,
+        "POL-022": 0.4278152287006378,
+        "POL-004": 0.42324692010879517
+      },
+      "processing_time": 0.054328,
+      "timestamp": "2025-10-31T07:02:00.005497",
+      "confidence_score": 0.6351062148809433,
+      "remediation_suggestions": [],
+      "user_id": "user_003",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "보안 승인 없는 소프트웨어를 회사 컴퓨터에 설치했습니다.",
+      "risk_score": 10.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "Direct analysis",
+      "related_policies": [],
+      "policy_similarities": {},
+      "processing_time": 0.0,
+      "timestamp": "2025-10-31T07:02:00.007572",
+      "confidence_score": 0.0,
+      "remediation_suggestions": [],
+      "user_id": "user_004",
+      "session_id": null,
+      "detected_language": "unknown",
+      "explanation_data": null,
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "not_needed",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "No retrieval needed"
+        ]
+      }
+    },
+    {
+      "text": "팀 회의록을 외부 협력사와 공유했습니다.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-030",
+        "POL-022",
+        "POL-012"
+      ],
+      "policy_similarities": {
+        "POL-030": 0.5,
+        "POL-022": 0.37970268726348877,
+        "POL-012": 0.2924404740333557
+      },
+      "processing_time": 0.051877,
+      "timestamp": "2025-10-31T07:02:00.059098",
+      "confidence_score": 0.6172143161296845,
+      "remediation_suggestions": [],
+      "user_id": "user_005",
+      "session_id": null,
+      "detected_language": "ko",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "프로젝트 일정 관리 파일을 개인 이메일로 보냈습니다.",
+      "risk_score": 10.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "Direct analysis",
+      "related_policies": [],
+      "policy_similarities": {},
+      "processing_time": 0.0,
+      "timestamp": "2025-10-31T07:02:00.061067",
+      "confidence_score": 0.0,
+      "remediation_suggestions": [],
+      "user_id": "user_001",
+      "session_id": null,
+      "detected_language": "unknown",
+      "explanation_data": null,
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "not_needed",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "No retrieval needed"
+        ]
+      }
+    },
+    {
+      "text": "I uploaded the internal project plan to my personal Google Drive.",
+      "risk_score": 35.0,
+      "risk_level": "MEDIUM",
+      "violations": [],
+      "threats": [
+        "Unauthorized cloud - Google Drive"
+      ],
+      "explanation": "1 threat(s) | Keywords: Google Drive",
+      "related_policies": [
+        "POL-022",
+        "POL-009",
+        "POL-013"
+      ],
+      "policy_similarities": {
+        "POL-022": 0.6999999999950336,
+        "POL-009": 0.4284654752420679,
+        "POL-013": 0.4115689208675464
+      },
+      "processing_time": 0.05993,
+      "timestamp": "2025-10-31T07:02:00.120540",
+      "confidence_score": 0.6540034396104648,
+      "remediation_suggestions": [],
+      "user_id": "user_002",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "Google Drive": 35.0
+          },
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 35.0
+        },
+        "key_factors": [
+          [
+            "Google Drive",
+            35.0,
+            "CRITICAL",
+            "'Google Drive' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'Google Drive' 키워드가 없었다면: 0.0점"
+        ],
+        "similar_cases": [
+          [
+            0.388,
+            "2025-10-31T07:01:59",
+            "MEDIUM",
+            38.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "An employee tried to download large volumes of confidential data before resignation.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-003"
+      ],
+      "threats": [
+        "Insider threat - resignation",
+        "Mass download attempt",
+        "Confidential information leak"
+      ],
+      "explanation": "3 threat(s) | 1 violation(s) | Keywords: resignation, download, confidential",
+      "related_policies": [
+        "POL-003",
+        "POL-002",
+        "POL-022"
+      ],
+      "policy_similarities": {
+        "POL-003": 0.7418153848852425,
+        "POL-002": 0.5416871428455823,
+        "POL-022": 0.39518340532052454
+      },
+      "processing_time": 0.047516,
+      "timestamp": "2025-10-31T07:02:00.168063",
+      "confidence_score": 0.9178685933051349,
+      "remediation_suggestions": [
+        "HR 및 보안팀에 즉시 보고하세요",
+        "계정 접근 권한을 제한하세요"
+      ],
+      "user_id": "user_003",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "resignation": 40.0,
+            "resign": 40.0,
+            "download": 28.0,
+            "mass download": 33.0,
+            "confidential": 40.0
+          },
+          "policy_similarities": {
+            "POL-003": 33.38169231983591
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "resignation",
+            40.0,
+            "CRITICAL",
+            "'resignation' 키워드 감지"
+          ],
+          [
+            "resign",
+            40.0,
+            "CRITICAL",
+            "'resign' 키워드 감지"
+          ],
+          [
+            "confidential",
+            40.0,
+            "CRITICAL",
+            "'confidential' 키워드 감지"
+          ],
+          [
+            "POL-003",
+            33.38169231983591,
+            "HIGH",
+            "정책 POL-003 매칭"
+          ],
+          [
+            "mass download",
+            33.0,
+            "CRITICAL",
+            "'mass download' 키워드 감지"
+          ],
+          [
+            "download",
+            28.0,
+            "HIGH",
+            "'download' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'resignation' 키워드가 없었다면: 60.0점"
+        ],
+        "similar_cases": [
+          [
+            1.0,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "The client information file was sent via Slack to an external partner.",
+      "risk_score": 48.0,
+      "risk_level": "HIGH",
+      "violations": [],
+      "threats": [
+        "Partner company security",
+        "Slack unauthorized use"
+      ],
+      "explanation": "2 threat(s) | Keywords: partner, Slack",
+      "related_policies": [
+        "POL-030",
+        "POL-002",
+        "POL-013"
+      ],
+      "policy_similarities": {
+        "POL-030": 0.5,
+        "POL-002": 0.44432350993156433,
+        "POL-013": 0.42607327997140143
+      },
+      "processing_time": 0.042266,
+      "timestamp": "2025-10-31T07:02:00.210416",
+      "confidence_score": 0.6870396789902966,
+      "remediation_suggestions": [
+        "즉시 보안팀에 보고하세요"
+      ],
+      "user_id": "user_004",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "partner": 23.0,
+            "Slack": 25.0
+          },
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 48.0
+        },
+        "key_factors": [
+          [
+            "Slack",
+            25.0,
+            "HIGH",
+            "'Slack' 키워드 감지"
+          ],
+          [
+            "partner",
+            23.0,
+            "HIGH",
+            "'partner' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'Slack' 키워드가 없었다면: 23.0점"
+        ],
+        "similar_cases": [
+          [
+            0.36000000000000004,
+            "2025-10-31T07:01:59",
+            "MEDIUM",
+            38.0
+          ],
+          [
+            0.34800000000000003,
+            "2025-10-31T07:02:00",
+            "MEDIUM",
+            35.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 4,
+        "confidence_boost": 0.05,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "Shared the company’s R&D strategy document without NDA.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-030",
+        "POL-001"
+      ],
+      "threats": [
+        "R&D materials leak",
+        "NDA violation"
+      ],
+      "explanation": "2 threat(s) | 2 violation(s) | Keywords: R&D, NDA",
+      "related_policies": [
+        "POL-030",
+        "POL-004",
+        "POL-001"
+      ],
+      "policy_similarities": {
+        "POL-030": 0.6614318655180137,
+        "POL-004": 0.5561282455887357,
+        "POL-001": 0.4822422210938413
+      },
+      "processing_time": 0.050863,
+      "timestamp": "2025-10-31T07:02:00.261271",
+      "confidence_score": 1.0,
+      "remediation_suggestions": [
+        "협업 접근 권한을 제한하세요",
+        "데이터 공유 계약을 확인하세요",
+        "즉시 보안팀에 보고하세요",
+        "데이터 전송을 중단하고 증거를 보존하세요"
+      ],
+      "user_id": "user_005",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "R&D": 45.0,
+            "research and development": 45.0,
+            "NDA": 40.0,
+            "non-disclosure agreement": 40.0
+          },
+          "policy_similarities": {
+            "POL-030": 15.87436477243233,
+            "POL-001": 21.70089994922286
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "R&D",
+            45.0,
+            "CRITICAL",
+            "'R&D' 키워드 감지"
+          ],
+          [
+            "research and development",
+            45.0,
+            "CRITICAL",
+            "'research and development' 키워드 감지"
+          ],
+          [
+            "NDA",
+            40.0,
+            "CRITICAL",
+            "'NDA' 키워드 감지"
+          ],
+          [
+            "non-disclosure agreement",
+            40.0,
+            "CRITICAL",
+            "'non-disclosure agreement' 키워드 감지"
+          ],
+          [
+            "POL-001",
+            21.70089994922286,
+            "HIGH",
+            "정책 POL-001 매칭"
+          ],
+          [
+            "POL-030",
+            15.87436477243233,
+            "HIGH",
+            "정책 POL-030 매칭"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'R&D' 키워드가 없었다면: 55.0점"
+        ],
+        "similar_cases": [
+          [
+            1.0,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:02:00",
+            "CRITICAL",
+            100.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "I sent the financial statement draft to my private email for review.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-026",
+        "POL-007",
+        "POL-002"
+      ],
+      "threats": [
+        "Email information leak",
+        "Financial statement leak"
+      ],
+      "explanation": "2 threat(s) | 3 violation(s) | Keywords: email, financial statement",
+      "related_policies": [
+        "POL-026",
+        "POL-007",
+        "POL-002"
+      ],
+      "policy_similarities": {
+        "POL-026": 0.693903306215235,
+        "POL-007": 0.6741286520196365,
+        "POL-002": 0.6298744363385925
+      },
+      "processing_time": 0.046905,
+      "timestamp": "2025-10-31T07:02:00.308226",
+      "confidence_score": 1.0,
+      "remediation_suggestions": [
+        "암호화되지 않은 이메일 전송을 중단하세요",
+        "의심 이메일을 보안팀에 보고하세요",
+        "이메일을 삭제하고 보고하세요",
+        "첨부파일을 실행하지 마세요",
+        "개인정보 전송을 즉시 중단하세요"
+      ],
+      "user_id": "user_001",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "email": 28.0,
+            "financial statement": 38.0
+          },
+          "policy_similarities": {
+            "POL-026": 16.65367934916564,
+            "POL-007": 16.179087648471274,
+            "POL-002": 15.116986472126221
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "financial statement",
+            38.0,
+            "CRITICAL",
+            "'financial statement' 키워드 감지"
+          ],
+          [
+            "email",
+            28.0,
+            "HIGH",
+            "'email' 키워드 감지"
+          ],
+          [
+            "POL-026",
+            16.65367934916564,
+            "HIGH",
+            "정책 POL-026 매칭"
+          ],
+          [
+            "POL-007",
+            16.179087648471274,
+            "HIGH",
+            "정책 POL-007 매칭"
+          ],
+          [
+            "POL-002",
+            15.116986472126221,
+            "HIGH",
+            "정책 POL-002 매칭"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'financial statement' 키워드가 없었다면: 62.0점"
+        ],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:02:00",
+            "CRITICAL",
+            100.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "Installed unauthorized software on the company-issued laptop.",
+      "risk_score": 56.0,
+      "risk_level": "HIGH",
+      "violations": [
+        "POL-005",
+        "POL-029"
+      ],
+      "threats": [
+        "Unauthorized access"
+      ],
+      "explanation": "1 threat(s) | 2 violation(s) | Keywords: unauthorized",
+      "related_policies": [
+        "POL-005",
+        "POL-029",
+        "POL-022"
+      ],
+      "policy_similarities": {
+        "POL-005": 0.75999999999663,
+        "POL-029": 0.4050624430179596,
+        "POL-022": 0.4036751687526703
+      },
+      "processing_time": 0.045968,
+      "timestamp": "2025-10-31T07:02:00.354225",
+      "confidence_score": 1.0,
+      "remediation_suggestions": [
+        "계정을 즉시 잠그세요",
+        "IT 관리자에게 보고하세요",
+        "암호화 적용 여부를 점검하세요",
+        "암호화 미적용 기기를 보안 조치하세요"
+      ],
+      "user_id": "user_002",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "unauthorized": 30.0,
+            "unauthorized access": 30.0
+          },
+          "policy_similarities": {
+            "POL-005": 7.5999999999663,
+            "POL-029": 9.721498632431029
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 56.0
+        },
+        "key_factors": [
+          [
+            "unauthorized",
+            30.0,
+            "HIGH",
+            "'unauthorized' 키워드 감지"
+          ],
+          [
+            "unauthorized access",
+            30.0,
+            "HIGH",
+            "'unauthorized access' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'unauthorized' 키워드가 없었다면: 26.0점"
+        ],
+        "similar_cases": [
+          [
+            0.36800000000000005,
+            "2025-10-31T07:02:00",
+            "HIGH",
+            48.0
+          ],
+          [
+            0.32800000000000007,
+            "2025-10-31T07:01:59",
+            "MEDIUM",
+            38.0
+          ],
+          [
+            0.31600000000000006,
+            "2025-10-31T07:02:00",
+            "MEDIUM",
+            35.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "The marketing data was accidentally shared in a public folder.",
+      "risk_score": 0.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "No threats",
+      "related_policies": [
+        "POL-022",
+        "POL-004",
+        "POL-002"
+      ],
+      "policy_similarities": {
+        "POL-022": 0.6408022976308954,
+        "POL-004": 0.5961687982034636,
+        "POL-002": 0.5629883962194421
+      },
+      "processing_time": 0.04377,
+      "timestamp": "2025-10-31T07:02:00.398148",
+      "confidence_score": 0.6799959492053801,
+      "remediation_suggestions": [],
+      "user_id": "user_003",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {},
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 0.0
+        },
+        "key_factors": [],
+        "counterfactuals": [],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "LOW",
+            0.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "Exported source code files to a USB drive without permission.",
+      "risk_score": 100.0,
+      "risk_level": "CRITICAL",
+      "violations": [
+        "POL-013",
+        "POL-003"
+      ],
+      "threats": [
+        "USB external extraction risk",
+        "USB drive usage",
+        "Permission violation",
+        "Source code leak",
+        "Source leak",
+        "Code leak"
+      ],
+      "explanation": "6 threat(s) | 2 violation(s) | Keywords: USB, USB drive, permission, source code, source",
+      "related_policies": [
+        "POL-013",
+        "POL-003",
+        "POL-022"
+      ],
+      "policy_similarities": {
+        "POL-013": 0.7749999999956896,
+        "POL-003": 0.418293735601052,
+        "POL-022": 0.3999468684196472
+      },
+      "processing_time": 0.041586,
+      "timestamp": "2025-10-31T07:02:00.439412",
+      "confidence_score": 1.0,
+      "remediation_suggestions": [
+        "USB 사용을 즉시 중단하세요",
+        "데이터 복사 내역을 확인하세요",
+        "HR 및 보안팀에 즉시 보고하세요",
+        "계정 접근 권한을 제한하세요"
+      ],
+      "user_id": "user_004",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "USB": 30.0,
+            "USB drive": 30.0,
+            "permission": 25.0,
+            "source code": 40.0,
+            "source": 35.0,
+            "code": 35.0
+          },
+          "policy_similarities": {
+            "POL-013": 18.59999999989655,
+            "POL-003": 18.82321810204734
+          },
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 100.0
+        },
+        "key_factors": [
+          [
+            "source code",
+            40.0,
+            "CRITICAL",
+            "'source code' 키워드 감지"
+          ],
+          [
+            "source",
+            35.0,
+            "CRITICAL",
+            "'source' 키워드 감지"
+          ],
+          [
+            "code",
+            35.0,
+            "CRITICAL",
+            "'code' 키워드 감지"
+          ],
+          [
+            "USB",
+            30.0,
+            "HIGH",
+            "'USB' 키워드 감지"
+          ],
+          [
+            "USB drive",
+            30.0,
+            "HIGH",
+            "'USB drive' 키워드 감지"
+          ],
+          [
+            "permission",
+            25.0,
+            "HIGH",
+            "'permission' 키워드 감지"
+          ],
+          [
+            "POL-003",
+            18.82321810204734,
+            "HIGH",
+            "정책 POL-003 매칭"
+          ],
+          [
+            "POL-013",
+            18.59999999989655,
+            "HIGH",
+            "정책 POL-013 매칭"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'source code' 키워드가 없었다면: 60.0점"
+        ],
+        "similar_cases": [
+          [
+            0.7,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.7,
+            "2025-10-31T07:02:00",
+            "CRITICAL",
+            100.0
+          ],
+          [
+            0.4,
+            "2025-10-31T07:01:59",
+            "CRITICAL",
+            100.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "partially_supported",
+        "utility_score": 5,
+        "confidence_boost": 0.15000000000000002,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "✓ High-quality result"
+        ]
+      }
+    },
+    {
+      "text": "Shared sensitive contract details over a personal messaging app.",
+      "risk_score": 35.0,
+      "risk_level": "MEDIUM",
+      "violations": [],
+      "threats": [
+        "Contract leak"
+      ],
+      "explanation": "1 threat(s) | Keywords: contract",
+      "related_policies": [
+        "POL-002",
+        "POL-022",
+        "POL-026"
+      ],
+      "policy_similarities": {
+        "POL-002": 0.6999999999942216,
+        "POL-022": 0.523727132994352,
+        "POL-026": 0.4733972839713968
+      },
+      "processing_time": 0.04948,
+      "timestamp": "2025-10-31T07:02:00.489041",
+      "confidence_score": 0.6697124416959971,
+      "remediation_suggestions": [],
+      "user_id": "user_005",
+      "session_id": null,
+      "detected_language": "en",
+      "explanation_data": {
+        "score_breakdown": {
+          "keyword_matches": {
+            "contract": 35.0
+          },
+          "policy_similarities": {},
+          "semantic_scores": {},
+          "bm25_scores": {},
+          "total_base_score": 0.0,
+          "final_score": 35.0
+        },
+        "key_factors": [
+          [
+            "contract",
+            35.0,
+            "CRITICAL",
+            "'contract' 키워드 감지"
+          ]
+        ],
+        "counterfactuals": [
+          "만약 'contract' 키워드가 없었다면: 0.0점"
+        ],
+        "similar_cases": [
+          [
+            0.4,
+            "2025-10-31T07:02:00",
+            "MEDIUM",
+            35.0
+          ],
+          [
+            0.388,
+            "2025-10-31T07:01:59",
+            "MEDIUM",
+            38.0
+          ],
+          [
+            0.34800000000000003,
+            "2025-10-31T07:02:00",
+            "HIGH",
+            48.0
+          ]
+        ]
+      },
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "required",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "✓ Retrieval was necessary",
+          "⚠ Lacks sufficient policy support"
+        ]
+      }
+    },
+    {
+      "text": "Created a presentation summarizing the company’s internal roadmap.",
+      "risk_score": 10.0,
+      "risk_level": "LOW",
+      "violations": [],
+      "threats": [],
+      "explanation": "Direct analysis",
+      "related_policies": [],
+      "policy_similarities": {},
+      "processing_time": 0.0,
+      "timestamp": "2025-10-31T07:02:00.490324",
+      "confidence_score": 0.0,
+      "remediation_suggestions": [],
+      "user_id": "user_001",
+      "session_id": null,
+      "detected_language": "unknown",
+      "explanation_data": null,
+      "context_adjusted": false,
+      "self_rag": {
+        "retrieval_need": "not_needed",
+        "support_level": "no_support",
+        "utility_score": 3,
+        "confidence_boost": 0.0,
+        "reflection_notes": [
+          "No retrieval needed"
+        ]
+      }
+    }
+  ]
+}

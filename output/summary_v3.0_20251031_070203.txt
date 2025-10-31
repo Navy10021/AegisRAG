@@ -1,0 +1,23 @@
+================================================================================
+🛡️  RAG Security Analyzer v3.0 (Self-RAG) Report
+================================================================================
+
+Generated: 2025-10-31 07:02:03
+Total: 20
+Avg Risk: 42.1/100
+Avg Confidence: 67%
+High-Risk: 6
+Self-RAG Used: 20/20
+
+Risk Distribution:
+  LOW: 9
+  CRITICAL: 6
+  MEDIUM: 3
+  HIGH: 2
+
+Top Violations:
+  POL-003: 3
+  POL-030: 2
+  POL-001: 2
+  POL-026: 1
+  POL-007: 1
