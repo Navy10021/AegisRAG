@@ -1,0 +1,2059 @@
+[
+  {
+    "id": "POL-001",
+    "title": "Protection of National Core Technologies",
+    "content": "Designs, process information, and R&D materials related to semiconductors, batteries, displays, and AI/ML technologies must not be leaked externally.",
+    "severity": "critical",
+    "risk_score": 95,
+    "priority": 1,
+    "keywords": [
+      "core technology",
+      "semiconductor",
+      "battery",
+      "display",
+      "AI",
+      "ML",
+      "design",
+      "process",
+      "R&D",
+      "핵심기술",
+      "반도체",
+      "배터리",
+      "디스플레이",
+      "인공지능",
+      "머신러닝",
+      "설계",
+      "공정",
+      "연구개발"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Engineering", "Manufacturing", "IT"],
+    "detection_patterns": {
+      "file_extensions": [".dwg", ".dxf", ".step", ".iges", ".gerber", ".cam", ".gds"],
+      "suspicious_combinations": [
+        ["반도체", "퇴사"],
+        ["반도체", "경쟁사"],
+        ["설계도", "다운로드"],
+        ["공정", "USB"],
+        ["AI", "모델", "유출"]
+      ],
+      "data_volume_threshold_mb": 100
+    },
+    "related_policies": ["POL-003", "POL-013", "POL-021", "POL-022"],
+    "examples": [
+      {
+        "scenario": "퇴사 예정 직원이 반도체 설계 파일을 USB로 복사",
+        "detection_method": "USB 연결 + 대용량 파일 전송 + 키워드 매칭",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "R&D 직원이 회사 이메일로 공정 문서를 개인 이메일로 전송",
+        "detection_method": "이메일 모니터링 + DLP + 키워드 분석",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "정기 백업 작업 (승인된 시간대)",
+      "승인된 협력사와의 데이터 공유 (NDA 체결)",
+      "내부 문서 관리 시스템으로의 이동"
+    ],
+    "compliance_standards": [
+      "국가핵심기술보호법",
+      "산업기술보호법"
+    ],
+    "remediation_steps": [
+      "즉시 보안팀에 보고하세요",
+      "데이터 전송을 중단하고 증거를 보존하세요",
+      "법무팀과 상담하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_security_team", "lock_account"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-002",
+    "title": "Personal Data Protection",
+    "content": "Customer and employee personal data must be encrypted, access-controlled, and monitored for unauthorized transfers.",
+    "severity": "high",
+    "risk_score": 85,
+    "priority": 2,
+    "keywords": [
+      "personal data",
+      "customer data",
+      "employee data",
+      "ID number",
+      "email",
+      "phone number",
+      "개인정보",
+      "고객정보",
+      "직원정보",
+      "주민등록번호",
+      "이메일",
+      "전화번호",
+      "데이터보호",
+      "정보보안"
+    ],
+    "category": "privacy",
+    "affected_departments": ["HR", "Sales", "Customer Service", "IT", "Marketing"],
+    "detection_patterns": {
+      "file_extensions": [".csv", ".xlsx", ".xls", ".db", ".sql"],
+      "suspicious_combinations": [
+        ["고객정보", "다운로드"],
+        ["주민등록번호", "USB"],
+        ["개인정보", "클라우드"],
+        ["직원정보", "외부"]
+      ],
+      "data_volume_threshold_mb": 10,
+      "record_count_threshold": 100
+    },
+    "related_policies": ["POL-009", "POL-013", "POL-026"],
+    "examples": [
+      {
+        "scenario": "영업 직원이 고객 리스트를 개인 클라우드에 업로드",
+        "detection_method": "클라우드 트래픽 모니터링 + DLP",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "HR 담당자가 직원 정보를 암호화 없이 이메일 전송",
+        "detection_method": "이메일 스캔 + 패턴 매칭",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "암호화된 백업",
+      "승인된 HR 시스템으로의 전송",
+      "익명화된 통계 데이터"
+    ],
+    "compliance_standards": [
+      "개인정보보호법",
+      "GDPR"
+    ],
+    "remediation_steps": [
+      "개인정보 전송을 즉시 중단하세요",
+      "개인정보보호책임자에게 보고하세요",
+      "영향받은 개인에게 통지하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "quarantine_file", "alert_dpo"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-003",
+    "title": "Insider Threat Management",
+    "content": "Mass downloads or transfers of sensitive data by departing employees are strictly prohibited.",
+    "severity": "critical",
+    "risk_score": 90,
+    "priority": 1,
+    "keywords": [
+      "resignation",
+      "job change",
+      "competitor",
+      "download",
+      "USB",
+      "cloud",
+      "퇴사",
+      "이직",
+      "경쟁사",
+      "다운로드",
+      "클라우드",
+      "데이터반출"
+    ],
+    "category": "insider_threat",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "file_extensions": ["*"],
+      "suspicious_combinations": [
+        ["퇴사", "다운로드"],
+        ["이직", "USB"],
+        ["경쟁사", "데이터"],
+        ["사직서", "파일"],
+        ["마지막출근", "반출"]
+      ],
+      "data_volume_threshold_mb": 500,
+      "time_window_days": 30,
+      "behavioral_indicators": [
+        "unusual_access_hours",
+        "mass_download",
+        "multiple_usb_connections",
+        "cloud_upload_spike"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-004", "POL-013"],
+    "examples": [
+      {
+        "scenario": "퇴사 2주 전 직원이 평소보다 10배 많은 파일 다운로드",
+        "detection_method": "행동 분석 + 이상 탐지",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "이직 확정 직원이 밤늦게 대용량 데이터를 클라우드로 전송",
+        "detection_method": "시간대 분석 + 트래픽 모니터링",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "정규 프로젝트 마무리 작업",
+      "승인된 인수인계",
+      "백업 작업"
+    ],
+    "compliance_standards": [
+      "영업비밀보호법"
+    ],
+    "remediation_steps": [
+      "HR 및 보안팀에 즉시 보고하세요",
+      "계정 접근 권한을 제한하세요",
+      "법적 조치를 검토하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_hr", "restrict_access", "monitor_closely", "require_approval"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-004",
+    "title": "Trade Secret Management",
+    "content": "Customer lists, pricing policies, marketing strategies, and R&D projects must not be disclosed externally.",
+    "severity": "high",
+    "risk_score": 85,
+    "priority": 2,
+    "keywords": [
+      "trade secret",
+      "customer list",
+      "pricing policy",
+      "marketing strategy",
+      "R&D project",
+      "영업비밀",
+      "고객리스트",
+      "가격정책",
+      "마케팅전략",
+      "연구개발",
+      "기술자료"
+    ],
+    "category": "trade_secret",
+    "affected_departments": ["Sales", "Marketing", "R&D", "Finance"],
+    "detection_patterns": {
+      "file_extensions": [".xlsx", ".docx", ".pptx", ".pdf"],
+      "suspicious_combinations": [
+        ["고객리스트", "외부"],
+        ["가격정책", "경쟁사"],
+        ["마케팅전략", "유출"],
+        ["영업비밀", "공개"]
+      ],
+      "data_volume_threshold_mb": 50
+    },
+    "related_policies": ["POL-001", "POL-003", "POL-030"],
+    "examples": [
+      {
+        "scenario": "영업 직원이 고객 리스트를 개인 이메일로 전송",
+        "detection_method": "이메일 DLP + 키워드 매칭",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "마케팅 담당자가 전략 문서를 클라우드에 업로드",
+        "detection_method": "클라우드 모니터링",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "NDA 체결된 파트너와의 공유",
+      "내부 부서간 협업",
+      "승인된 프레젠테이션"
+    ],
+    "compliance_standards": [
+      "부정경쟁방지법"
+    ],
+    "remediation_steps": [
+      "영업비밀 유출을 중단하세요",
+      "법무팀과 상의하세요",
+      "NDA 체결 여부를 확인하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_legal", "log_incident"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-005",
+    "title": "IT System Access Control",
+    "content": "Unauthorized system access and installation of unapproved software must be strictly monitored and controlled.",
+    "severity": "medium",
+    "risk_score": 65,
+    "priority": 3,
+    "keywords": [
+      "access control",
+      "permission",
+      "login",
+      "unauthorized",
+      "software",
+      "접근제어",
+      "권한",
+      "로그인",
+      "비인가",
+      "시스템보안"
+    ],
+    "category": "access_control",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "file_extensions": [".exe", ".msi", ".dmg", ".app"],
+      "suspicious_combinations": [
+        ["비인가", "접근"],
+        ["권한", "상승"],
+        ["관리자", "로그인"],
+        ["미승인", "소프트웨어"]
+      ],
+      "behavioral_indicators": [
+        "failed_login_attempts",
+        "privilege_escalation",
+        "after_hours_access",
+        "unusual_system_access"
+      ]
+    },
+    "related_policies": ["POL-006", "POL-018", "POL-028"],
+    "examples": [
+      {
+        "scenario": "직원이 관리자 권한 없이 시스템 설정 변경 시도",
+        "detection_method": "권한 변경 로그 모니터링",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "승인되지 않은 원격 접속 도구 설치",
+        "detection_method": "소프트웨어 설치 모니터링",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "IT 팀의 정기 유지보수",
+      "승인된 시스템 업그레이드",
+      "보안 패치 적용"
+    ],
+    "compliance_standards": [
+      "정보보안관리규정"
+    ],
+    "remediation_steps": [
+      "계정을 즉시 잠그세요",
+      "IT 관리자에게 보고하세요",
+      "보안 감사를 수행하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_access", "alert_it_admin", "log_attempt"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-006",
+    "title": "Network Traffic Monitoring",
+    "content": "All network traffic must be monitored for anomalies, malware, and unauthorized data transfers.",
+    "severity": "medium",
+    "risk_score": 70,
+    "priority": 3,
+    "keywords": [
+      "network",
+      "traffic",
+      "monitoring",
+      "IDS",
+      "IPS",
+      "malware",
+      "네트워크",
+      "트래픽",
+      "침입탐지",
+      "모니터링",
+      "데이터유출"
+    ],
+    "category": "network_security",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["이상", "트래픽"],
+        ["대용량", "전송"],
+        ["비정상", "패킷"],
+        ["악성코드", "통신"]
+      ],
+      "traffic_indicators": [
+        "unusual_port_usage",
+        "high_volume_transfer",
+        "suspicious_destination_ip",
+        "encrypted_c2_communication"
+      ]
+    },
+    "related_policies": ["POL-005", "POL-014", "POL-016"],
+    "examples": [
+      {
+        "scenario": "내부 서버에서 외부 의심 IP로 지속적인 통신 시도",
+        "detection_method": "IDS/IPS 알림",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "정상 업무 시간 외 대용량 데이터 전송",
+        "detection_method": "트래픽 분석",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 클라우드 백업",
+      "정기 시스템 업데이트",
+      "CDN 트래픽"
+    ],
+    "compliance_standards": [
+      "정보통신망법"
+    ],
+    "remediation_steps": [
+      "이상 트래픽을 차단하세요",
+      "보안관제센터에 보고하세요",
+      "로그를 분석하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_suspicious_traffic", "alert_soc", "capture_packets"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-007",
+    "title": "Phishing Email Response",
+    "content": "Employees must not click unknown links or open attachments in suspicious emails; all phishing attempts must be reported.",
+    "severity": "high",
+    "risk_score": 80,
+    "priority": 2,
+    "keywords": [
+      "phishing",
+      "email",
+      "malware",
+      "link",
+      "suspicious",
+      "피싱",
+      "이메일",
+      "악성코드",
+      "링크",
+      "첨부파일",
+      "스팸"
+    ],
+    "category": "email_security",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "file_extensions": [".exe", ".scr", ".js", ".vbs", ".bat", ".zip"],
+      "suspicious_combinations": [
+        ["피싱", "링크"],
+        ["의심", "첨부파일"],
+        ["악성", "이메일"],
+        ["스팸", "클릭"]
+      ],
+      "email_indicators": [
+        "suspicious_sender",
+        "urgent_action_required",
+        "unusual_attachment",
+        "shortened_url",
+        "credential_request"
+      ]
+    },
+    "related_policies": ["POL-026"],
+    "examples": [
+      {
+        "scenario": "CEO 사칭 이메일로 긴급 송금 요청",
+        "detection_method": "발신자 도메인 분석 + 행동 패턴",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "첨부파일에 악성코드가 포함된 이메일",
+        "detection_method": "샌드박스 분석",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "정상적인 마케팅 이메일",
+      "내부 공지 메일",
+      "승인된 외부 협력사 이메일"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "이메일을 삭제하고 보고하세요",
+      "첨부파일을 실행하지 마세요",
+      "보안팀이 조사하도록 하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["quarantine_email", "block_sender", "alert_security"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-008",
+    "title": "Password Management",
+    "content": "Passwords must be strong, at least 12 characters long, and changed every 90 days; multi-factor authentication is recommended.",
+    "severity": "medium",
+    "risk_score": 60,
+    "priority": 3,
+    "keywords": [
+      "password",
+      "authentication",
+      "credential",
+      "MFA",
+      "비밀번호",
+      "인증",
+      "자격증명",
+      "다단계인증"
+    ],
+    "category": "identity_management",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["비밀번호", "공유"],
+        ["계정", "탈취"],
+        ["자격증명", "유출"],
+        ["패스워드", "크랙"]
+      ],
+      "behavioral_indicators": [
+        "weak_password_usage",
+        "password_reuse",
+        "shared_credentials",
+        "no_mfa_enabled"
+      ]
+    },
+    "related_policies": ["POL-005", "POL-019"],
+    "examples": [
+      {
+        "scenario": "직원이 간단한 비밀번호 사용으로 계정 해킹",
+        "detection_method": "비밀번호 강도 분석",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "여러 시스템에 동일 비밀번호 사용",
+        "detection_method": "크리덴셜 모니터링",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "정책 준수 비밀번호",
+      "MFA 활성화된 계정",
+      "비밀번호 관리자 사용"
+    ],
+    "compliance_standards": [
+      "정보보호관리규정"
+    ],
+    "remediation_steps": [
+      "비밀번호를 즉시 변경하세요",
+      "이중인증을 활성화하세요",
+      "패스워드 정책을 점검하세요"
+    ],
+    "auto_response": {
+      "enabled": false,
+      "actions": ["force_password_change", "enable_mfa_prompt"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-009",
+    "title": "Cloud Service Usage",
+    "content": "Use of unauthorized cloud storage services or personal cloud accounts is prohibited; company data must remain within approved platforms.",
+    "severity": "high",
+    "risk_score": 82,
+    "priority": 2,
+    "keywords": [
+      "cloud",
+      "storage",
+      "data leak",
+      "unauthorized",
+      "클라우드",
+      "스토리지",
+      "데이터유출",
+      "비인가",
+      "개인계정"
+    ],
+    "category": "cloud_security",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["개인", "클라우드"],
+        ["비인가", "스토리지"],
+        ["Dropbox", "업로드"],
+        ["Google Drive", "개인"],
+        ["OneDrive", "개인"]
+      ],
+      "cloud_services": [
+        "dropbox.com",
+        "drive.google.com",
+        "onedrive.live.com",
+        "box.com",
+        "icloud.com"
+      ],
+      "data_volume_threshold_mb": 100
+    },
+    "related_policies": ["POL-002", "POL-024"],
+    "examples": [
+      {
+        "scenario": "직원이 회사 문서를 개인 Dropbox에 업로드",
+        "detection_method": "클라우드 트래픽 모니터링",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "개인 Google Drive로 대용량 파일 전송",
+        "detection_method": "DLP + URL 필터링",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 클라우드 서비스",
+      "회사 계정 사용",
+      "협업 도구 공식 사용"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "비인가 클라우드 사용을 중단하세요",
+      "데이터를 복구 및 삭제하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_cloud_access", "alert_security", "quarantine_data"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-010",
+    "title": "Mobile Device Security",
+    "content": "Company mobile devices must have remote lock, wipe, and encryption enabled; lost or stolen devices must be reported immediately.",
+    "severity": "medium",
+    "risk_score": 68,
+    "priority": 3,
+    "keywords": [
+      "mobile",
+      "smartphone",
+      "MDM",
+      "device",
+      "lost",
+      "encryption",
+      "모바일",
+      "스마트폰",
+      "분실",
+      "도난",
+      "암호화",
+      "기기보안"
+    ],
+    "category": "endpoint_security",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["모바일", "분실"],
+        ["스마트폰", "도난"],
+        ["기기", "미암호화"],
+        ["MDM", "미설치"]
+      ],
+      "device_indicators": [
+        "mdm_not_enrolled",
+        "encryption_disabled",
+        "location_services_off",
+        "jailbroken_device"
+      ]
+    },
+    "related_policies": ["POL-025", "POL-029"],
+    "examples": [
+      {
+        "scenario": "회사 스마트폰 분실 후 원격 잠금 실패",
+        "detection_method": "MDM 모니터링",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "암호화 미설정 기기에서 민감 데이터 접근",
+        "detection_method": "기기 정책 점검",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "정상 기기 교체",
+      "수리 중인 기기",
+      "테스트 기기"
+    ],
+    "compliance_standards": [
+      "모바일보안지침"
+    ],
+    "remediation_steps": [
+      "기기 잠금 및 초기화를 수행하세요",
+      "보안담당자에게 보고하세요",
+      "분실 경위서를 제출하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["remote_lock", "remote_wipe", "alert_it"]
+    },
+    "notification_channels": ["email", "sms"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-011",
+    "title": "Third-Party Vendor Security",
+    "content": "All third-party vendors must adhere to company security standards and undergo periodic security audits.",
+    "severity": "medium",
+    "risk_score": 65,
+    "priority": 3,
+    "keywords": [
+      "third-party",
+      "vendor",
+      "contractor",
+      "outsourcing",
+      "협력업체",
+      "외주",
+      "보안평가",
+      "위험관리"
+    ],
+    "category": "vendor_management",
+    "affected_departments": ["Procurement", "Legal", "IT", "Security"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["협력업체", "데이터"],
+        ["외주", "접근"],
+        ["계약", "미체결"],
+        ["평가", "미실시"]
+      ],
+      "vendor_indicators": [
+        "no_security_assessment",
+        "expired_contract",
+        "excessive_access_rights",
+        "no_nda"
+      ]
+    },
+    "related_policies": ["POL-030"],
+    "examples": [
+      {
+        "scenario": "보안 평가 미실시 협력업체에게 시스템 접근 권한 부여",
+        "detection_method": "접근 권한 감사",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "계약 종료 후에도 접근 권한 유지 중인 외주 업체",
+        "detection_method": "정기 권한 검토",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "평가 완료 협력업체",
+      "NDA 체결 업체",
+      "장기 파트너사"
+    ],
+    "compliance_standards": [
+      "정보보호관리규정",
+      "ISO/IEC 27001"
+    ],
+    "remediation_steps": [
+      "계약 조건을 재검토하세요",
+      "보안평가를 수행하세요",
+      "협력사 보안교육을 실시하세요"
+    ],
+    "auto_response": {
+      "enabled": false,
+      "actions": ["notify_procurement", "schedule_audit"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-012",
+    "title": "Data Backup and Recovery",
+    "content": "Critical systems must have regular backups with monthly recovery tests; backup data must be encrypted.",
+    "severity": "medium",
+    "risk_score": 70,
+    "priority": 3,
+    "keywords": [
+      "backup",
+      "recovery",
+      "disaster",
+      "data loss",
+      "백업",
+      "복구",
+      "재해복구",
+      "데이터손실",
+      "암호화"
+    ],
+    "category": "business_continuity",
+    "affected_departments": ["IT", "Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["백업", "실패"],
+        ["복구", "불가"],
+        ["데이터", "손실"],
+        ["암호화", "미적용"]
+      ],
+      "backup_indicators": [
+        "backup_failure",
+        "recovery_test_overdue",
+        "unencrypted_backup",
+        "single_backup_location"
+      ]
+    },
+    "related_policies": ["POL-029"],
+    "examples": [
+      {
+        "scenario": "백업 실패 알림 무시로 데이터 복구 불가",
+        "detection_method": "백업 모니터링 시스템",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "암호화되지 않은 백업 미디어 분실",
+        "detection_method": "백업 정책 감사",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "정기 백업 유지보수",
+      "계획된 복구 테스트",
+      "시스템 업그레이드"
+    ],
+    "compliance_standards": [
+      "재해복구지침"
+    ],
+    "remediation_steps": [
+      "백업 상태를 점검하세요",
+      "복구 테스트를 수행하세요",
+      "백업 위치의 보안을 확인하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_it_ops", "trigger_backup", "log_failure"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-013",
+    "title": "USB and Removable Media Control",
+    "content": "Use of personal USB or external storage devices is prohibited on company systems.",
+    "severity": "high",
+    "risk_score": 83,
+    "priority": 2,
+    "keywords": [
+      "USB",
+      "removable media",
+      "external storage",
+      "portable",
+      "USB",
+      "이동식저장장치",
+      "외장하드",
+      "데이터반출"
+    ],
+    "category": "data_protection",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["USB", "연결"],
+        ["외장하드", "복사"],
+        ["이동식", "데이터"],
+        ["개인", "저장장치"]
+      ],
+      "device_types": [
+        "usb_flash_drive",
+        "external_hdd",
+        "sd_card",
+        "portable_ssd"
+      ],
+      "data_volume_threshold_mb": 50
+    },
+    "related_policies": ["POL-001", "POL-003"],
+    "examples": [
+      {
+        "scenario": "퇴사 예정 직원이 USB로 대용량 파일 복사",
+        "detection_method": "USB 연결 로그 + 파일 전송 모니터링",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "승인되지 않은 외장 하드로 데이터 백업",
+        "detection_method": "디바이스 제어 솔루션",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 암호화 USB",
+      "IT 팀 업무용 저장장치",
+      "보안 검증된 기기"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "USB 사용을 즉시 중단하세요",
+      "데이터 복사 내역을 확인하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_usb", "alert_security", "log_device"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-014",
+    "title": "Vulnerability Management",
+    "content": "All systems must be scanned quarterly and critical vulnerabilities patched within 48 hours.",
+    "severity": "high",
+    "risk_score": 78,
+    "priority": 2,
+    "keywords": [
+      "vulnerability",
+      "patch",
+      "CVE",
+      "security update",
+      "취약점",
+      "패치",
+      "보안업데이트",
+      "취약점스캔"
+    ],
+    "category": "vulnerability_management",
+    "affected_departments": ["IT", "Security"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["취약점", "미패치"],
+        ["보안", "업데이트"],
+        ["CVE", "발견"],
+        ["긴급", "패치"]
+      ],
+      "vulnerability_indicators": [
+        "unpatched_critical_cve",
+        "outdated_software",
+        "eol_system",
+        "scan_overdue"
+      ]
+    },
+    "related_policies": ["POL-015", "POL-016"],
+    "examples": [
+      {
+        "scenario": "치명적 취약점 발견 후 48시간 내 패치 미적용",
+        "detection_method": "취약점 스캔 결과",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "지원 종료된 OS 계속 사용",
+        "detection_method": "자산 관리 시스템",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "패치 테스트 중",
+      "보상 통제 적용",
+      "격리된 시스템"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "즉시 패치를 적용하세요",
+      "취약점 스캔을 수행하세요",
+      "패치 일정을 관리하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_it", "schedule_patch", "isolate_if_critical"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-015",
+    "title": "Incident Response Procedures",
+    "content": "All security incidents must be reported within 1 hour of detection and investigated within 24 hours.",
+    "severity": "critical",
+    "risk_score": 92,
+    "priority": 1,
+    "keywords": [
+      "incident",
+      "response",
+      "security breach",
+      "investigation",
+      "보안사고",
+      "대응",
+      "침해",
+      "조사"
+    ],
+    "category": "incident_response",
+    "affected_departments": ["Security", "IT", "Legal", "PR"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["보안", "사고"],
+        ["침해", "발생"],
+        ["데이터", "유출"],
+        ["시스템", "해킹"]
+      ],
+      "incident_types": [
+        "data_breach",
+        "malware_infection",
+        "unauthorized_access",
+        "ddos_attack",
+        "insider_threat"
+      ]
+    },
+    "related_policies": ["POL-014", "POL-016"],
+    "examples": [
+      {
+        "scenario": "랜섬웨어 감염 후 1시간 내 보고 지연",
+        "detection_method": "엔드포인트 보안 솔루션",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "데이터 유출 의심 후 조사 지연",
+        "detection_method": "DLP 알림",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "계획된 보안 테스트",
+      "허가된 침투 테스트",
+      "정상 유지보수 활동"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "즉시 보안팀에 보고하세요",
+      "영향받은 시스템을 격리하세요",
+      "증거를 보존하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_csirt", "isolate_system", "start_investigation"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-016",
+    "title": "Security Logging and Monitoring",
+    "content": "All systems must maintain logs for at least 90 days and critical logs must be reviewed daily.",
+    "severity": "medium",
+    "risk_score": 72,
+    "priority": 3,
+    "keywords": [
+      "logging",
+      "monitoring",
+      "SIEM",
+      "audit log",
+      "로그",
+      "모니터링",
+      "감사",
+      "로그관리"
+    ],
+    "category": "logging_monitoring",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["로그", "삭제"],
+        ["감사", "미실시"],
+        ["모니터링", "중단"],
+        ["로그", "위변조"]
+      ],
+      "log_indicators": [
+        "log_tampering",
+        "log_deletion",
+        "insufficient_retention",
+        "no_monitoring"
+      ]
+    },
+    "related_policies": ["POL-006", "POL-014", "POL-015"],
+    "examples": [
+      {
+        "scenario": "보안 로그 임의 삭제로 사고 조사 불가",
+        "detection_method": "로그 무결성 검사",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "중요 시스템 로그 모니터링 미설정",
+        "detection_method": "SIEM 설정 감사",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "정책에 따른 로그 삭제",
+      "시스템 유지보수",
+      "로그 아카이빙"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "로그 설정을 점검하세요",
+      "SIEM 연동을 확인하세요",
+      "정기 로그 리뷰를 수행하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_soc", "backup_logs", "investigate_tampering"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-017",
+    "title": "Physical Access Control",
+    "content": "Unauthorized physical access to server rooms and data centers is prohibited; all entries must be logged.",
+    "severity": "high",
+    "risk_score": 75,
+    "priority": 2,
+    "keywords": [
+      "physical access",
+      "server room",
+      "data center",
+      "badge",
+      "물리접근",
+      "서버실",
+      "물리보안",
+      "보안구역"
+    ],
+    "category": "physical_security",
+    "affected_departments": ["Facilities", "Security", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["무단", "출입"],
+        ["서버실", "접근"],
+        ["보안구역", "침입"],
+        ["배지", "도용"]
+      ],
+      "access_indicators": [
+        "unauthorized_entry",
+        "tailgating",
+        "after_hours_access",
+        "badge_sharing"
+      ]
+    },
+    "related_policies": ["POL-005"],
+    "examples": [
+      {
+        "scenario": "타인 배지로 서버실 무단 출입",
+        "detection_method": "출입 통제 시스템",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "업무 시간 외 보안구역 무단 접근",
+        "detection_method": "CCTV + 출입 로그",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 유지보수",
+      "긴급 시스템 복구",
+      "보안 담당자 점검"
+    ],
+    "compliance_standards": [
+      "물리보안규정"
+    ],
+    "remediation_steps": [
+      "출입기록을 확인하세요",
+      "무단출입 여부를 점검하세요",
+      "출입권한을 재설정하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_security_guard", "lock_door", "review_cctv"]
+    },
+    "notification_channels": ["email", "sms"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-018",
+    "title": "Remote Work Security",
+    "content": "Remote connections must use company-approved VPNs and comply with device security standards; unauthorized connections are prohibited.",
+    "severity": "medium",
+    "risk_score": 68,
+    "priority": 3,
+    "keywords": [
+      "remote work",
+      "VPN",
+      "telecommuting",
+      "connection",
+      "재택근무",
+      "원격접속",
+      "보안",
+      "비인가접속"
+    ],
+    "category": "remote_access",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["비인가", "VPN"],
+        ["개인", "네트워크"],
+        ["재택", "보안"],
+        ["원격", "접속"]
+      ],
+      "remote_indicators": [
+        "no_vpn_usage",
+        "unauthorized_access_point",
+        "insecure_network",
+        "device_non_compliance"
+      ]
+    },
+    "related_policies": ["POL-028"],
+    "examples": [
+      {
+        "scenario": "VPN 미사용으로 회사 시스템 직접 접속",
+        "detection_method": "네트워크 접속 로그",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "공공 와이파이에서 민감 데이터 접근",
+        "detection_method": "접속 위치 분석",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 원격 접속",
+      "VPN 사용 중",
+      "보안 정책 준수 기기"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "비인가 접속을 차단하세요",
+      "VPN 로그를 점검하세요",
+      "기기 보안을 확인하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_non_vpn_access", "alert_user", "log_attempt"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-019",
+    "title": "API Key Management",
+    "content": "All API keys must be securely stored, usage logged, and must not be exposed publicly.",
+    "severity": "high",
+    "risk_score": 88,
+    "priority": 2,
+    "keywords": [
+      "API",
+      "key",
+      "security",
+      "로그",
+      "API 키",
+      "보안",
+      "로그관리",
+      "인증키"
+    ],
+    "category": "api_security",
+    "affected_departments": ["Development", "IT", "DevOps"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["API", "노출"],
+        ["키", "공개"],
+        ["인증", "유출"],
+        ["GitHub", "업로드"]
+      ],
+      "exposure_indicators": [
+        "public_repository",
+        "code_commit",
+        "log_file",
+        "config_file",
+        "hardcoded_key"
+      ]
+    },
+    "related_policies": ["POL-008"],
+    "examples": [
+      {
+        "scenario": "API 키가 포함된 코드를 GitHub에 업로드",
+        "detection_method": "코드 스캐닝 도구",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "설정 파일에 평문으로 API 키 저장",
+        "detection_method": "보안 감사",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "암호화된 키 저장소",
+      "환경 변수 사용",
+      "시크릿 관리 시스템"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "노출된 API 키를 폐기하세요",
+      "새 키를 발급하세요",
+      "로그 기록을 검토하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["revoke_key", "alert_devops", "scan_usage"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-020",
+    "title": "IoT Device Security",
+    "content": "IoT devices must be regularly patched, default credentials changed, and monitored for unauthorized access.",
+    "severity": "medium",
+    "risk_score": 66,
+    "priority": 3,
+    "keywords": [
+      "IoT",
+      "device",
+      "firmware",
+      "patch",
+      "credential",
+      "사물인터넷",
+      "기기",
+      "패치",
+      "기본비밀번호",
+      "보안감시"
+    ],
+    "category": "iot_security",
+    "affected_departments": ["IT", "Facilities", "Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["IoT", "취약점"],
+        ["기본", "비밀번호"],
+        ["펌웨어", "구버전"],
+        ["사물인터넷", "해킹"]
+      ],
+      "iot_indicators": [
+        "default_credentials",
+        "outdated_firmware",
+        "unpatched_device",
+        "insecure_protocol"
+      ]
+    },
+    "related_policies": ["POL-027"],
+    "examples": [
+      {
+        "scenario": "기본 비밀번호를 사용하는 IoT 카메라 해킹",
+        "detection_method": "네트워크 스캔",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "패치되지 않은 IoT 센서를 통한 네트워크 침입",
+        "detection_method": "취약점 스캔",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "격리된 IoT 네트워크",
+      "정기 업데이트 중",
+      "모니터링 중인 기기"
+    ],
+    "compliance_standards": [
+      "사물인터넷보안가이드라인"
+    ],
+    "remediation_steps": [
+      "펌웨어를 업데이트하세요",
+      "기본 비밀번호를 변경하세요",
+      "보안 점검을 수행하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["isolate_device", "alert_it", "schedule_update"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-021",
+    "title": "AI/ML Data and Model Protection",
+    "content": "All internal AI/ML datasets, training data, model weights, and algorithms must be protected from unauthorized access or external leakage.",
+    "severity": "critical",
+    "risk_score": 96,
+    "priority": 1,
+    "keywords": [
+      "AI data",
+      "ML model",
+      "training data",
+      "model weights",
+      "algorithm",
+      "machine learning",
+      "deep learning",
+      "딥러닝",
+      "머신러닝",
+      "인공지능",
+      "모델보호",
+      "데이터보호",
+      "학습데이터",
+      "알고리즘"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["AI/ML Team", "R&D", "Data Science", "IT"],
+    "detection_patterns": {
+      "file_extensions": [".h5", ".pkl", ".pth", ".ckpt", ".pb", ".onnx", ".pt", ".safetensors"],
+      "suspicious_combinations": [
+        ["모델", "다운로드"],
+        ["학습데이터", "유출"],
+        ["가중치", "복사"],
+        ["알고리즘", "외부"],
+        ["AI", "모델", "경쟁사"]
+      ],
+      "data_volume_threshold_mb": 500
+    },
+    "related_policies": ["POL-001", "POL-003", "POL-022"],
+    "examples": [
+      {
+        "scenario": "AI 엔지니어가 학습된 모델 파일을 개인 클라우드로 전송",
+        "detection_method": "DLP + 파일 확장자 모니터링",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "퇴사 예정 데이터 과학자가 학습 데이터셋 대량 다운로드",
+        "detection_method": "행동 분석 + 데이터 접근 로그",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 모델 배포",
+      "정기 백업 작업",
+      "협업 도구로의 공유"
+    ],
+    "compliance_standards": [
+      "국가핵심기술보호법",
+      "산업기술보호법"
+    ],
+    "remediation_steps": [
+      "데이터 및 모델 접근을 즉시 제한하세요",
+      "보안팀에 사고를 보고하세요",
+      "법무팀과 상담하고 증거를 보존하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_security_team", "lock_account", "preserve_evidence"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-022",
+    "title": "Sensitive Project Documentation Control",
+    "content": "Confidential project plans, blueprints, prototypes, and experimental results must not leave company networks and must be encrypted in storage.",
+    "severity": "critical",
+    "risk_score": 93,
+    "priority": 1,
+    "keywords": [
+      "project documentation",
+      "blueprint",
+      "prototype",
+      "experimental data",
+      "기밀문서",
+      "설계도",
+      "시제품",
+      "실험결과",
+      "문서보호",
+      "자료유출"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Engineering", "Product Development"],
+    "detection_patterns": {
+      "file_extensions": [".dwg", ".dxf", ".pdf", ".docx", ".pptx", ".xlsx"],
+      "suspicious_combinations": [
+        ["설계도", "외부"],
+        ["시제품", "자료"],
+        ["기밀", "문서"],
+        ["프로젝트", "유출"]
+      ],
+      "data_volume_threshold_mb": 200
+    },
+    "related_policies": ["POL-001", "POL-023"],
+    "examples": [
+      {
+        "scenario": "신제품 설계 도면을 이메일로 외부 전송",
+        "detection_method": "이메일 DLP + 문서 분류",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "기밀 프로젝트 문서를 암호화 없이 저장",
+        "detection_method": "파일 암호화 정책 점검",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "암호화된 공유",
+      "승인된 협력사 전송",
+      "내부 백업"
+    ],
+    "compliance_standards": [
+      "산업기술보호법",
+      "영업비밀보호법"
+    ],
+    "remediation_steps": [
+      "문서 접근을 제한하세요",
+      "암호화 저장 여부를 점검하세요",
+      "보안팀에 즉시 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "encrypt_file", "alert_security"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-023",
+    "title": "Critical Research Material Security",
+    "content": "Lab results, chemical formulas, and technical prototypes must be stored securely and not shared externally.",
+    "severity": "critical",
+    "risk_score": 94,
+    "priority": 1,
+    "keywords": [
+      "research material",
+      "lab results",
+      "chemical formula",
+      "prototype",
+      "연구자료",
+      "실험결과",
+      "화학조성",
+      "시제품",
+      "기술보호"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Laboratory", "Engineering"],
+    "detection_patterns": {
+      "file_extensions": [".xlsx", ".csv", ".pdf", ".docx", ".pptx"],
+      "suspicious_combinations": [
+        ["실험", "결과"],
+        ["화학", "조성"],
+        ["연구", "자료"],
+        ["랩", "데이터"]
+      ],
+      "data_volume_threshold_mb": 100
+    },
+    "related_policies": ["POL-001", "POL-022"],
+    "examples": [
+      {
+        "scenario": "화학 공식이 포함된 연구 자료를 외부로 전송",
+        "detection_method": "DLP + 문서 내용 스캔",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "실험 결과 데이터를 개인 저장소에 복사",
+        "detection_method": "파일 접근 모니터링",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 학술 발표",
+      "특허 출원 자료",
+      "내부 보고서"
+    ],
+    "compliance_standards": [
+      "산업기술보호법",
+      "영업비밀보호법"
+    ],
+    "remediation_steps": [
+      "자료 접근을 제한하세요",
+      "암호화 및 안전 저장을 수행하세요",
+      "보안팀에 즉시 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_research_head", "secure_storage"]
+    },
+    "notification_channels": ["email", "sms"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-024",
+    "title": "Cloud Platform Security",
+    "content": "All cloud platforms storing company data must be approved, encrypted, and monitored for unauthorized access.",
+    "severity": "high",
+    "risk_score": 81,
+    "priority": 2,
+    "keywords": [
+      "cloud",
+      "platform",
+      "encryption",
+      "monitoring",
+      "클라우드",
+      "데이터보호",
+      "비인가접속",
+      "암호화"
+    ],
+    "category": "cloud_security",
+    "affected_departments": ["IT", "DevOps", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["비인가", "클라우드"],
+        ["미승인", "플랫폼"],
+        ["암호화", "미적용"],
+        ["클라우드", "설정오류"]
+      ],
+      "cloud_indicators": [
+        "unapproved_service",
+        "public_bucket",
+        "weak_access_control",
+        "no_encryption"
+      ]
+    },
+    "related_policies": ["POL-009"],
+    "examples": [
+      {
+        "scenario": "승인되지 않은 클라우드 서비스에 데이터 저장",
+        "detection_method": "클라우드 사용 모니터링",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "S3 버킷을 공개 설정으로 운영",
+        "detection_method": "클라우드 설정 감사",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 클라우드 서비스",
+      "적절한 암호화 적용",
+      "접근 제어 설정"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "비인가 클라우드 접근을 차단하세요",
+      "데이터 암호화 여부를 확인하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_cloud_admin", "review_permissions", "enable_encryption"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-025",
+    "title": "Mobile Application Security",
+    "content": "All company mobile applications must follow secure coding practices and be regularly tested for vulnerabilities.",
+    "severity": "high",
+    "risk_score": 76,
+    "priority": 2,
+    "keywords": [
+      "mobile app",
+      "secure coding",
+      "vulnerability",
+      "모바일앱",
+      "보안코딩",
+      "취약점검사"
+    ],
+    "category": "software_security",
+    "affected_departments": ["Development", "QA", "Security"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["모바일", "취약점"],
+        ["앱", "보안"],
+        ["코딩", "결함"],
+        ["보안", "테스트"]
+      ],
+      "app_indicators": [
+        "insecure_storage",
+        "weak_crypto",
+        "inadequate_authentication",
+        "code_injection"
+      ]
+    },
+    "related_policies": ["POL-010", "POL-014"],
+    "examples": [
+      {
+        "scenario": "모바일 앱에 하드코딩된 API 키 발견",
+        "detection_method": "정적 코드 분석",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "앱에서 민감 데이터를 평문으로 저장",
+        "detection_method": "동적 분석",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "테스트 환경 설정",
+      "개발 중인 기능",
+      "보안 라이브러리 사용"
+    ],
+    "compliance_standards": [
+      "모바일보안지침",
+      "소프트웨어개발보안가이드"
+    ],
+    "remediation_steps": [
+      "앱 코드를 검토하세요",
+      "취약점 스캔을 수행하세요",
+      "보안테스트를 정기적으로 재실시하세요"
+    ],
+    "auto_response": {
+      "enabled": false,
+      "actions": ["alert_dev_team", "schedule_security_review"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-026",
+    "title": "Email Security and Encryption",
+    "content": "All emails containing sensitive data must be encrypted and suspicious emails must be reported immediately.",
+    "severity": "high",
+    "risk_score": 79,
+    "priority": 2,
+    "keywords": [
+      "email",
+      "encryption",
+      "sensitive data",
+      "phishing",
+      "이메일",
+      "암호화",
+      "보안메일",
+      "기밀정보"
+    ],
+    "category": "email_security",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["이메일", "암호화"],
+        ["기밀", "전송"],
+        ["민감", "데이터"],
+        ["보안", "메일"]
+      ],
+      "email_indicators": [
+        "unencrypted_sensitive_data",
+        "external_recipient",
+        "large_attachment",
+        "suspicious_link"
+      ]
+    },
+    "related_policies": ["POL-002", "POL-007"],
+    "examples": [
+      {
+        "scenario": "개인정보가 포함된 이메일을 암호화 없이 전송",
+        "detection_method": "이메일 DLP",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "의심스러운 링크가 포함된 이메일 수신",
+        "detection_method": "이메일 보안 게이트웨이",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "암호화된 이메일",
+      "내부 전송",
+      "정상 비즈니스 메일"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "암호화되지 않은 이메일 전송을 중단하세요",
+      "의심 이메일을 보안팀에 보고하세요",
+      "첨부파일을 실행하지 마세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_unencrypted", "quarantine_suspicious", "alert_user"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-027",
+    "title": "IoT Device Firmware Management",
+    "content": "IoT devices must have updated firmware and default credentials must be changed; regular vulnerability scans are mandatory.",
+    "severity": "medium",
+    "risk_score": 67,
+    "priority": 3,
+    "keywords": [
+      "IoT",
+      "firmware",
+      "patch",
+      "credential",
+      "사물인터넷",
+      "패치",
+      "취약점스캔",
+      "기본비밀번호"
+    ],
+    "category": "iot_security",
+    "affected_departments": ["IT", "Facilities"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["IoT", "펌웨어"],
+        ["기본", "계정"],
+        ["업데이트", "미실시"],
+        ["취약점", "발견"]
+      ],
+      "firmware_indicators": [
+        "outdated_version",
+        "default_password",
+        "no_update_schedule",
+        "known_vulnerability"
+      ]
+    },
+    "related_policies": ["POL-020"],
+    "examples": [
+      {
+        "scenario": "IoT 센서가 구버전 펌웨어로 운영 중",
+        "detection_method": "자산 관리 시스템",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "기본 관리자 계정으로 IoT 기기 접근 가능",
+        "detection_method": "보안 스캔",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "최신 펌웨어 적용",
+      "강력한 인증 설정",
+      "정기 점검 중"
+    ],
+    "compliance_standards": [
+      "사물인터넷보안가이드라인"
+    ],
+    "remediation_steps": [
+      "펌웨어를 최신 상태로 업데이트하세요",
+      "기본 비밀번호를 변경하세요",
+      "정기적 보안 점검을 수행하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["schedule_update", "alert_it", "scan_device"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-028",
+    "title": "Remote Access Monitoring",
+    "content": "All remote access sessions must be logged, monitored, and unauthorized connections must be blocked.",
+    "severity": "medium",
+    "risk_score": 69,
+    "priority": 3,
+    "keywords": [
+      "remote access",
+      "VPN",
+      "logging",
+      "monitoring",
+      "원격접속",
+      "로그",
+      "비인가접속",
+      "원격보안"
+    ],
+    "category": "remote_access",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["원격", "접속"],
+        ["비인가", "VPN"],
+        ["로그", "이상"],
+        ["접속", "시도"]
+      ],
+      "access_indicators": [
+        "failed_vpn_login",
+        "unusual_location",
+        "after_hours_access",
+        "multiple_failed_attempts"
+      ]
+    },
+    "related_policies": ["POL-018"],
+    "examples": [
+      {
+        "scenario": "해외에서 VPN으로 시스템 접근 시도",
+        "detection_method": "지역 기반 접속 분석",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "여러 차례 VPN 로그인 실패 후 성공",
+        "detection_method": "로그인 패턴 분석",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "승인된 해외 출장",
+      "정상 업무 시간",
+      "등록된 원격 근무자"
+    ],
+    "compliance_standards": [
+      "정보보호관리체계(ISMS)"
+    ],
+    "remediation_steps": [
+      "비인가 접속을 차단하세요",
+      "VPN 및 접속 로그를 점검하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_suspicious_ip", "alert_security", "require_mfa"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-029",
+    "title": "Endpoint Device Encryption",
+    "content": "All laptops, desktops, and mobile devices must use full-disk encryption to protect company data.",
+    "severity": "high",
+    "risk_score": 77,
+    "priority": 2,
+    "keywords": [
+      "endpoint",
+      "encryption",
+      "device security",
+      "laptop",
+      "desktop",
+      "모바일",
+      "암호화",
+      "기기보안"
+    ],
+    "category": "endpoint_security",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["암호화", "미적용"],
+        ["기기", "분실"],
+        ["노트북", "보안"],
+        ["데스크톱", "암호화"]
+      ],
+      "encryption_indicators": [
+        "encryption_disabled",
+        "bitlocker_off",
+        "filevault_off",
+        "no_encryption_key"
+      ]
+    },
+    "related_policies": ["POL-010", "POL-012"],
+    "examples": [
+      {
+        "scenario": "암호화 미적용 노트북 분실로 데이터 유출",
+        "detection_method": "기기 관리 시스템",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "직원이 임의로 암호화 기능 비활성화",
+        "detection_method": "엔드포인트 보안 점검",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "암호화 적용 완료",
+      "테스트 기기",
+      "격리된 환경"
+    ],
+    "compliance_standards": [
+      "정보보호관리규정",
+      "모바일보안지침"
+    ],
+    "remediation_steps": [
+      "암호화 적용 여부를 점검하세요",
+      "암호화 미적용 기기를 보안 조치하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["enforce_encryption", "alert_it", "lock_device"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-030",
+    "title": "R&D Collaboration and Data Sharing",
+    "content": "All R&D collaborations must have controlled access, data sharing agreements, and confidentiality measures in place.",
+    "severity": "high",
+    "risk_score": 84,
+    "priority": 2,
+    "keywords": [
+      "R&D",
+      "collaboration",
+      "data sharing",
+      "confidentiality",
+      "연구개발",
+      "협업",
+      "데이터공유",
+      "기밀유지"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Legal", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["R&D", "공유"],
+        ["협업", "데이터"],
+        ["연구", "외부"],
+        ["기밀", "협력"]
+      ],
+      "collaboration_indicators": [
+        "no_nda",
+        "unrestricted_access",
+        "no_data_classification",
+        "external_sharing"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-004", "POL-011"],
+    "examples": [
+      {
+        "scenario": "NDA 미체결 파트너와 R&D 데이터 공유",
+        "detection_method": "문서 접근 로그",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "외부 협력사에 과도한 연구 자료 접근 권한 부여",
+        "detection_method": "권한 감사",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "NDA 체결된 협력",
+      "제한적 접근 권한",
+      "승인된 공동 연구"
+    ],
+    "compliance_standards": [
+      "영업비밀보호법",
+      "산업기술보호법"
+    ],
+    "remediation_steps": [
+      "협업 접근 권한을 제한하세요",
+      "데이터 공유 계약을 확인하세요",
+      "보안팀에 보고하세요"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["restrict_access", "alert_legal", "verify_nda"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  }
+]
