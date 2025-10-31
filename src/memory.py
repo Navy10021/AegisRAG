@@ -1,0 +1,162 @@
+"""
+RAG Security Analyzer - Memory System
+컨텍스트 기억 및 관계형 분석 시스템
+"""
+
+import logging
+from collections import deque, defaultdict, Counter
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+
+import numpy as np
+import networkx as nx
+
+from .models import AnalysisResult, SelfRAGResult, get_analysis_result
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================
+# Context Memory System
+# ============================================================
+
+class ContextMemorySystem:
+    """사용자 행동 패턴 학습 및 컨텍스트 기억"""
+    
+    def __init__(self):
+        self.user_profiles = defaultdict(lambda: {
+            'analyses_count': 0,
+            'avg_risk_score': 0.0,
+            'risk_history': deque(maxlen=100),
+            'violation_patterns': Counter(),
+            'behavior_trend': 'stable'
+        })
+    
+    def update_user_context(self, user_id: str, result):
+        """사용자 프로필 업데이트"""
+        # result가 SelfRAGResult인 경우 처리
+        analysis = get_analysis_result(result)
+        
+        profile = self.user_profiles[user_id]
+        profile['analyses_count'] += 1
+        n = profile['analyses_count']
+        profile['avg_risk_score'] = (profile['avg_risk_score'] * (n-1) + analysis.risk_score) / n
+        profile['risk_history'].append({
+            'timestamp': analysis.timestamp,
+            'score': analysis.risk_score,
+            'level': analysis.risk_level
+        })
+        for v in analysis.violations:
+            profile['violation_patterns'][v] += 1
+        
+        # 행동 트렌드 분석
+        if len(profile['risk_history']) >= 10:
+            recent = [h['score'] for h in list(profile['risk_history'])[-10:]]
+            x = np.arange(len(recent))
+            slope = np.polyfit(x, recent, 1)[0]
+            profile['behavior_trend'] = 'increasing' if slope > 5 else 'decreasing' if slope < -5 else 'stable'
+    
+    def get_context_adjustment(self, user_id: str, base_score: float) -> float:
+        """컨텍스트 기반 점수 조정"""
+        profile = self.user_profiles.get(user_id)
+        if not profile or profile['analyses_count'] < 5:
+            return 0.0
+        
+        adjustment = 0.0
+        if profile['behavior_trend'] == 'increasing':
+            adjustment += 10
+        if profile['violation_patterns']:
+            max_viol = max(profile['violation_patterns'].values())
+            if max_viol >= 3:
+                adjustment += min(max_viol * 5, 20)
+        return min(adjustment, 30)
+    
+    def get_user_summary(self, user_id: str) -> Dict:
+        """사용자 요약 정보"""
+        profile = self.user_profiles.get(user_id)
+        if not profile:
+            return {'status': 'no_data'}
+        return {
+            'analyses_count': profile['analyses_count'],
+            'avg_risk_score': profile['avg_risk_score'],
+            'behavior_trend': profile['behavior_trend'],
+            'top_violations': profile['violation_patterns'].most_common(5),
+            'recent_level': profile['risk_history'][-1]['level'] if profile['risk_history'] else 'UNKNOWN'
+        }
+
+
+# ============================================================
+# Relationship Analyzer
+# ============================================================
+
+class RelationshipAnalyzer:
+    """이벤트 간 관계 분석"""
+    
+    def __init__(self):
+        self.event_graph = nx.DiGraph()
+        self.temporal_window = timedelta(hours=24)
+    
+    def add_event(self, event_id: str, result):
+        """이벤트 추가"""
+        # result가 SelfRAGResult인 경우 처리
+        analysis = get_analysis_result(result)
+        
+        self.event_graph.add_node(
+            event_id,
+            text=analysis.text,
+            risk_score=analysis.risk_score,
+            timestamp=datetime.fromisoformat(analysis.timestamp),
+            violations=analysis.violations,
+            user_id=analysis.user_id
+        )
+    
+    def build_relationships(self):
+        """이벤트 간 관계 구축"""
+        nodes = list(self.event_graph.nodes(data=True))
+        for i, (id1, data1) in enumerate(nodes):
+            for id2, data2 in nodes[i+1:]:
+                time_diff = abs(data1['timestamp'] - data2['timestamp'])
+                if time_diff <= self.temporal_window:
+                    temporal_score = 1.0 - (time_diff.total_seconds() / self.temporal_window.total_seconds())
+                    v1, v2 = set(data1['violations']), set(data2['violations'])
+                    semantic_score = len(v1 & v2) / max(len(v1 | v2), 1)
+                    user_score = 1.0 if data1.get('user_id') == data2.get('user_id') else 0.5
+                    relationship_score = temporal_score * 0.3 + semantic_score * 0.5 + user_score * 0.2
+                    
+                    if relationship_score > 0.3:
+                        self.event_graph.add_edge(id1, id2, weight=relationship_score)
+    
+    def detect_compound_threats(self, min_chain: int = 3) -> List[Dict]:
+        """복합 위협 탐지"""
+        threats = []
+        for component in nx.weakly_connected_components(self.event_graph):
+            if len(component) >= min_chain:
+                subgraph = self.event_graph.subgraph(component)
+                avg_risk = np.mean([data['risk_score'] for _, data in subgraph.nodes(data=True)])
+                if avg_risk > 50:
+                    threats.append({
+                        'threat_id': f"COMPOUND_{len(threats)+1}",
+                        'chain_length': len(component),
+                        'avg_risk_score': avg_risk,
+                        'severity': 'CRITICAL' if avg_risk > 70 else 'HIGH'
+                    })
+        return sorted(threats, key=lambda x: x['avg_risk_score'], reverse=True)
+    
+    def visualize(self, output: str = 'output/threat_graph.png'):
+        """그래프 시각화"""
+        try:
+            import matplotlib.pyplot as plt
+            plt.figure(figsize=(12, 8))
+            pos = nx.spring_layout(self.event_graph, k=2)
+            colors = []
+            for node_id in self.event_graph.nodes():
+                score = self.event_graph.nodes[node_id]['risk_score']
+                colors.append('#ff4444' if score >= 70 else '#ff9944' if score >= 40 else '#44ff44')
+            nx.draw(self.event_graph, pos, node_color=colors, node_size=400,
+                   with_labels=True, font_size=8, arrows=True, edge_color='gray', alpha=0.7)
+            plt.title('Threat Relationship Graph', fontsize=14, fontweight='bold')
+            plt.savefig(output, dpi=150, bbox_inches='tight')
+            plt.close()
+            logger.info(f"✅ Graph saved: {output}")
+        except Exception as e:
+            logger.error(f"Graph error: {e}")

@@ -1,0 +1,602 @@
+"""
+RAG Security Analyzer - Main Analyzer
+메인 보안 분석기 (Self-RAG 통합)
+"""
+
+import json
+import logging
+import os
+import re
+import time
+from collections import deque
+from datetime import datetime
+from functools import lru_cache
+from typing import List, Optional
+
+from .models import (
+    AnalysisResult, SelfRAGResult, ScoreBreakdown,
+    SecurityPolicy, RelevanceScore,
+    get_analysis_result, is_self_rag_result
+)
+from .retriever import (
+    BM25, get_embedding_model, encode_texts,
+    hybrid_search, SENTENCE_TRANSFORMERS_AVAILABLE
+)
+from .memory import ContextMemorySystem, RelationshipAnalyzer
+from .explainer import ExplainableAI
+from .utils import LanguageDetector
+from .self_rag import SelfRAGEngine
+from .models import RetrievalNeed, SupportLevel, UtilityScore
+
+logger = logging.getLogger(__name__)
+
+# OpenAI 가용성 체크
+try:
+    import openai
+    OPENAI_AVAILABLE = True
+except:
+    OPENAI_AVAILABLE = False
+
+
+# ============================================================
+# Advanced RAG Analyzer
+# ============================================================
+
+class AdvancedRAGAnalyzer:
+    """v3.0: Self-RAG가 통합된 Advanced RAG Analyzer"""
+    
+    SEVERITY_MULT = {"critical": 1.5, "high": 1.2, "medium": 1.0, "low": 0.8}
+    SEVERITY_PTS = {'critical': 30, 'high': 20, 'medium': 10, 'low': 5}
+    
+    def __init__(
+        self,
+        policies: List[SecurityPolicy],
+        api_key: Optional[str] = None,
+        use_llm: bool = True,
+        use_embeddings: bool = True,
+        enable_advanced: bool = True,
+        enable_bm25: bool = True,
+        enable_self_rag: bool = True
+    ):
+        self.policies = policies
+        self.use_llm = use_llm and OPENAI_AVAILABLE
+        self.use_embeddings = use_embeddings and SENTENCE_TRANSFORMERS_AVAILABLE
+        self.enable_bm25 = enable_bm25
+        self.enable_self_rag = enable_self_rag
+        self.stats = {
+            'total': 0, 'llm': 0, 'rule': 0, 'errors': 0,
+            'self_rag': 0, 'self_rag_skipped': 0
+        }
+        
+        self.context_memory = ContextMemorySystem() if enable_advanced else None
+        self.relationship_analyzer = RelationshipAnalyzer() if enable_advanced else None
+        self.language_detector = LanguageDetector() if enable_advanced else None
+        self.analysis_history = deque(maxlen=1000)
+        
+        if api_key:
+            os.environ['OPENAI_API_KEY'] = api_key
+        self.api_key = os.getenv('OPENAI_API_KEY')
+        
+        # Self-RAG 엔진 초기화
+        if self.enable_self_rag:
+            self.self_rag_engine = SelfRAGEngine(self, use_llm=self.use_llm)
+        
+        # Hybrid Search 초기화
+        if self.use_embeddings:
+            try:
+                self.embedding_model = get_embedding_model()
+                if self.embedding_model:
+                    policy_texts = [f"{p.title}. {p.content}. {' '.join(p.keywords)}" for p in policies]
+                    self.policy_embeddings = encode_texts(policy_texts, self.embedding_model)
+                    
+                    if self.enable_bm25:
+                        self.bm25_model = BM25()
+                        self.bm25_model.fit(policy_texts)
+                        logger.info("✅ Hybrid Search (Semantic + BM25 + Keyword) ready")
+                    else:
+                        self.bm25_model = None
+                else:
+                    self.use_embeddings = False
+                    self.bm25_model = None
+            except Exception as e:
+                logger.warning(f"Embedding failed: {e}")
+                self.use_embeddings = False
+                self.bm25_model = None
+        
+        if self.use_llm and self.api_key:
+            openai.api_key = self.api_key
+            logger.info("✅ LLM ready")
+        else:
+            self.use_llm = False
+        
+        self._search_cached = lru_cache(maxsize=256)(self._search_impl)
+        
+        version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
+        logger.info(f"✅ Analyzer {version} ready")
+    
+    def _search_impl(self, text: str):
+        """Hybrid Search"""
+        if self.use_embeddings:
+            results = hybrid_search(text, self.policies, self.policy_embeddings,
+                                  self.embedding_model, self.bm25_model)
+            return tuple([(r[0], r[1]) for r in results])
+        
+        # Fallback
+        text_lower = text.lower()
+        scored = []
+        for p in self.policies:
+            match = sum(1 for kw in p.keywords if kw.lower() in text_lower)
+            if match > 0:
+                scored.append((p, match / max(len(p.keywords), 1)))
+        scored.sort(key=lambda x: x[1], reverse=True)
+        return tuple(scored[:3])
+    
+    def analyze(
+        self,
+        text: str,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None,
+        use_self_rag: Optional[bool] = None
+    ):
+        """
+        메인 분석 메서드
+        
+        Args:
+            text: 분석할 텍스트
+            user_id: 사용자 ID (선택)
+            session_id: 세션 ID (선택)
+            use_self_rag: Self-RAG 사용 여부 (None: 전역 설정 따름)
+        """
+        should_use_self_rag = use_self_rag if use_self_rag is not None else self.enable_self_rag
+        
+        if should_use_self_rag and self.enable_self_rag:
+            return self._analyze_with_self_rag(text, user_id, session_id)
+        else:
+            return self._analyze_standard(text, user_id, session_id)
+    
+    def _analyze_with_self_rag(
+        self,
+        text: str,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ):
+        """v3.0: Self-RAG 파이프라인"""
+        start = datetime.now()
+        
+        try:
+            # Step 1: 검색 필요성 판단
+            retrieval_need = self.self_rag_engine.assess_retrieval_need(text)
+            
+            if retrieval_need == RetrievalNeed.NOT_NEEDED:
+                result = self._direct_analysis(text, user_id, session_id)
+                self.stats['self_rag_skipped'] += 1
+                
+                return SelfRAGResult(
+                    original_result=result,
+                    retrieval_need=retrieval_need,
+                    relevance_scores={},
+                    support_level=SupportLevel.NO_SUPPORT,
+                    utility_score=UtilityScore.MODERATELY_USEFUL,
+                    reflection_notes=["No retrieval needed"],
+                    confidence_boost=0.0
+                )
+            
+            # Step 2: 표준 분석 (검색 포함)
+            result = self._analyze_standard(text, user_id, session_id)
+            
+            # Step 3: 관련성 평가
+            relevance_scores = self.self_rag_engine.assess_relevance(text, result)
+            
+            # Step 4: 지원도 평가
+            support_level = self.self_rag_engine.assess_support(result, relevance_scores)
+            
+            # Step 5: 유용성 평가
+            utility_score = self.self_rag_engine.assess_utility(result, support_level)
+            
+            # 반성 노트 생성
+            reflection_notes = self.self_rag_engine.generate_reflection(
+                retrieval_need, relevance_scores, support_level, utility_score
+            )
+            
+            # 신뢰도 증가
+            confidence_boost = self.self_rag_engine.calculate_confidence_boost(
+                relevance_scores, support_level, utility_score
+            )
+            
+            result.confidence_score = min(result.confidence_score + confidence_boost, 1.0)
+            result.processing_time = (datetime.now() - start).total_seconds()
+            
+            self.stats['self_rag'] += 1
+            self.stats['total'] += 1
+            
+            return SelfRAGResult(
+                original_result=result,
+                retrieval_need=retrieval_need,
+                relevance_scores=relevance_scores,
+                support_level=support_level,
+                utility_score=utility_score,
+                reflection_notes=reflection_notes,
+                confidence_boost=confidence_boost
+            )
+        
+        except Exception as e:
+            self.stats['errors'] += 1
+            logger.error(f"Self-RAG error: {e}")
+            return self._analyze_standard(text, user_id, session_id)
+    
+    def _analyze_standard(
+        self,
+        text: str,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ):
+        """표준 분석 (v2.5 방식)"""
+        start = datetime.now()
+        event_id = f"EVT_{int(time.time()*1000)}"
+        
+        try:
+            if not text.strip():
+                raise ValueError("Empty text")
+            
+            detected_lang = 'unknown'
+            if self.language_detector:
+                detected_lang = self.language_detector.detect_language(text)
+            
+            policy_results = list(self._search_cached(text))
+            policies = [p for p, _ in policy_results]
+            similarities = {p.id: s for p, s in policy_results}
+            
+            if self.use_llm:
+                result = self._analyze_llm(text, policies)
+                self.stats['llm'] += 1
+            else:
+                result = self._analyze_rules(text, policies, similarities, detected_lang)
+                self.stats['rule'] += 1
+            
+            result.user_id = user_id
+            result.session_id = session_id
+            result.detected_language = detected_lang
+            result.related_policies = [p.id for p in policies]
+            result.policy_similarities = similarities
+            result.processing_time = (datetime.now() - start).total_seconds()
+            
+            if self.context_memory and user_id:
+                adj = self.context_memory.get_context_adjustment(user_id, result.risk_score)
+                if adj != 0:
+                    result.risk_score = min(result.risk_score + adj, 100)
+                    result.context_adjusted = True
+                self.context_memory.update_user_context(user_id, result)
+            
+            breakdown = self._create_breakdown(result, similarities)
+            similar = self._find_similar(result, 3)
+            result.explanation_data = ExplainableAI.generate_explanation(result, breakdown, similar)
+            
+            result.confidence_score = self._calc_confidence(result, similarities)
+            result.remediation_suggestions = self._get_remediation(result, policies)
+            
+            if self.relationship_analyzer:
+                self.relationship_analyzer.add_event(event_id, result)
+                self.relationship_analyzer.build_relationships()
+            
+            self.stats['total'] += 1
+            self.analysis_history.append(result)
+            
+            return result
+        except Exception as e:
+            self.stats['errors'] += 1
+            logger.error(f"Error: {e}")
+            return AnalysisResult(
+                text=text, risk_score=0, risk_level='LOW',
+                explanation=f"Error: {str(e)}",
+                processing_time=(datetime.now() - start).total_seconds(),
+                user_id=user_id
+            )
+    
+    def _direct_analysis(
+        self,
+        text: str,
+        user_id: Optional[str] = None,
+        session_id: Optional[str] = None
+    ):
+        """검색 없는 직접 분석"""
+        risk_score = 10.0
+        threats = []
+        
+        dangerous = {'hack': 20, 'crack': 20, 'steal': 15, 'breach': 25}
+        text_lower = text.lower()
+        for pattern, points in dangerous.items():
+            if pattern in text_lower:
+                risk_score += points
+                threats.append(f"Detected: {pattern}")
+        
+        risk_level = "HIGH" if risk_score >= 50 else "MEDIUM" if risk_score >= 30 else "LOW"
+        
+        return AnalysisResult(
+            text=text,
+            risk_score=min(risk_score, 100),
+            risk_level=risk_level,
+            threats=threats,
+            explanation="Direct analysis",
+            user_id=user_id,
+            session_id=session_id
+        )
+    
+    def _create_breakdown(self, result, similarities):
+        """점수 세부 분석 생성"""
+        breakdown = ScoreBreakdown()
+        patterns = self.language_detector.get_patterns(result.detected_language) if self.language_detector else {}
+        for threat in result.threats:
+            for kw, (desc, pts) in patterns.items():
+                if desc in threat:
+                    breakdown.keyword_matches[kw] = float(pts)
+        for pid, sim in similarities.items():
+            if pid in result.violations:
+                p = next(p for p in self.policies if p.id == pid)
+                score = self.SEVERITY_PTS.get(p.severity, 10) * self.SEVERITY_MULT.get(p.severity, 1.0) * sim
+                breakdown.policy_similarities[pid] = score
+        breakdown.final_score = result.risk_score
+        return breakdown
+    
+    def _find_similar(self, current, top_k: int = 3):
+        """유사 케이스 찾기"""
+        if not self.analysis_history:
+            return []
+        scored = []
+        for past in self.analysis_history:
+            past_analysis = get_analysis_result(past)
+            current_analysis = get_analysis_result(current)
+            if past_analysis.text == current_analysis.text:
+                continue
+            sim = ExplainableAI._calc_similarity(current_analysis, past_analysis)
+            if sim > 0.3:
+                scored.append((sim, past))
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [case for _, case in scored[:top_k]]
+    
+    def _calc_confidence(self, result, similarities):
+        """신뢰도 계산"""
+        conf = 0.5
+        if similarities:
+            conf += sum(similarities.values()) / len(similarities) * 0.3
+        if result.violations:
+            conf += min(len(result.violations) * 0.1, 0.2)
+        return min(conf, 1.0)
+    
+    def _get_remediation(self, result, policies):
+        """교정 제안 생성"""
+        suggestions = []
+        for p in policies:
+            if p.id in result.violations and p.remediation_steps:
+                suggestions.extend(p.remediation_steps[:2])
+        if not suggestions and result.risk_level in ['CRITICAL', 'HIGH']:
+            suggestions.append("즉시 보안팀에 보고하세요")
+        return suggestions[:5]
+    
+    def _analyze_llm(self, text: str, policies: List[SecurityPolicy]):
+        """LLM 기반 분석"""
+        context = "\n".join([f"[{p.id}] {p.title}: {p.content}" for p in policies])
+        prompt = f"""Security expert. Analyze:
+
+Policies:
+{context}
+
+Text: "{text}"
+
+JSON:
+{{
+    "risk_score": <0-100>,
+    "risk_level": "<CRITICAL|HIGH|MEDIUM|LOW>",
+    "violations": ["ids"],
+    "threats": ["descriptions"],
+    "explanation": "why"
+}}"""
+        try:
+            response = openai.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {"role": "system", "content": "Security expert. JSON only."},
+                    {"role": "user", "content": prompt}
+                ],
+                temperature=0.1,
+                response_format={"type": "json_object"},
+                timeout=30
+            )
+            result_dict = json.loads(response.choices[0].message.content)
+            return AnalysisResult(text=text, **result_dict)
+        except Exception as e:
+            logger.error(f"LLM error: {e}")
+            return self._analyze_rules(text, policies, {}, 'unknown')
+    
+    def _analyze_rules(self, text: str, policies: List[SecurityPolicy], similarities: dict, language: str):
+        """규칙 기반 분석"""
+        violations, threats, score = [], [], 0.0
+        text_lower = text.lower()
+        keywords = []
+        
+        patterns = self.language_detector.get_patterns(language) if self.language_detector else {}
+        
+        for kw, (threat, pts) in patterns.items():
+            if re.search(r'\b' + re.escape(kw.lower()) + r'\b', text_lower):
+                threats.append(threat)
+                score += pts
+                keywords.append(kw)
+        
+        for policy in policies:
+            matched = [k for k in policy.keywords if re.search(r'\b' + re.escape(k.lower()) + r'\b', text_lower)]
+            if matched:
+                violations.append(policy.id)
+                base = self.SEVERITY_PTS.get(policy.severity, 10)
+                mult = self.SEVERITY_MULT.get(policy.severity, 1.0)
+                match_ratio = len(matched) / max(len(policy.keywords), 1)
+                sim = similarities.get(policy.id, 0.5)
+                score += base * mult * (0.8 + sim * 0.7) * (0.6 + match_ratio * 0.4)
+        
+        score = min(score, 100.0)
+        level = "CRITICAL" if score >= 60 else "HIGH" if score >= 40 else "MEDIUM" if score >= 20 else "LOW"
+        
+        exp_parts = []
+        if threats:
+            exp_parts.append(f"{len(threats)} threat(s)")
+        if violations:
+            exp_parts.append(f"{len(violations)} violation(s)")
+        if keywords:
+            exp_parts.append(f"Keywords: {', '.join(keywords[:5])}")
+        
+        return AnalysisResult(
+            text=text, risk_score=round(score, 1), risk_level=level,
+            violations=violations, threats=threats,
+            explanation=" | ".join(exp_parts) if exp_parts else "No threats"
+        )
+    
+    def analyze_batch(self, texts: List[str], user_ids: Optional[List[str]] = None, use_self_rag: Optional[bool] = None):
+        """배치 분석"""
+        if user_ids is None:
+            user_ids = [None] * len(texts)
+        return [self.analyze(t, user_id=uid, use_self_rag=use_self_rag)
+                for t, uid in zip(texts, user_ids)]
+    
+    def print_result(self, result, show_explanation: bool = True):
+        """결과 출력"""
+        # SelfRAGResult 처리
+        if is_self_rag_result(result):
+            self._print_self_rag_result(result, show_explanation)
+            return
+        
+        # 표준 AnalysisResult
+        analysis = get_analysis_result(result)
+        emoji = {"CRITICAL": "🔴", "HIGH": "🟠", "MEDIUM": "🟡", "LOW": "🟢"}[analysis.risk_level]
+        version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
+        
+        print("="*80)
+        print(f"🛡️  Analysis Result {version}")
+        print("="*80)
+        print(f"\n📝 Text: {analysis.text}")
+        if analysis.user_id:
+            print(f"👤 User: {analysis.user_id}")
+        if analysis.detected_language != 'unknown':
+            print(f"🌐 Language: {analysis.detected_language}")
+        print(f"🕒 Time: {analysis.processing_time:.3f}s | 🎯 Confidence: {analysis.confidence_score:.0%}")
+        if analysis.context_adjusted:
+            print(f"📊 Context-adjusted")
+        print(f"{emoji} Risk: {analysis.risk_score:.1f}/100 ({analysis.risk_level})")
+        print(f"\n📊 Analysis:")
+        print(f"   • Violations: {len(analysis.violations)}")
+        if analysis.violations:
+            print(f"     → {', '.join(analysis.violations)}")
+        print(f"   • Threats: {len(analysis.threats)}")
+        for i, t in enumerate(analysis.threats[:3], 1):
+            print(f"     {i}. {t}")
+        if analysis.remediation_suggestions:
+            print(f"\n💡 Remediation:")
+            for i, s in enumerate(analysis.remediation_suggestions[:3], 1):
+                print(f"     {i}. {s}")
+        print(f"\n💭 {analysis.explanation}")
+        print("="*80 + "\n")
+        
+        if show_explanation and analysis.explanation_data:
+            ExplainableAI.print_explanation(result)
+    
+    def _print_self_rag_result(self, self_rag_result: SelfRAGResult, show_explanation: bool = True):
+        """Self-RAG 결과 출력"""
+        result = self_rag_result.original_result
+        
+        emoji = {"CRITICAL": "🔴", "HIGH": "🟠", "MEDIUM": "🟡", "LOW": "🟢"}[result.risk_level]
+        
+        print("\n" + "="*80)
+        print("🧠 Self-RAG Analysis Result v3.0")
+        print("="*80)
+        
+        print(f"\n📝 Text: {result.text}")
+        if result.user_id:
+            print(f"👤 User: {result.user_id}")
+        if result.detected_language != 'unknown':
+            print(f"🌐 Language: {result.detected_language}")
+        print(f"🕒 Time: {result.processing_time:.3f}s")
+        
+        print(f"\n{emoji} Risk Assessment:")
+        print(f"   Score: {result.risk_score:.1f}/100")
+        print(f"   Level: {result.risk_level}")
+        print(f"   Confidence: {result.confidence_score:.0%} (+{self_rag_result.confidence_boost:.1%} from Self-RAG)")
+        
+        print(f"\n🔍 Self-RAG Evaluation:")
+        print(f"   Retrieval Need: {self_rag_result.retrieval_need.value}")
+        print(f"   Support Level: {self_rag_result.support_level.value}")
+        print(f"   Utility Score: {self_rag_result.utility_score.value}/5 {'★' * self_rag_result.utility_score.value}")
+        
+        if self_rag_result.relevance_scores:
+            print(f"\n📊 Policy Relevance:")
+            for policy_id, score in self_rag_result.relevance_scores.items():
+                emoji_rel = {
+                    RelevanceScore.HIGHLY_RELEVANT: "🟢",
+                    RelevanceScore.RELEVANT: "🟡",
+                    RelevanceScore.PARTIALLY_RELEVANT: "🟠",
+                    RelevanceScore.NOT_RELEVANT: "🔴"
+                }[score]
+                print(f"   {emoji_rel} {policy_id}: {score.value}")
+        
+        if result.violations:
+            print(f"\n⚠️  Violations ({len(result.violations)}):")
+            for v in result.violations:
+                print(f"   • {v}")
+        
+        if result.threats:
+            print(f"\n🚨 Threats ({len(result.threats)}):")
+            for i, t in enumerate(result.threats[:3], 1):
+                print(f"   {i}. {t}")
+        
+        if result.remediation_suggestions:
+            print(f"\n💡 Remediation:")
+            for i, s in enumerate(result.remediation_suggestions[:3], 1):
+                print(f"   {i}. {s}")
+        
+        if self_rag_result.reflection_notes:
+            print(f"\n💭 Self-Reflection:")
+            for note in self_rag_result.reflection_notes:
+                print(f"   {note}")
+        
+        print("\n" + "="*80 + "\n")
+        
+        if show_explanation and result.explanation_data:
+            ExplainableAI.print_explanation(result)
+    
+    def get_user_profile(self, user_id: str):
+        """사용자 프로필 조회"""
+        if not self.context_memory:
+            return {'error': 'Context memory disabled'}
+        return self.context_memory.get_user_summary(user_id)
+    
+    def detect_compound_threats(self):
+        """복합 위협 탐지"""
+        if not self.relationship_analyzer:
+            return []
+        return self.relationship_analyzer.detect_compound_threats()
+    
+    def visualize_relationships(self):
+        """관계 그래프 시각화"""
+        if self.relationship_analyzer:
+            self.relationship_analyzer.visualize()
+    
+    def print_stats(self):
+        """통계 출력"""
+        version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
+        print("\n" + "="*80)
+        print(f"📊 Statistics {version}")
+        print("="*80)
+        print(f"Total: {self.stats['total']}")
+        print(f"LLM: {self.stats['llm']}")
+        print(f"Rule: {self.stats['rule']}")
+        print(f"Errors: {self.stats['errors']}")
+        
+        if self.enable_self_rag:
+            print(f"\n🧠 Self-RAG:")
+            print(f"   With Self-RAG: {self.stats['self_rag']}")
+            print(f"   Direct: {self.stats['self_rag_skipped']}")
+        
+        if self.context_memory:
+            print(f"\n👥 Users: {len(self.context_memory.user_profiles)}")
+        
+        if self.relationship_analyzer:
+            g = self.relationship_analyzer.event_graph
+            print(f"🔗 Events: {g.number_of_nodes()} nodes, {g.number_of_edges()} edges")
+        
+        print("="*80 + "\n")
