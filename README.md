@@ -13,6 +13,285 @@ AegisRAG combines **Self-RAG meta-evaluation**, **hybrid semantic retrieval**, *
 
 ---
 
+## 🏗️ Architecture Overview
+
+```mermaid
+graph TB
+    subgraph "Input Layer"
+        A[📝 User Text Input] --> B[🌐 Language Detection]
+        A --> C[👤 User Context]
+    end
+    
+    subgraph "Self-RAG Pipeline"
+        B --> D{🧠 Retrieval Need<br/>Assessment}
+        D -->|Required| E[🔍 Hybrid Retrieval]
+        D -->|Not Required| F[Direct Analysis]
+        
+        E --> G[📊 Embedding Search]
+        E --> H[🔎 BM25 Search]
+        E --> I[🎯 Keyword Match]
+        
+        G --> J[Policy Ranking]
+        H --> J
+        I --> J
+        
+        J --> K[✅ Relevance Scoring]
+        K --> L[🎓 Support Level<br/>Analysis]
+        L --> M[⭐ Utility<br/>Evaluation]
+        M --> N[💭 Reflection<br/>Generation]
+    end
+    
+    subgraph "Analysis Layer"
+        N --> O[🔬 Pattern Detection<br/>900+ Patterns]
+        F --> O
+        O --> P[🤖 LLM Analysis<br/>GPT-4o-mini]
+        O --> Q[📋 Rule-based<br/>Analysis]
+        
+        P --> R[Risk Calculation]
+        Q --> R
+    end
+    
+    subgraph "Intelligence Layer"
+        R --> S[🔍 XAI Explainer<br/>Factor Attribution]
+        R --> T[🧠 Memory System<br/>User Profiling]
+        R --> U[🔗 Relationship<br/>Analyzer]
+        
+        S --> V[Counterfactual<br/>Analysis]
+        T --> W[Trend Detection]
+        U --> X[Compound Threats]
+    end
+    
+    subgraph "Output Layer"
+        V --> Y[📊 Analysis Result]
+        W --> Y
+        X --> Y
+        Y --> Z[🎯 Risk Score<br/>+ Confidence]
+        Y --> AA[📝 Detailed Report]
+        Y --> AB[📈 Visualization]
+    end
+    
+    style D fill:#ff6b6b
+    style E fill:#4ecdc4
+    style K fill:#ffe66d
+    style L fill:#a8e6cf
+    style M fill:#ffd3b6
+    style N fill:#ffaaa5
+    style O fill:#ff8b94
+    style P fill:#a8e6cf
+    style S fill:#dcedc1
+    style T fill:#ffd3b6
+    style U fill:#ffaaa5
+```
+
+---
+
+## 🔄 Self-RAG Meta-Evaluation Pipeline
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Input as 📝 Input Handler
+    participant RAG as 🧠 Self-RAG Engine
+    participant Retriever as 🔍 Hybrid Retriever
+    participant Evaluator as ✅ Meta-Evaluator
+    participant LLM as 🤖 LLM Analyzer
+    participant Output as 📊 Result Generator
+
+    User->>Input: Submit Text
+    Input->>RAG: Process Request
+    
+    rect rgb(255, 235, 238)
+        Note over RAG,Evaluator: Stage 1: Retrieval Need Assessment
+        RAG->>RAG: Analyze Query Complexity
+        RAG->>RAG: Check Cache & Memory
+        RAG-->>RAG: Decision: REQUIRED/NOT_REQUIRED
+    end
+    
+    alt Retrieval Required
+        rect rgb(230, 245, 255)
+            Note over RAG,Retriever: Stage 2: Hybrid Retrieval
+            RAG->>Retriever: Request Policy Search
+            Retriever->>Retriever: Embedding Search (85% weight)
+            Retriever->>Retriever: BM25 Search (10% weight)
+            Retriever->>Retriever: Keyword Match (5% weight)
+            Retriever-->>RAG: Top-K Policies (k=5)
+        end
+        
+        rect rgb(255, 250, 230)
+            Note over RAG,Evaluator: Stage 3: Relevance Scoring
+            RAG->>Evaluator: Evaluate Policy Relevance
+            loop For each policy
+                Evaluator->>Evaluator: Score: highly_relevant/relevant/not_relevant
+                Evaluator->>Evaluator: Calculate Similarity (0.0-1.0)
+            end
+            Evaluator-->>RAG: Ranked Policies + Scores
+        end
+        
+        rect rgb(240, 255, 240)
+            Note over RAG,Evaluator: Stage 4: Support Level Analysis
+            RAG->>Evaluator: Validate Evidence
+            Evaluator->>Evaluator: fully_supported/partially_supported/no_support
+            Evaluator->>Evaluator: Check Policy-Text Alignment
+            Evaluator-->>RAG: Support Assessment
+        end
+        
+        rect rgb(255, 240, 245)
+            Note over RAG,LLM: Stage 5: Utility & Reflection
+            RAG->>Evaluator: Rate Usefulness (1-5★)
+            RAG->>LLM: Generate Deep Analysis
+            LLM->>LLM: Pattern Detection (900+ patterns)
+            LLM->>LLM: Risk Calculation
+            LLM-->>RAG: Analysis Result
+            RAG->>RAG: Self-Reflection Notes
+            RAG->>RAG: Confidence Boost (+15%)
+        end
+    else No Retrieval Needed
+        rect rgb(245, 245, 245)
+            Note over RAG,LLM: Direct Analysis Path
+            RAG->>LLM: Analyze without retrieval
+            LLM-->>RAG: Basic Result
+        end
+    end
+    
+    RAG->>Output: Compile Results
+    Output->>Output: Generate XAI Explanation
+    Output->>Output: Update User Memory
+    Output->>Output: Check Compound Threats
+    Output-->>User: 📊 Comprehensive Report
+```
+
+---
+
+## 🎯 Data Flow Architecture
+
+```mermaid
+flowchart LR
+    subgraph Input["🎤 Input Processing"]
+        A1[Raw Text] --> A2[Language<br/>Detection]
+        A2 --> A3[Preprocessing]
+        A3 --> A4[Context<br/>Enrichment]
+    end
+    
+    subgraph Retrieval["🔍 Hybrid Retrieval System"]
+        B1[Sentence<br/>Transformer<br/>🤗 all-MiniLM-L6-v2]
+        B2[BM25<br/>Sparse<br/>Search]
+        B3[Keyword<br/>Pattern<br/>Matching]
+        
+        A4 --> B1
+        A4 --> B2
+        A4 --> B3
+        
+        B1 -.85%.-> C1[Policy<br/>Fusion]
+        B2 -.10%.-> C1
+        B3 -.5%.-> C1
+    end
+    
+    subgraph Analysis["🤖 Multi-Layer Analysis"]
+        C1 --> D1{Self-RAG<br/>Enabled?}
+        D1 -->|Yes| D2[5-Stage<br/>Meta-Evaluation]
+        D1 -->|No| D3[Direct<br/>Analysis]
+        
+        D2 --> E1[Pattern<br/>Detection<br/>900+ rules]
+        D3 --> E1
+        
+        E1 --> E2{LLM<br/>Available?}
+        E2 -->|Yes| E3[GPT-4o-mini<br/>Deep Analysis]
+        E2 -->|No| E4[Enhanced<br/>Rule-based]
+        
+        E3 --> F1[Risk<br/>Calculation]
+        E4 --> F1
+    end
+    
+    subgraph Intelligence["🧠 Intelligence Layer"]
+        F1 --> G1[XAI<br/>Explainer<br/>🔬]
+        F1 --> G2[Memory<br/>System<br/>👤]
+        F1 --> G3[Relationship<br/>Graph<br/>🔗]
+        
+        G1 --> H1[Factor<br/>Attribution]
+        G1 --> H2[Counterfactual]
+        
+        G2 --> H3[User Profile]
+        G2 --> H4[Trend Analysis]
+        
+        G3 --> H5[Compound<br/>Threats]
+        G3 --> H6[Network<br/>Analysis]
+    end
+    
+    subgraph Output["📊 Output Generation"]
+        H1 --> I1[Detailed<br/>Report]
+        H2 --> I1
+        H3 --> I1
+        H4 --> I1
+        H5 --> I1
+        H6 --> I1
+        
+        I1 --> I2[JSON<br/>Result]
+        I1 --> I3[Visual<br/>Charts]
+        I1 --> I4[Executive<br/>Summary]
+    end
+    
+    classDef inputStyle fill:#e3f2fd,stroke:#1976d2,stroke-width:2px
+    classDef retrievalStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef analysisStyle fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+    classDef intelligenceStyle fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef outputStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class A1,A2,A3,A4 inputStyle
+    class B1,B2,B3,C1 retrievalStyle
+    class D1,D2,D3,E1,E2,E3,E4,F1 analysisStyle
+    class G1,G2,G3,H1,H2,H3,H4,H5,H6 intelligenceStyle
+    class I1,I2,I3,I4 outputStyle
+```
+
+---
+
+## 🔬 Pattern Detection System
+
+```mermaid
+graph TD
+    A[📝 Input Text] --> B{Language<br/>Detection}
+    
+    B -->|Korean| C1[🇰🇷 Korean Patterns<br/>450+ patterns]
+    B -->|English| C2[🇬🇧 English Patterns<br/>450+ patterns]
+    B -->|Japanese| C3[🇯🇵 Japanese Patterns<br/>TBD]
+    B -->|Chinese| C4[🇨🇳 Chinese Patterns<br/>TBD]
+    
+    C1 --> D[Pattern Matching Engine]
+    C2 --> D
+    C3 --> D
+    C4 --> D
+    
+    D --> E1[🔴 CRITICAL<br/>Score: 85-100]
+    D --> E2[🟠 HIGH<br/>Score: 70-84]
+    D --> E3[🟡 MEDIUM<br/>Score: 50-69]
+    D --> E4[🟢 LOW<br/>Score: 0-49]
+    
+    E1 --> F{Confidence<br/>Check}
+    E2 --> F
+    E3 --> F
+    E4 --> F
+    
+    F -->|High| G1[✅ Confirmed<br/>Threat]
+    F -->|Medium| G2[⚠️ Potential<br/>Threat]
+    F -->|Low| G3[ℹ️ Monitor]
+    
+    G1 --> H[Risk Score<br/>Calculation]
+    G2 --> H
+    G3 --> H
+    
+    H --> I[📊 Final Result]
+    
+    style E1 fill:#ff6b6b,color:#fff
+    style E2 fill:#ffa500,color:#fff
+    style E3 fill:#ffd700,color:#333
+    style E4 fill:#90ee90,color:#333
+    style G1 fill:#dc143c,color:#fff
+    style G2 fill:#ff8c00,color:#fff
+    style G3 fill:#32cd32,color:#fff
+```
+
+---
+
 ## ✨ What's New in v3.0
 
 <table>
