@@ -11,7 +11,7 @@ import time
 from collections import deque
 from datetime import datetime
 from functools import lru_cache
-from typing import List, Optional
+from typing import Dict, List, Optional, Union
 
 from .models import (
     AnalysisResult, SelfRAGResult, ScoreBreakdown,
@@ -34,8 +34,9 @@ logger = logging.getLogger(__name__)
 try:
     import openai
     OPENAI_AVAILABLE = True
-except:
+except (ImportError, ModuleNotFoundError) as e:
     OPENAI_AVAILABLE = False
+    logger.warning(f"OpenAI module not available: {e}")
 
 
 # ============================================================
@@ -88,7 +89,7 @@ class AdvancedRAGAnalyzer:
                 if self.embedding_model:
                     policy_texts = [f"{p.title}. {p.content}. {' '.join(p.keywords)}" for p in policies]
                     self.policy_embeddings = encode_texts(policy_texts, self.embedding_model)
-                    
+
                     if self.enable_bm25:
                         self.bm25_model = BM25()
                         self.bm25_model.fit(policy_texts)
@@ -98,8 +99,8 @@ class AdvancedRAGAnalyzer:
                 else:
                     self.use_embeddings = False
                     self.bm25_model = None
-            except Exception as e:
-                logger.warning(f"Embedding failed: {e}")
+            except (RuntimeError, ValueError, OSError) as e:
+                logger.warning(f"Embedding initialization failed: {e}")
                 self.use_embeddings = False
                 self.bm25_model = None
         
@@ -137,7 +138,7 @@ class AdvancedRAGAnalyzer:
         user_id: Optional[str] = None,
         session_id: Optional[str] = None,
         use_self_rag: Optional[bool] = None
-    ):
+    ) -> Union[AnalysisResult, SelfRAGResult]:
         """
         메인 분석 메서드
         
@@ -407,7 +408,13 @@ JSON:
             logger.error(f"LLM error: {e}")
             return self._analyze_rules(text, policies, {}, 'unknown')
     
-    def _analyze_rules(self, text: str, policies: List[SecurityPolicy], similarities: dict, language: str):
+    def _analyze_rules(
+        self,
+        text: str,
+        policies: List[SecurityPolicy],
+        similarities: Dict[str, float],
+        language: str
+    ) -> AnalysisResult:
         """규칙 기반 분석"""
         violations, threats, score = [], [], 0.0
         text_lower = text.lower()
