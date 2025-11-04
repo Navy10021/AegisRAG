@@ -24,9 +24,10 @@ from .retriever import (
 )
 from .memory import ContextMemorySystem, RelationshipAnalyzer
 from .explainer import ExplainableAI
-from .utils import LanguageDetector
+from .utils import LanguageDetector, sanitize_prompt_input
 from .self_rag import SelfRAGEngine
 from .models import RetrievalNeed, SupportLevel, UtilityScore
+from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -44,11 +45,27 @@ except (ImportError, ModuleNotFoundError) as e:
 # ============================================================
 
 class AdvancedRAGAnalyzer:
-    """v3.0: Self-RAG가 통합된 Advanced RAG Analyzer"""
-    
-    SEVERITY_MULT = {"critical": 1.5, "high": 1.2, "medium": 1.0, "low": 0.8}
-    SEVERITY_PTS = {'critical': 30, 'high': 20, 'medium': 10, 'low': 5}
-    
+    """
+    Advanced RAG Security Analyzer with Self-RAG Integration (v3.0)
+
+    A comprehensive security analysis framework combining Self-RAG meta-evaluation,
+    hybrid semantic retrieval, and explainable AI for insider threat detection.
+
+    Features:
+        - Self-RAG: 5-stage meta-evaluation pipeline
+        - Hybrid Search: Semantic (85%) + BM25 (10%) + Keyword (5%)
+        - Pattern Detection: 900+ security keywords (multi-language)
+        - Explainable AI: LIME-inspired factor attribution
+        - Context Memory: User behavior profiling
+        - Relationship Analysis: Multi-event correlation
+
+    Example:
+        >>> policies = [SecurityPolicy(id="P1", title="Data Loss", ...)]
+        >>> analyzer = AdvancedRAGAnalyzer(policies, api_key="sk-...")
+        >>> result = analyzer.analyze("password leak", user_id="user123")
+        >>> print(f"Risk: {result.risk_score}/100")
+    """
+
     def __init__(
         self,
         policies: List[SecurityPolicy],
@@ -57,9 +74,24 @@ class AdvancedRAGAnalyzer:
         use_embeddings: bool = True,
         enable_advanced: bool = True,
         enable_bm25: bool = True,
-        enable_self_rag: bool = True
+        enable_self_rag: bool = True,
+        config: AnalyzerConfig = None
     ):
+        """
+        Initialize the Advanced RAG Analyzer.
+
+        Args:
+            policies: List of security policies for analysis
+            api_key: OpenAI API key (optional, uses env var if not provided)
+            use_llm: Enable LLM-based analysis
+            use_embeddings: Enable semantic search
+            enable_advanced: Enable context memory and relationship analysis
+            enable_bm25: Enable BM25 keyword search
+            enable_self_rag: Enable Self-RAG meta-evaluation
+            config: Custom configuration (uses defaults if None)
+        """
         self.policies = policies
+        self.config = config or DEFAULT_ANALYZER_CONFIG
         self.use_llm = use_llm and OPENAI_AVAILABLE
         self.use_embeddings = use_embeddings and SENTENCE_TRANSFORMERS_AVAILABLE
         self.enable_bm25 = enable_bm25
@@ -72,11 +104,18 @@ class AdvancedRAGAnalyzer:
         self.context_memory = ContextMemorySystem() if enable_advanced else None
         self.relationship_analyzer = RelationshipAnalyzer() if enable_advanced else None
         self.language_detector = LanguageDetector() if enable_advanced else None
-        self.analysis_history = deque(maxlen=1000)
-        
+        self.analysis_history = deque(maxlen=self.config.MAX_HISTORY_SIZE)
+
+        # API 키 관리 (환경변수 직접 수정 금지)
         if api_key:
-            os.environ['OPENAI_API_KEY'] = api_key
-        self.api_key = os.getenv('OPENAI_API_KEY')
+            self._api_key = api_key
+            logger.info("API key provided via parameter")
+        else:
+            self._api_key = os.getenv('OPENAI_API_KEY', '')
+            if self._api_key:
+                logger.info("API key loaded from environment")
+            else:
+                logger.warning("No API key found - LLM features will be disabled")
         
         # Self-RAG 엔진 초기화
         if self.enable_self_rag:
@@ -104,13 +143,13 @@ class AdvancedRAGAnalyzer:
                 self.use_embeddings = False
                 self.bm25_model = None
         
-        if self.use_llm and self.api_key:
-            openai.api_key = self.api_key
+        if self.use_llm and self._api_key:
+            openai.api_key = self._api_key
             logger.info("✅ LLM ready")
         else:
             self.use_llm = False
-        
-        self._search_cached = lru_cache(maxsize=256)(self._search_impl)
+
+        self._search_cached = lru_cache(maxsize=self.config.CACHE_SIZE)(self._search_impl)
         
         version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
         logger.info(f"✅ Analyzer {version} ready")
@@ -140,13 +179,32 @@ class AdvancedRAGAnalyzer:
         use_self_rag: Optional[bool] = None
     ) -> Union[AnalysisResult, SelfRAGResult]:
         """
-        메인 분석 메서드
-        
+        Analyze text for security threats and policy violations.
+
+        Performs comprehensive security analysis using Self-RAG, hybrid retrieval,
+        pattern detection, and LLM/rule-based evaluation. Supports context-aware
+        analysis with user behavior profiling.
+
         Args:
-            text: 분석할 텍스트
-            user_id: 사용자 ID (선택)
-            session_id: 세션 ID (선택)
-            use_self_rag: Self-RAG 사용 여부 (None: 전역 설정 따름)
+            text: Text to analyze (max 10,000 characters)
+            user_id: User identifier for context tracking (optional)
+            session_id: Session identifier for grouping analyses (optional)
+            use_self_rag: Override Self-RAG setting (None=use global config)
+
+        Returns:
+            SelfRAGResult if Self-RAG enabled, otherwise AnalysisResult
+            Contains: risk_score (0-100), risk_level, violations, threats,
+                     explanation, confidence_score, and XAI data
+
+        Raises:
+            ValueError: If text is empty
+
+        Example:
+            >>> result = analyzer.analyze("password leaked to external")
+            >>> print(f"{result.risk_level}: {result.risk_score}/100")
+            CRITICAL: 85.0/100
+            >>> print(f"Confidence: {result.confidence_score:.0%}")
+            Confidence: 92%
         """
         should_use_self_rag = use_self_rag if use_self_rag is not None else self.enable_self_rag
         
@@ -333,7 +391,11 @@ class AdvancedRAGAnalyzer:
         for pid, sim in similarities.items():
             if pid in result.violations:
                 p = next(p for p in self.policies if p.id == pid)
-                score = self.SEVERITY_PTS.get(p.severity, 10) * self.SEVERITY_MULT.get(p.severity, 1.0) * sim
+                score = (
+                    self.config.SEVERITY_POINTS.get(p.severity, 10) *
+                    self.config.SEVERITY_MULTIPLIERS.get(p.severity, 1.0) *
+                    sim
+                )
                 breakdown.policy_similarities[pid] = score
         breakdown.final_score = result.risk_score
         return breakdown
@@ -375,13 +437,19 @@ class AdvancedRAGAnalyzer:
     
     def _analyze_llm(self, text: str, policies: List[SecurityPolicy]):
         """LLM 기반 분석"""
-        context = "\n".join([f"[{p.id}] {p.title}: {p.content}" for p in policies])
+        # 입력 sanitization (프롬프트 인젝션 방지)
+        sanitized_text = sanitize_prompt_input(
+            text,
+            max_length=self.config.MAX_INPUT_LENGTH
+        )
+
+        context = "\n".join([f"[{p.id}] {p.title}: {p.content}" for p in policies[:10]])  # 최대 10개 정책
         prompt = f"""Security expert. Analyze:
 
 Policies:
 {context}
 
-Text: "{text}"
+Text: "{sanitized_text}"
 
 JSON:
 {{
@@ -432,14 +500,19 @@ JSON:
             matched = [k for k in policy.keywords if re.search(r'\b' + re.escape(k.lower()) + r'\b', text_lower)]
             if matched:
                 violations.append(policy.id)
-                base = self.SEVERITY_PTS.get(policy.severity, 10)
-                mult = self.SEVERITY_MULT.get(policy.severity, 1.0)
+                base = self.config.SEVERITY_POINTS.get(policy.severity, 10)
+                mult = self.config.SEVERITY_MULTIPLIERS.get(policy.severity, 1.0)
                 match_ratio = len(matched) / max(len(policy.keywords), 1)
                 sim = similarities.get(policy.id, 0.5)
                 score += base * mult * (0.8 + sim * 0.7) * (0.6 + match_ratio * 0.4)
         
         score = min(score, 100.0)
-        level = "CRITICAL" if score >= 60 else "HIGH" if score >= 40 else "MEDIUM" if score >= 20 else "LOW"
+        level = (
+            "CRITICAL" if score >= self.config.RISK_CRITICAL_THRESHOLD
+            else "HIGH" if score >= self.config.RISK_HIGH_THRESHOLD
+            else "MEDIUM" if score >= self.config.RISK_MEDIUM_THRESHOLD
+            else "LOW"
+        )
         
         exp_parts = []
         if threats:
@@ -605,5 +678,92 @@ JSON:
         if self.relationship_analyzer:
             g = self.relationship_analyzer.event_graph
             print(f"🔗 Events: {g.number_of_nodes()} nodes, {g.number_of_edges()} edges")
-        
+
         print("="*80 + "\n")
+
+    def cleanup_old_history(self, max_age_hours: int = 24) -> int:
+        """
+        Clean up old analysis history entries.
+
+        Removes analysis results older than specified hours to free memory.
+        Useful for long-running services to prevent memory bloat.
+
+        Args:
+            max_age_hours: Maximum age in hours (default: 24)
+
+        Returns:
+            Number of entries removed
+
+        Example:
+            >>> removed = analyzer.cleanup_old_history(max_age_hours=12)
+            >>> print(f"Cleaned up {removed} old entries")
+        """
+        from datetime import timedelta
+
+        if not self.analysis_history:
+            return 0
+
+        cutoff = datetime.now() - timedelta(hours=max_age_hours)
+        original_count = len(self.analysis_history)
+
+        # Filter out old entries
+        filtered = deque(
+            (r for r in self.analysis_history
+             if datetime.fromisoformat(get_analysis_result(r).timestamp) > cutoff),
+            maxlen=self.config.MAX_HISTORY_SIZE
+        )
+
+        self.analysis_history = filtered
+        removed = original_count - len(self.analysis_history)
+
+        if removed > 0:
+            logger.info(f"Cleaned up {removed} old analysis entries")
+
+        return removed
+
+    def clear_cache(self):
+        """
+        Clear all caches to free memory.
+
+        Clears LRU cache and resets analysis history.
+        Use with caution as this will impact performance temporarily.
+
+        Example:
+            >>> analyzer.clear_cache()
+            >>> print("All caches cleared")
+        """
+        # Clear LRU cache
+        if hasattr(self, '_search_cached'):
+            self._search_cached.cache_clear()
+            logger.info("Search cache cleared")
+
+        # Clear analysis history
+        original_size = len(self.analysis_history)
+        self.analysis_history.clear()
+        logger.info(f"Cleared {original_size} analysis history entries")
+
+    def get_memory_usage(self) -> Dict[str, int]:
+        """
+        Get current memory usage statistics.
+
+        Returns:
+            Dictionary with memory usage information
+
+        Example:
+            >>> usage = analyzer.get_memory_usage()
+            >>> print(f"History: {usage['history_count']} entries")
+        """
+        usage = {
+            'history_count': len(self.analysis_history),
+            'cache_size': self.config.CACHE_SIZE,
+        }
+
+        if self.context_memory:
+            usage['user_profiles'] = len(self.context_memory.user_profiles)
+
+        if self.relationship_analyzer:
+            g = self.relationship_analyzer.event_graph
+            usage['graph_nodes'] = g.number_of_nodes()
+            usage['graph_edges'] = g.number_of_edges()
+
+        return usage

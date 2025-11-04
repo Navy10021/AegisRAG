@@ -13,6 +13,7 @@ from .models import (
     RetrievalNeed, RelevanceScore, SupportLevel, UtilityScore,
     SelfRAGResult, get_analysis_result
 )
+from .utils import sanitize_prompt_input
 
 logger = logging.getLogger(__name__)
 
@@ -269,9 +270,12 @@ class SelfRAGEngine:
     
     def _assess_retrieval_need_llm(self, text: str) -> RetrievalNeed:
         """LLM 기반 검색 필요성 판단"""
+        # 입력 sanitization
+        sanitized_text = sanitize_prompt_input(text, max_length=1000)
+
         prompt = f"""Assess if retrieval from security policy database is needed.
 
-Text: "{text}"
+Text: "{sanitized_text}"
 
 Classify as:
 - REQUIRED: Clear security concerns
