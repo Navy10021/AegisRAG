@@ -24,9 +24,10 @@ from .retriever import (
 )
 from .memory import ContextMemorySystem, RelationshipAnalyzer
 from .explainer import ExplainableAI
-from .utils import LanguageDetector
+from .utils import LanguageDetector, sanitize_prompt_input
 from .self_rag import SelfRAGEngine
 from .models import RetrievalNeed, SupportLevel, UtilityScore
+from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -45,10 +46,7 @@ except (ImportError, ModuleNotFoundError) as e:
 
 class AdvancedRAGAnalyzer:
     """v3.0: Self-RAG가 통합된 Advanced RAG Analyzer"""
-    
-    SEVERITY_MULT = {"critical": 1.5, "high": 1.2, "medium": 1.0, "low": 0.8}
-    SEVERITY_PTS = {'critical': 30, 'high': 20, 'medium': 10, 'low': 5}
-    
+
     def __init__(
         self,
         policies: List[SecurityPolicy],
@@ -57,9 +55,11 @@ class AdvancedRAGAnalyzer:
         use_embeddings: bool = True,
         enable_advanced: bool = True,
         enable_bm25: bool = True,
-        enable_self_rag: bool = True
+        enable_self_rag: bool = True,
+        config: AnalyzerConfig = None
     ):
         self.policies = policies
+        self.config = config or DEFAULT_ANALYZER_CONFIG
         self.use_llm = use_llm and OPENAI_AVAILABLE
         self.use_embeddings = use_embeddings and SENTENCE_TRANSFORMERS_AVAILABLE
         self.enable_bm25 = enable_bm25
@@ -72,11 +72,18 @@ class AdvancedRAGAnalyzer:
         self.context_memory = ContextMemorySystem() if enable_advanced else None
         self.relationship_analyzer = RelationshipAnalyzer() if enable_advanced else None
         self.language_detector = LanguageDetector() if enable_advanced else None
-        self.analysis_history = deque(maxlen=1000)
-        
+        self.analysis_history = deque(maxlen=self.config.MAX_HISTORY_SIZE)
+
+        # API 키 관리 (환경변수 직접 수정 금지)
         if api_key:
-            os.environ['OPENAI_API_KEY'] = api_key
-        self.api_key = os.getenv('OPENAI_API_KEY')
+            self._api_key = api_key
+            logger.info("API key provided via parameter")
+        else:
+            self._api_key = os.getenv('OPENAI_API_KEY', '')
+            if self._api_key:
+                logger.info("API key loaded from environment")
+            else:
+                logger.warning("No API key found - LLM features will be disabled")
         
         # Self-RAG 엔진 초기화
         if self.enable_self_rag:
@@ -104,13 +111,13 @@ class AdvancedRAGAnalyzer:
                 self.use_embeddings = False
                 self.bm25_model = None
         
-        if self.use_llm and self.api_key:
-            openai.api_key = self.api_key
+        if self.use_llm and self._api_key:
+            openai.api_key = self._api_key
             logger.info("✅ LLM ready")
         else:
             self.use_llm = False
-        
-        self._search_cached = lru_cache(maxsize=256)(self._search_impl)
+
+        self._search_cached = lru_cache(maxsize=self.config.CACHE_SIZE)(self._search_impl)
         
         version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
         logger.info(f"✅ Analyzer {version} ready")
@@ -333,7 +340,11 @@ class AdvancedRAGAnalyzer:
         for pid, sim in similarities.items():
             if pid in result.violations:
                 p = next(p for p in self.policies if p.id == pid)
-                score = self.SEVERITY_PTS.get(p.severity, 10) * self.SEVERITY_MULT.get(p.severity, 1.0) * sim
+                score = (
+                    self.config.SEVERITY_POINTS.get(p.severity, 10) *
+                    self.config.SEVERITY_MULTIPLIERS.get(p.severity, 1.0) *
+                    sim
+                )
                 breakdown.policy_similarities[pid] = score
         breakdown.final_score = result.risk_score
         return breakdown
@@ -375,13 +386,19 @@ class AdvancedRAGAnalyzer:
     
     def _analyze_llm(self, text: str, policies: List[SecurityPolicy]):
         """LLM 기반 분석"""
-        context = "\n".join([f"[{p.id}] {p.title}: {p.content}" for p in policies])
+        # 입력 sanitization (프롬프트 인젝션 방지)
+        sanitized_text = sanitize_prompt_input(
+            text,
+            max_length=self.config.MAX_INPUT_LENGTH
+        )
+
+        context = "\n".join([f"[{p.id}] {p.title}: {p.content}" for p in policies[:10]])  # 최대 10개 정책
         prompt = f"""Security expert. Analyze:
 
 Policies:
 {context}
 
-Text: "{text}"
+Text: "{sanitized_text}"
 
 JSON:
 {{
@@ -432,14 +449,19 @@ JSON:
             matched = [k for k in policy.keywords if re.search(r'\b' + re.escape(k.lower()) + r'\b', text_lower)]
             if matched:
                 violations.append(policy.id)
-                base = self.SEVERITY_PTS.get(policy.severity, 10)
-                mult = self.SEVERITY_MULT.get(policy.severity, 1.0)
+                base = self.config.SEVERITY_POINTS.get(policy.severity, 10)
+                mult = self.config.SEVERITY_MULTIPLIERS.get(policy.severity, 1.0)
                 match_ratio = len(matched) / max(len(policy.keywords), 1)
                 sim = similarities.get(policy.id, 0.5)
                 score += base * mult * (0.8 + sim * 0.7) * (0.6 + match_ratio * 0.4)
         
         score = min(score, 100.0)
-        level = "CRITICAL" if score >= 60 else "HIGH" if score >= 40 else "MEDIUM" if score >= 20 else "LOW"
+        level = (
+            "CRITICAL" if score >= self.config.RISK_CRITICAL_THRESHOLD
+            else "HIGH" if score >= self.config.RISK_HIGH_THRESHOLD
+            else "MEDIUM" if score >= self.config.RISK_MEDIUM_THRESHOLD
+            else "LOW"
+        )
         
         exp_parts = []
         if threats:
