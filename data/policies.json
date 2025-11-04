@@ -1,0 +1,2016 @@
+[
+  {
+    "id": "POL-001",
+    "title": "Protection of National Core Technologies",
+    "content": "Designs, process information, and R&D materials related to semiconductors, batteries, displays, and AI/ML technologies must not be leaked externally.",
+    "severity": "critical",
+    "risk_score": 95,
+    "priority": 1,
+    "keywords": [
+      "core technology",
+      "semiconductor",
+      "battery",
+      "display",
+      "AI",
+      "ML",
+      "design",
+      "process",
+      "R&D",
+      "blueprint",
+      "chip design",
+      "manufacturing process",
+      "research development"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Engineering", "Manufacturing", "IT"],
+    "detection_patterns": {
+      "file_extensions": [".dwg", ".dxf", ".step", ".iges", ".gerber", ".cam", ".gds"],
+      "suspicious_combinations": [
+        ["semiconductor", "resignation"],
+        ["semiconductor", "competitor"],
+        ["blueprint", "download"],
+        ["process", "USB"],
+        ["AI", "model", "leak"]
+      ],
+      "data_volume_threshold_mb": 100
+    },
+    "related_policies": ["POL-003", "POL-013", "POL-021", "POL-022"],
+    "examples": [
+      {
+        "scenario": "Departing employee copying semiconductor design files to USB",
+        "detection_method": "USB connection + large file transfer + keyword matching",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "R&D employee sending process documents to personal email",
+        "detection_method": "Email monitoring + DLP + keyword analysis",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Regular backup operations (approved time window)",
+      "Data sharing with approved partners (NDA signed)",
+      "Movement to internal document management system"
+    ],
+    "compliance_standards": [
+      "Export Control Regulations",
+      "Trade Secret Protection Laws",
+      "Industrial Technology Protection"
+    ],
+    "remediation_steps": [
+      "Report to security team immediately",
+      "Stop data transfer and preserve evidence",
+      "Consult with legal team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_security_team", "lock_account"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-002",
+    "title": "Personal Data Protection",
+    "content": "Customer and employee personal data must be encrypted, access-controlled, and monitored for unauthorized transfers.",
+    "severity": "high",
+    "risk_score": 85,
+    "priority": 2,
+    "keywords": [
+      "personal data",
+      "customer data",
+      "employee data",
+      "ID number",
+      "email",
+      "phone number",
+      "PII",
+      "personally identifiable information",
+      "data protection",
+      "privacy"
+    ],
+    "category": "privacy",
+    "affected_departments": ["HR", "Sales", "Customer Service", "IT", "Marketing"],
+    "detection_patterns": {
+      "file_extensions": [".csv", ".xlsx", ".xls", ".db", ".sql"],
+      "suspicious_combinations": [
+        ["customer data", "download"],
+        ["social security", "USB"],
+        ["personal data", "cloud"],
+        ["employee info", "external"]
+      ],
+      "data_volume_threshold_mb": 10,
+      "record_count_threshold": 100
+    },
+    "related_policies": ["POL-009", "POL-013", "POL-026"],
+    "examples": [
+      {
+        "scenario": "Sales employee uploading customer list to personal cloud",
+        "detection_method": "Cloud traffic monitoring + DLP",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "HR sending employee information via email without encryption",
+        "detection_method": "Email scanning + pattern matching",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Encrypted backups",
+      "Transfer to approved HR systems",
+      "Anonymized statistical data"
+    ],
+    "compliance_standards": [
+      "GDPR",
+      "CCPA",
+      "Privacy Laws"
+    ],
+    "remediation_steps": [
+      "Stop personal data transfer immediately",
+      "Report to Data Protection Officer",
+      "Notify affected individuals"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "quarantine_file", "alert_dpo"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-003",
+    "title": "Insider Threat Management",
+    "content": "Mass downloads or transfers of sensitive data by departing employees are strictly prohibited.",
+    "severity": "critical",
+    "risk_score": 90,
+    "priority": 1,
+    "keywords": [
+      "resignation",
+      "job change",
+      "competitor",
+      "download",
+      "USB",
+      "cloud",
+      "departure",
+      "leaving",
+      "data exfiltration",
+      "termination"
+    ],
+    "category": "insider_threat",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "file_extensions": ["*"],
+      "suspicious_combinations": [
+        ["resignation", "download"],
+        ["job change", "USB"],
+        ["competitor", "data"],
+        ["resignation letter", "files"],
+        ["last day", "export"]
+      ],
+      "data_volume_threshold_mb": 500,
+      "time_window_days": 30,
+      "behavioral_indicators": [
+        "unusual_access_hours",
+        "mass_download",
+        "multiple_usb_connections",
+        "cloud_upload_spike"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-004", "POL-013"],
+    "examples": [
+      {
+        "scenario": "Employee downloading 10x more files than usual 2 weeks before departure",
+        "detection_method": "Behavioral analysis + anomaly detection",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "Departing employee transferring large data to cloud late at night",
+        "detection_method": "Time-based analysis + traffic monitoring",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Regular project completion work",
+      "Approved handover process",
+      "Backup operations"
+    ],
+    "compliance_standards": [
+      "Trade Secret Protection Laws",
+      "Non-Disclosure Agreements"
+    ],
+    "remediation_steps": [
+      "Report to HR and security team immediately",
+      "Restrict account access",
+      "Review legal actions"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_hr", "restrict_access", "monitor_closely", "require_approval"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-004",
+    "title": "Trade Secret Management",
+    "content": "Customer lists, pricing policies, marketing strategies, and R&D projects must not be disclosed externally.",
+    "severity": "high",
+    "risk_score": 85,
+    "priority": 2,
+    "keywords": [
+      "trade secret",
+      "customer list",
+      "pricing policy",
+      "marketing strategy",
+      "R&D project",
+      "business intelligence",
+      "competitive advantage",
+      "confidential",
+      "proprietary"
+    ],
+    "category": "trade_secret",
+    "affected_departments": ["Sales", "Marketing", "R&D", "Finance"],
+    "detection_patterns": {
+      "file_extensions": [".xlsx", ".docx", ".pptx", ".pdf"],
+      "suspicious_combinations": [
+        ["customer list", "external"],
+        ["pricing policy", "competitor"],
+        ["marketing strategy", "leak"],
+        ["trade secret", "disclosure"]
+      ],
+      "data_volume_threshold_mb": 50
+    },
+    "related_policies": ["POL-001", "POL-003", "POL-030"],
+    "examples": [
+      {
+        "scenario": "Sales employee sending customer list to personal email",
+        "detection_method": "Email DLP + keyword matching",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Marketing manager uploading strategy document to cloud",
+        "detection_method": "Cloud monitoring",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Sharing with NDA-signed partners",
+      "Inter-department collaboration",
+      "Approved presentations"
+    ],
+    "compliance_standards": [
+      "Unfair Competition Prevention Laws",
+      "Trade Secret Protection"
+    ],
+    "remediation_steps": [
+      "Stop trade secret disclosure",
+      "Consult with legal team",
+      "Verify NDA status"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_legal", "log_incident"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-005",
+    "title": "IT System Access Control",
+    "content": "Unauthorized system access and installation of unapproved software must be strictly monitored and controlled.",
+    "severity": "medium",
+    "risk_score": 65,
+    "priority": 3,
+    "keywords": [
+      "access control",
+      "permission",
+      "login",
+      "unauthorized",
+      "software",
+      "privilege escalation",
+      "admin rights",
+      "system security"
+    ],
+    "category": "access_control",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "file_extensions": [".exe", ".msi", ".dmg", ".app"],
+      "suspicious_combinations": [
+        ["unauthorized", "access"],
+        ["privilege", "escalation"],
+        ["admin", "login"],
+        ["unapproved", "software"]
+      ],
+      "access_indicators": [
+        "failed_login_attempts",
+        "privilege_escalation_attempt",
+        "after_hours_access",
+        "unusual_admin_activity"
+      ]
+    },
+    "related_policies": ["POL-010", "POL-018", "POL-020"],
+    "examples": [
+      {
+        "scenario": "Employee installing unauthorized software without IT approval",
+        "detection_method": "Endpoint monitoring",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "Multiple failed login attempts followed by success",
+        "detection_method": "Login pattern analysis",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved software installations",
+      "IT maintenance windows",
+      "Authorized admin activities"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "NIST Cybersecurity Framework"
+    ],
+    "remediation_steps": [
+      "Report unauthorized access to IT",
+      "Change compromised credentials",
+      "Review access logs"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_installation", "alert_it", "require_approval"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-006",
+    "title": "Network Traffic Anomaly Detection",
+    "content": "Unusual network traffic patterns indicating data exfiltration or malware communication must be detected and blocked.",
+    "severity": "high",
+    "risk_score": 80,
+    "priority": 2,
+    "keywords": [
+      "network traffic",
+      "anomaly",
+      "exfiltration",
+      "malware",
+      "DDoS",
+      "data leak",
+      "network security",
+      "bandwidth spike"
+    ],
+    "category": "network_security",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["unusual", "traffic"],
+        ["data", "exfiltration"],
+        ["malware", "communication"],
+        ["bandwidth", "spike"]
+      ],
+      "traffic_indicators": [
+        "unusual_port_usage",
+        "large_outbound_transfer",
+        "connection_to_known_malicious_ip",
+        "abnormal_traffic_volume"
+      ],
+      "data_volume_threshold_mb": 1000
+    },
+    "related_policies": ["POL-007", "POL-008", "POL-024"],
+    "examples": [
+      {
+        "scenario": "Large outbound data transfer to unknown external IP",
+        "detection_method": "Network traffic analysis",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Unusual port communication indicating malware",
+        "detection_method": "IDS/IPS detection",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved cloud backup",
+      "Large file transfers to known partners",
+      "Software updates"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "NIST Cybersecurity Framework"
+    ],
+    "remediation_steps": [
+      "Isolate affected systems",
+      "Block suspicious connections",
+      "Analyze traffic logs"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_connection", "alert_soc", "isolate_system"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-007",
+    "title": "Malware and Ransomware Prevention",
+    "content": "All systems must have updated anti-malware software and regular scans; ransomware detection must trigger immediate response.",
+    "severity": "critical",
+    "risk_score": 92,
+    "priority": 1,
+    "keywords": [
+      "malware",
+      "ransomware",
+      "virus",
+      "trojan",
+      "encryption",
+      "crypto-locker",
+      "antivirus",
+      "infection"
+    ],
+    "category": "malware",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "file_extensions": [".exe", ".dll", ".scr", ".bat", ".encrypted", ".locked"],
+      "suspicious_combinations": [
+        ["ransomware", "encryption"],
+        ["malware", "detected"],
+        ["virus", "infection"],
+        ["trojan", "download"]
+      ],
+      "malware_indicators": [
+        "suspicious_file_execution",
+        "rapid_file_encryption",
+        "ransom_note_detected",
+        "c2_communication"
+      ]
+    },
+    "related_policies": ["POL-006", "POL-008", "POL-014"],
+    "examples": [
+      {
+        "scenario": "Ransomware encrypting files on network drive",
+        "detection_method": "Behavioral analysis + file monitoring",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "Phishing email attachment containing trojan",
+        "detection_method": "Email security gateway + sandbox",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Legitimate encryption tools",
+      "Approved software updates",
+      "Security testing activities"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "NIST Cybersecurity Framework"
+    ],
+    "remediation_steps": [
+      "Isolate infected systems immediately",
+      "Do not pay ransom",
+      "Restore from clean backups",
+      "Report to security team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["isolate_system", "block_execution", "alert_security", "disable_network"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-008",
+    "title": "Phishing and Social Engineering Prevention",
+    "content": "Suspicious emails, phone calls, or messages attempting to steal credentials or information must be reported immediately.",
+    "severity": "high",
+    "risk_score": 78,
+    "priority": 2,
+    "keywords": [
+      "phishing",
+      "social engineering",
+      "credential theft",
+      "spear phishing",
+      "pretexting",
+      "suspicious email",
+      "fake login"
+    ],
+    "category": "social_engineering",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["phishing", "email"],
+        ["credential", "request"],
+        ["urgent", "password"],
+        ["verify", "account"]
+      ],
+      "phishing_indicators": [
+        "suspicious_sender",
+        "urgent_language",
+        "credential_request",
+        "suspicious_link",
+        "unexpected_attachment"
+      ]
+    },
+    "related_policies": ["POL-007", "POL-014", "POL-026"],
+    "examples": [
+      {
+        "scenario": "Email impersonating CEO requesting urgent wire transfer",
+        "detection_method": "Email header analysis + domain verification",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Fake IT support call requesting password",
+        "detection_method": "User reporting + verification process",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Legitimate company communications",
+      "Known partner emails",
+      "Internal system notifications"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Security Awareness Training Standards"
+    ],
+    "remediation_steps": [
+      "Do not click suspicious links",
+      "Report to security team",
+      "Verify requests through alternate channels",
+      "Change credentials if compromised"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["quarantine_email", "alert_user", "block_sender"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-009",
+    "title": "Data Classification and Labeling",
+    "content": "All company data must be classified (Public, Internal, Confidential, Secret) and handled according to classification level.",
+    "severity": "medium",
+    "risk_score": 70,
+    "priority": 3,
+    "keywords": [
+      "data classification",
+      "labeling",
+      "confidential",
+      "secret",
+      "internal",
+      "public",
+      "data handling"
+    ],
+    "category": "data_governance",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["confidential", "public"],
+        ["secret", "unencrypted"],
+        ["classification", "missing"],
+        ["sensitive", "unlabeled"]
+      ],
+      "classification_indicators": [
+        "missing_label",
+        "incorrect_classification",
+        "mishandling_confidential",
+        "unauthorized_downgrade"
+      ]
+    },
+    "related_policies": ["POL-002", "POL-011", "POL-013"],
+    "examples": [
+      {
+        "scenario": "Confidential document shared without proper classification label",
+        "detection_method": "DLP scanning + metadata check",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "Employee downgrading classification without authorization",
+        "detection_method": "Audit log review",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Properly classified public data",
+      "Approved classification changes",
+      "System-generated content"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Data Governance Framework"
+    ],
+    "remediation_steps": [
+      "Apply appropriate classification label",
+      "Review handling procedures",
+      "Consult data governance team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["flag_document", "alert_owner", "require_classification"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-010",
+    "title": "Password and Authentication Management",
+    "content": "Strong passwords, multi-factor authentication, and regular password changes are mandatory for all accounts.",
+    "severity": "high",
+    "risk_score": 75,
+    "priority": 2,
+    "keywords": [
+      "password",
+      "authentication",
+      "MFA",
+      "2FA",
+      "credential",
+      "weak password",
+      "password reuse"
+    ],
+    "category": "access_control",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["weak", "password"],
+        ["password", "reuse"],
+        ["MFA", "disabled"],
+        ["credential", "sharing"]
+      ],
+      "auth_indicators": [
+        "weak_password_detected",
+        "mfa_not_enabled",
+        "password_expired",
+        "credential_sharing"
+      ]
+    },
+    "related_policies": ["POL-005", "POL-018"],
+    "examples": [
+      {
+        "scenario": "Employee using simple password like 'Password123'",
+        "detection_method": "Password policy enforcement",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Account without MFA accessing sensitive systems",
+        "detection_method": "Authentication log analysis",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Strong passwords meeting requirements",
+      "MFA properly configured",
+      "Service accounts with approved exceptions"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "NIST Password Guidelines"
+    ],
+    "remediation_steps": [
+      "Change password to meet complexity requirements",
+      "Enable multi-factor authentication",
+      "Do not share credentials"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["force_password_change", "require_mfa", "alert_user"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-011",
+    "title": "Document Management and Retention",
+    "content": "Company documents must be stored in approved systems with proper version control and retention policies.",
+    "severity": "medium",
+    "risk_score": 62,
+    "priority": 3,
+    "keywords": [
+      "document management",
+      "retention",
+      "version control",
+      "archive",
+      "document storage"
+    ],
+    "category": "data_governance",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["document", "unauthorized storage"],
+        ["retention", "violation"],
+        ["version", "missing"],
+        ["archive", "deletion"]
+      ],
+      "document_indicators": [
+        "unauthorized_storage",
+        "retention_violation",
+        "premature_deletion",
+        "no_version_control"
+      ]
+    },
+    "related_policies": ["POL-009", "POL-013"],
+    "examples": [
+      {
+        "scenario": "Storing company documents in unauthorized cloud storage",
+        "detection_method": "Cloud access monitoring",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "Deleting documents before retention period expires",
+        "detection_method": "Deletion log review",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved document management systems",
+      "Proper retention compliance",
+      "Authorized archival processes"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Records Management Standards"
+    ],
+    "remediation_steps": [
+      "Move documents to approved systems",
+      "Follow retention policies",
+      "Maintain version control"
+    ],
+    "auto_response": {
+      "enabled": false,
+      "actions": ["alert_owner", "log_violation"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-012",
+    "title": "Mobile Device Security",
+    "content": "Company-issued mobile devices must have MDM software, encryption, and remote wipe capabilities enabled.",
+    "severity": "high",
+    "risk_score": 73,
+    "priority": 2,
+    "keywords": [
+      "mobile device",
+      "MDM",
+      "smartphone",
+      "tablet",
+      "BYOD",
+      "remote wipe",
+      "device encryption"
+    ],
+    "category": "endpoint_security",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["mobile", "unmanaged"],
+        ["device", "MDM bypass"],
+        ["smartphone", "rooted"],
+        ["tablet", "jailbroken"]
+      ],
+      "mobile_indicators": [
+        "mdm_not_installed",
+        "encryption_disabled",
+        "rooted_device",
+        "outdated_os"
+      ]
+    },
+    "related_policies": ["POL-010", "POL-029"],
+    "examples": [
+      {
+        "scenario": "Employee using rooted smartphone to access company email",
+        "detection_method": "MDM device health check",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Lost company phone without remote wipe capability",
+        "detection_method": "Device inventory check",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Properly managed devices",
+      "Developer test devices with approval",
+      "Encrypted and compliant devices"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Mobile Device Management Standards"
+    ],
+    "remediation_steps": [
+      "Install MDM software",
+      "Enable device encryption",
+      "Report lost devices immediately"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_access", "alert_it", "require_mdm"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-013",
+    "title": "Data Loss Prevention (DLP)",
+    "content": "Sensitive data transfers via email, USB, cloud, or print must be monitored and blocked if unauthorized.",
+    "severity": "critical",
+    "risk_score": 88,
+    "priority": 1,
+    "keywords": [
+      "DLP",
+      "data loss",
+      "data transfer",
+      "USB",
+      "email",
+      "cloud upload",
+      "print",
+      "data leakage"
+    ],
+    "category": "data_protection",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "file_extensions": ["*"],
+      "suspicious_combinations": [
+        ["sensitive", "USB"],
+        ["confidential", "email"],
+        ["secret", "cloud"],
+        ["data", "print"]
+      ],
+      "transfer_indicators": [
+        "usb_connection",
+        "email_to_external",
+        "cloud_upload",
+        "large_print_job"
+      ],
+      "data_volume_threshold_mb": 100
+    },
+    "related_policies": ["POL-001", "POL-002", "POL-003"],
+    "examples": [
+      {
+        "scenario": "Employee copying confidential files to USB drive",
+        "detection_method": "Endpoint DLP agent",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "Sensitive document emailed to personal account",
+        "detection_method": "Email DLP gateway",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved data transfers",
+      "Encrypted backups",
+      "Internal system operations"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "GDPR",
+      "Data Protection Standards"
+    ],
+    "remediation_steps": [
+      "Stop unauthorized transfer",
+      "Report to security team",
+      "Review data handling procedures"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_security", "quarantine_data"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-014",
+    "title": "Security Awareness Training",
+    "content": "All employees must complete annual security awareness training covering phishing, social engineering, and data protection.",
+    "severity": "medium",
+    "risk_score": 60,
+    "priority": 3,
+    "keywords": [
+      "security training",
+      "awareness",
+      "education",
+      "phishing training",
+      "security culture"
+    ],
+    "category": "training",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["training", "incomplete"],
+        ["awareness", "overdue"],
+        ["compliance", "missing"]
+      ],
+      "training_indicators": [
+        "training_not_completed",
+        "training_expired",
+        "poor_phishing_test_results"
+      ]
+    },
+    "related_policies": ["POL-008"],
+    "examples": [
+      {
+        "scenario": "Employee failing multiple phishing simulation tests",
+        "detection_method": "Training platform analytics",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "Department with low training completion rate",
+        "detection_method": "Compliance reporting",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Training completed on time",
+      "High simulation test scores",
+      "Active security participation"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Security Awareness Standards"
+    ],
+    "remediation_steps": [
+      "Complete required training",
+      "Review security policies",
+      "Participate in awareness programs"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["send_reminder", "alert_manager", "track_completion"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-015",
+    "title": "Third-Party Vendor Security",
+    "content": "All vendors with access to company systems or data must undergo security assessments and sign appropriate agreements.",
+    "severity": "high",
+    "risk_score": 76,
+    "priority": 2,
+    "keywords": [
+      "vendor",
+      "third-party",
+      "supplier",
+      "contractor",
+      "vendor risk",
+      "security assessment"
+    ],
+    "category": "third_party",
+    "affected_departments": ["Procurement", "IT", "Legal"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["vendor", "unassessed"],
+        ["third-party", "access"],
+        ["contractor", "data"],
+        ["supplier", "system"]
+      ],
+      "vendor_indicators": [
+        "no_security_assessment",
+        "expired_agreement",
+        "excessive_access",
+        "no_monitoring"
+      ]
+    },
+    "related_policies": ["POL-011", "POL-030"],
+    "examples": [
+      {
+        "scenario": "Vendor accessing systems without security assessment",
+        "detection_method": "Access review audit",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Third-party with excessive data access privileges",
+        "detection_method": "Permission audit",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved vendors with current assessments",
+      "Proper access controls",
+      "Active monitoring"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Third-Party Risk Management Standards"
+    ],
+    "remediation_steps": [
+      "Conduct security assessment",
+      "Sign appropriate agreements",
+      "Limit access to minimum required"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_procurement", "review_access", "require_assessment"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-016",
+    "title": "Incident Response and Reporting",
+    "content": "All security incidents must be reported immediately and handled according to incident response procedures.",
+    "severity": "high",
+    "risk_score": 82,
+    "priority": 2,
+    "keywords": [
+      "incident response",
+      "security incident",
+      "breach",
+      "incident reporting",
+      "emergency response"
+    ],
+    "category": "incident_management",
+    "affected_departments": ["IT", "Security Operations", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["incident", "unreported"],
+        ["breach", "delayed"],
+        ["security event", "unhandled"],
+        ["emergency", "response"]
+      ],
+      "incident_indicators": [
+        "unreported_incident",
+        "delayed_response",
+        "improper_handling",
+        "no_documentation"
+      ]
+    },
+    "related_policies": ["POL-007", "POL-024"],
+    "examples": [
+      {
+        "scenario": "Data breach discovered but not reported within required timeframe",
+        "detection_method": "Audit review",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Malware infection handled without following procedures",
+        "detection_method": "Incident log review",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Proper incident reporting",
+      "Following established procedures",
+      "Complete documentation"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Incident Response Standards",
+      "GDPR Breach Notification"
+    ],
+    "remediation_steps": [
+      "Report incident immediately",
+      "Follow incident response plan",
+      "Document all actions",
+      "Notify affected parties"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["create_ticket", "alert_soc", "initiate_response"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-017",
+    "title": "Cloud Service Security",
+    "content": "Cloud services must be approved, properly configured, and monitored for security compliance and data protection.",
+    "severity": "high",
+    "risk_score": 79,
+    "priority": 2,
+    "keywords": [
+      "cloud security",
+      "SaaS",
+      "PaaS",
+      "IaaS",
+      "cloud storage",
+      "shadow IT"
+    ],
+    "category": "cloud_security",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["cloud", "unapproved"],
+        ["SaaS", "shadow IT"],
+        ["storage", "unauthorized"],
+        ["cloud", "misconfiguration"]
+      ],
+      "cloud_indicators": [
+        "unapproved_service",
+        "misconfigured_access",
+        "data_residency_violation",
+        "no_encryption"
+      ]
+    },
+    "related_policies": ["POL-013", "POL-025"],
+    "examples": [
+      {
+        "scenario": "Employee using unapproved cloud storage for company data",
+        "detection_method": "Cloud access monitoring",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Misconfigured S3 bucket exposing sensitive data",
+        "detection_method": "Cloud security posture management",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved cloud services",
+      "Proper configuration",
+      "Encrypted data"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Cloud Security Standards",
+      "SOC 2"
+    ],
+    "remediation_steps": [
+      "Use only approved cloud services",
+      "Review cloud configurations",
+      "Ensure proper encryption"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_unapproved", "alert_it", "review_config"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-018",
+    "title": "Secure Remote Work",
+    "content": "Remote workers must use VPN, secure home networks, and follow endpoint security requirements.",
+    "severity": "high",
+    "risk_score": 74,
+    "priority": 2,
+    "keywords": [
+      "remote work",
+      "VPN",
+      "home office",
+      "telecommuting",
+      "remote access"
+    ],
+    "category": "remote_access",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["remote", "no VPN"],
+        ["home network", "insecure"],
+        ["public WiFi", "access"],
+        ["remote", "unencrypted"]
+      ],
+      "remote_indicators": [
+        "vpn_not_used",
+        "insecure_network",
+        "public_wifi_access",
+        "unencrypted_connection"
+      ]
+    },
+    "related_policies": ["POL-005", "POL-010", "POL-028"],
+    "examples": [
+      {
+        "scenario": "Employee accessing company systems from public WiFi without VPN",
+        "detection_method": "Connection monitoring",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Remote worker with outdated endpoint security",
+        "detection_method": "Endpoint compliance check",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Proper VPN usage",
+      "Secure home networks",
+      "Compliant endpoints"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Remote Work Security Standards"
+    ],
+    "remediation_steps": [
+      "Always use VPN for company access",
+      "Secure home network",
+      "Keep endpoint security updated"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["require_vpn", "block_insecure", "alert_user"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-019",
+    "title": "Software Development Security",
+    "content": "Code must undergo security reviews, use approved libraries, and follow secure development practices.",
+    "severity": "high",
+    "risk_score": 77,
+    "priority": 2,
+    "keywords": [
+      "secure coding",
+      "code review",
+      "vulnerability",
+      "SAST",
+      "DAST",
+      "DevSecOps"
+    ],
+    "category": "application_security",
+    "affected_departments": ["Engineering", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["code", "vulnerability"],
+        ["library", "outdated"],
+        ["security", "review missing"],
+        ["injection", "flaw"]
+      ],
+      "development_indicators": [
+        "vulnerability_detected",
+        "insecure_library",
+        "no_code_review",
+        "hardcoded_credentials"
+      ]
+    },
+    "related_policies": ["POL-020"],
+    "examples": [
+      {
+        "scenario": "Code containing SQL injection vulnerability",
+        "detection_method": "SAST scanning",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Using library with known security vulnerabilities",
+        "detection_method": "Dependency scanning",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Code passed security review",
+      "Up-to-date libraries",
+      "Secure coding practices followed"
+    ],
+    "compliance_standards": [
+      "OWASP Top 10",
+      "Secure Development Standards"
+    ],
+    "remediation_steps": [
+      "Fix security vulnerabilities",
+      "Update libraries",
+      "Conduct code review"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_deployment", "alert_team", "create_ticket"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-020",
+    "title": "Patch Management",
+    "content": "All systems, applications, and devices must have critical security patches applied within required timeframes.",
+    "severity": "high",
+    "risk_score": 81,
+    "priority": 2,
+    "keywords": [
+      "patch",
+      "update",
+      "vulnerability",
+      "CVE",
+      "security update"
+    ],
+    "category": "vulnerability_management",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["patch", "missing"],
+        ["vulnerability", "unpatched"],
+        ["update", "overdue"],
+        ["CVE", "critical"]
+      ],
+      "patch_indicators": [
+        "missing_critical_patch",
+        "outdated_software",
+        "known_vulnerability",
+        "patch_deadline_exceeded"
+      ]
+    },
+    "related_policies": ["POL-005", "POL-027"],
+    "examples": [
+      {
+        "scenario": "Server running with critical unpatched vulnerability",
+        "detection_method": "Vulnerability scanning",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Workstations with outdated operating systems",
+        "detection_method": "Asset inventory check",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Patches applied on schedule",
+      "Up-to-date systems",
+      "Approved exceptions"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Patch Management Standards"
+    ],
+    "remediation_steps": [
+      "Apply critical patches immediately",
+      "Test patches in non-production",
+      "Document patching status"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["schedule_patching", "alert_it", "create_ticket"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-021",
+    "title": "Intellectual Property Protection",
+    "content": "Patents, trademarks, copyrights, and proprietary algorithms must be protected from unauthorized disclosure.",
+    "severity": "critical",
+    "risk_score": 93,
+    "priority": 1,
+    "keywords": [
+      "intellectual property",
+      "patent",
+      "trademark",
+      "copyright",
+      "IP protection",
+      "proprietary"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Legal", "Engineering"],
+    "detection_patterns": {
+      "file_extensions": [".pdf", ".docx", ".txt"],
+      "suspicious_combinations": [
+        ["patent", "leak"],
+        ["trademark", "unauthorized"],
+        ["IP", "disclosure"],
+        ["proprietary", "external"]
+      ],
+      "ip_indicators": [
+        "patent_document_transfer",
+        "algorithm_source_leak",
+        "trademark_misuse",
+        "copyright_violation"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-004"],
+    "examples": [
+      {
+        "scenario": "Employee sharing proprietary algorithm with external party",
+        "detection_method": "DLP + keyword matching",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "Patent application documents sent to personal email",
+        "detection_method": "Email monitoring",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved patent filings",
+      "Legal team communications",
+      "NDA-protected sharing"
+    ],
+    "compliance_standards": [
+      "Intellectual Property Laws",
+      "Patent Protection Regulations"
+    ],
+    "remediation_steps": [
+      "Stop unauthorized disclosure",
+      "Notify legal team",
+      "Preserve evidence"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_legal", "lock_document"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-022",
+    "title": "Export Control Compliance",
+    "content": "Technology and data subject to export controls must not be transferred to restricted countries or entities.",
+    "severity": "critical",
+    "risk_score": 94,
+    "priority": 1,
+    "keywords": [
+      "export control",
+      "ITAR",
+      "EAR",
+      "sanctions",
+      "restricted country",
+      "dual-use technology"
+    ],
+    "category": "compliance",
+    "affected_departments": ["Legal", "Compliance", "R&D", "Sales"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["export", "restricted"],
+        ["technology", "sanctions"],
+        ["dual-use", "transfer"],
+        ["ITAR", "violation"]
+      ],
+      "export_indicators": [
+        "transfer_to_restricted_country",
+        "sanctioned_entity_contact",
+        "controlled_tech_export",
+        "license_required"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-021"],
+    "examples": [
+      {
+        "scenario": "Technical data sent to entity in restricted country",
+        "detection_method": "Geography-based DLP",
+        "risk_level": "critical"
+      },
+      {
+        "scenario": "Export of controlled technology without proper license",
+        "detection_method": "Compliance monitoring",
+        "risk_level": "critical"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved exports with licenses",
+      "Non-controlled technology",
+      "Domestic transfers"
+    ],
+    "compliance_standards": [
+      "ITAR",
+      "EAR",
+      "Export Administration Regulations"
+    ],
+    "remediation_steps": [
+      "Stop transfer immediately",
+      "Contact legal and compliance",
+      "Report to authorities if required"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_transfer", "alert_compliance", "alert_legal"]
+    },
+    "notification_channels": ["email", "sms", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-023",
+    "title": "Physical Security Integration",
+    "content": "Physical access to secure areas must be controlled, monitored, and integrated with IT security systems.",
+    "severity": "medium",
+    "risk_score": 68,
+    "priority": 3,
+    "keywords": [
+      "physical security",
+      "access control",
+      "badge",
+      "facility",
+      "tailgating"
+    ],
+    "category": "physical_security",
+    "affected_departments": ["Facilities", "Security", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["unauthorized", "entry"],
+        ["badge", "shared"],
+        ["tailgating", "detected"],
+        ["after hours", "access"]
+      ],
+      "physical_indicators": [
+        "unauthorized_access_attempt",
+        "badge_sharing",
+        "forced_entry",
+        "unusual_access_pattern"
+      ]
+    },
+    "related_policies": ["POL-005"],
+    "examples": [
+      {
+        "scenario": "Employee allowing unauthorized person into secure area",
+        "detection_method": "Video surveillance + badge system",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "After-hours access to data center without approval",
+        "detection_method": "Access log analysis",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved after-hours work",
+      "Escorted visitors",
+      "Authorized maintenance"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Physical Security Standards"
+    ],
+    "remediation_steps": [
+      "Report unauthorized access",
+      "Review access logs",
+      "Enhance security measures"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_security", "log_event", "review_access"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-024",
+    "title": "Security Logging and Monitoring",
+    "content": "All security events must be logged, monitored, and retained according to policy for incident investigation.",
+    "severity": "high",
+    "risk_score": 72,
+    "priority": 2,
+    "keywords": [
+      "logging",
+      "monitoring",
+      "SIEM",
+      "audit trail",
+      "log retention"
+    ],
+    "category": "monitoring",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["log", "deleted"],
+        ["monitoring", "disabled"],
+        ["audit", "gap"],
+        ["SIEM", "alert"]
+      ],
+      "logging_indicators": [
+        "log_deletion",
+        "monitoring_disabled",
+        "logging_gap",
+        "tampered_logs"
+      ]
+    },
+    "related_policies": ["POL-006", "POL-016"],
+    "examples": [
+      {
+        "scenario": "Security logs deleted to hide malicious activity",
+        "detection_method": "Log integrity monitoring",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Critical system with logging disabled",
+        "detection_method": "Configuration audit",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Routine log rotation",
+      "Approved maintenance",
+      "Proper log retention"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Log Management Standards"
+    ],
+    "remediation_steps": [
+      "Enable logging immediately",
+      "Investigate log tampering",
+      "Restore from backup if needed"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["alert_soc", "enable_logging", "investigate"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-025",
+    "title": "API Security Management",
+    "content": "All APIs must use authentication, authorization, encryption, and rate limiting; API keys must be protected.",
+    "severity": "high",
+    "risk_score": 78,
+    "priority": 2,
+    "keywords": [
+      "API",
+      "REST",
+      "authentication",
+      "API key",
+      "rate limiting",
+      "API security"
+    ],
+    "category": "application_security",
+    "affected_departments": ["Engineering", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["API", "exposed"],
+        ["key", "leaked"],
+        ["authentication", "missing"],
+        ["rate limit", "exceeded"]
+      ],
+      "api_indicators": [
+        "exposed_api_key",
+        "no_authentication",
+        "excessive_requests",
+        "unauthorized_access"
+      ]
+    },
+    "related_policies": ["POL-019"],
+    "examples": [
+      {
+        "scenario": "API key exposed in public GitHub repository",
+        "detection_method": "Secret scanning",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Unauthenticated API allowing data access",
+        "detection_method": "Security testing",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Properly secured APIs",
+      "API keys rotated regularly",
+      "Rate limiting configured"
+    ],
+    "compliance_standards": [
+      "OWASP API Security Top 10",
+      "API Security Standards"
+    ],
+    "remediation_steps": [
+      "Revoke exposed API keys",
+      "Implement proper authentication",
+      "Configure rate limiting"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["revoke_key", "alert_team", "block_access"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-026",
+    "title": "Email Security Management",
+    "content": "Sensitive emails must be encrypted; suspicious emails must be reported; email security gateways must be maintained.",
+    "severity": "high",
+    "risk_score": 75,
+    "priority": 2,
+    "keywords": [
+      "email",
+      "encryption",
+      "confidential",
+      "transmission",
+      "sensitive data",
+      "email security"
+    ],
+    "category": "communication_security",
+    "affected_departments": ["All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["email", "encryption"],
+        ["confidential", "transmission"],
+        ["sensitive", "data"],
+        ["security", "mail"]
+      ],
+      "email_indicators": [
+        "unencrypted_sensitive_data",
+        "external_recipient",
+        "large_attachment",
+        "suspicious_link"
+      ]
+    },
+    "related_policies": ["POL-002", "POL-007"],
+    "examples": [
+      {
+        "scenario": "Sending personal data via email without encryption",
+        "detection_method": "Email DLP",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Receiving email with suspicious links",
+        "detection_method": "Email security gateway",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Encrypted emails",
+      "Internal transmissions",
+      "Normal business emails"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Email Security Standards"
+    ],
+    "remediation_steps": [
+      "Stop unencrypted email transmission",
+      "Report suspicious emails to security team",
+      "Do not execute attachments"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_unencrypted", "quarantine_suspicious", "alert_user"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-027",
+    "title": "IoT Device Firmware Management",
+    "content": "IoT devices must have updated firmware and default credentials must be changed; regular vulnerability scans are mandatory.",
+    "severity": "medium",
+    "risk_score": 67,
+    "priority": 3,
+    "keywords": [
+      "IoT",
+      "firmware",
+      "patch",
+      "credential",
+      "internet of things",
+      "vulnerability scan",
+      "default password"
+    ],
+    "category": "iot_security",
+    "affected_departments": ["IT", "Facilities"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["IoT", "firmware"],
+        ["default", "account"],
+        ["update", "not applied"],
+        ["vulnerability", "detected"]
+      ],
+      "firmware_indicators": [
+        "outdated_version",
+        "default_password",
+        "no_update_schedule",
+        "known_vulnerability"
+      ]
+    },
+    "related_policies": ["POL-020"],
+    "examples": [
+      {
+        "scenario": "IoT sensor running on outdated firmware",
+        "detection_method": "Asset management system",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "IoT device accessible with default admin credentials",
+        "detection_method": "Security scanning",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Latest firmware applied",
+      "Strong authentication configured",
+      "Regular maintenance scheduled"
+    ],
+    "compliance_standards": [
+      "IoT Security Guidelines",
+      "Device Security Standards"
+    ],
+    "remediation_steps": [
+      "Update firmware to latest version",
+      "Change default passwords",
+      "Perform regular security checks"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["schedule_update", "alert_it", "scan_device"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-028",
+    "title": "Remote Access Monitoring",
+    "content": "All remote access sessions must be logged, monitored, and unauthorized connections must be blocked.",
+    "severity": "medium",
+    "risk_score": 69,
+    "priority": 3,
+    "keywords": [
+      "remote access",
+      "VPN",
+      "logging",
+      "monitoring",
+      "unauthorized access",
+      "remote security"
+    ],
+    "category": "remote_access",
+    "affected_departments": ["IT", "Security Operations"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["remote", "access"],
+        ["unauthorized", "VPN"],
+        ["log", "anomaly"],
+        ["access", "attempt"]
+      ],
+      "access_indicators": [
+        "failed_vpn_login",
+        "unusual_location",
+        "after_hours_access",
+        "multiple_failed_attempts"
+      ]
+    },
+    "related_policies": ["POL-018"],
+    "examples": [
+      {
+        "scenario": "VPN access attempt from foreign country",
+        "detection_method": "Geographic-based access analysis",
+        "risk_level": "medium"
+      },
+      {
+        "scenario": "Multiple VPN login failures followed by success",
+        "detection_method": "Login pattern analysis",
+        "risk_level": "medium"
+      }
+    ],
+    "false_positive_indicators": [
+      "Approved international travel",
+      "Normal business hours",
+      "Registered remote workers"
+    ],
+    "compliance_standards": [
+      "ISO 27001",
+      "Remote Access Security Standards"
+    ],
+    "remediation_steps": [
+      "Block unauthorized access",
+      "Review VPN and access logs",
+      "Report to security team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["block_suspicious_ip", "alert_security", "require_mfa"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-029",
+    "title": "Endpoint Device Encryption",
+    "content": "All laptops, desktops, and mobile devices must use full-disk encryption to protect company data.",
+    "severity": "high",
+    "risk_score": 77,
+    "priority": 2,
+    "keywords": [
+      "endpoint",
+      "encryption",
+      "device security",
+      "laptop",
+      "desktop",
+      "mobile",
+      "full-disk encryption"
+    ],
+    "category": "endpoint_security",
+    "affected_departments": ["IT", "All Departments"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["encryption", "not applied"],
+        ["device", "lost"],
+        ["laptop", "security"],
+        ["desktop", "encryption"]
+      ],
+      "encryption_indicators": [
+        "encryption_disabled",
+        "bitlocker_off",
+        "filevault_off",
+        "no_encryption_key"
+      ]
+    },
+    "related_policies": ["POL-010", "POL-012"],
+    "examples": [
+      {
+        "scenario": "Lost unencrypted laptop resulting in data breach",
+        "detection_method": "Device management system",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Employee arbitrarily disabling encryption",
+        "detection_method": "Endpoint security check",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "Encryption properly applied",
+      "Test devices",
+      "Isolated environment"
+    ],
+    "compliance_standards": [
+      "Data Protection Standards",
+      "Mobile Security Guidelines"
+    ],
+    "remediation_steps": [
+      "Verify encryption status",
+      "Secure unencrypted devices",
+      "Report to security team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["enforce_encryption", "alert_it", "lock_device"]
+    },
+    "notification_channels": ["email"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  },
+  {
+    "id": "POL-030",
+    "title": "R&D Collaboration and Data Sharing",
+    "content": "All R&D collaborations must have controlled access, data sharing agreements, and confidentiality measures in place.",
+    "severity": "high",
+    "risk_score": 84,
+    "priority": 2,
+    "keywords": [
+      "R&D",
+      "collaboration",
+      "data sharing",
+      "confidentiality",
+      "research development",
+      "partnership",
+      "joint research"
+    ],
+    "category": "core_tech",
+    "affected_departments": ["R&D", "Legal", "IT"],
+    "detection_patterns": {
+      "suspicious_combinations": [
+        ["R&D", "sharing"],
+        ["collaboration", "data"],
+        ["research", "external"],
+        ["confidential", "partnership"]
+      ],
+      "collaboration_indicators": [
+        "no_nda",
+        "unrestricted_access",
+        "no_data_classification",
+        "external_sharing"
+      ]
+    },
+    "related_policies": ["POL-001", "POL-004", "POL-011"],
+    "examples": [
+      {
+        "scenario": "Sharing R&D data with partner without NDA",
+        "detection_method": "Document access logs",
+        "risk_level": "high"
+      },
+      {
+        "scenario": "Granting excessive research data access to external collaborator",
+        "detection_method": "Permission audit",
+        "risk_level": "high"
+      }
+    ],
+    "false_positive_indicators": [
+      "NDA-signed collaboration",
+      "Limited access permissions",
+      "Approved joint research"
+    ],
+    "compliance_standards": [
+      "Trade Secret Protection Laws",
+      "Industrial Technology Protection"
+    ],
+    "remediation_steps": [
+      "Restrict collaboration access",
+      "Verify data sharing agreements",
+      "Report to security team"
+    ],
+    "auto_response": {
+      "enabled": true,
+      "actions": ["restrict_access", "alert_legal", "verify_nda"]
+    },
+    "notification_channels": ["email", "slack"],
+    "last_updated": "2025-10-30",
+    "version": "2.0"
+  }
+]
