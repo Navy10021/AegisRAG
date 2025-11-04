@@ -1,0 +1,21 @@
+text,user_id,risk_score,risk_level,confidence,language,violations,threats,self_rag
+I uploaded the internal project plan to my personal Google Drive.,user_002,35.0,MEDIUM,0.6585226240683841,en,,Unauthorized cloud - Google Drive,Yes
+An employee tried to download large volumes of confidential data before resignation.,user_003,100.0,CRITICAL,1.0,en,"POL-003,POL-026","Insider threat - resignation,Mass download attempt,Confidential information leak",Yes
+The client information file was sent via Slack to an external partner.,user_004,48.0,HIGH,0.7139840261854838,en,,"Partner company security,Slack unauthorized use",Yes
+Shared the company’s R&D strategy document without an NDA.,user_005,100.0,CRITICAL,0.9319220474373013,en,POL-030,"R&D materials leak,NDA violation",Yes
+I sent the financial statement draft to my private email for review.,user_001,100.0,CRITICAL,1.0,en,"POL-026,POL-002","Email information leak,Financial statement leak",Yes
+Installed unauthorized software on the company-issued laptop.,user_002,39.4,MEDIUM,0.9181416186338323,en,POL-005,Unauthorized access,Yes
+The marketing data was accidentally shared in a public folder.,user_003,8.6,LOW,0.9440408271029144,en,POL-009,,Yes
+Exported source code files to a USB drive without permission.,user_004,100.0,CRITICAL,1.0,en,"POL-013,POL-003","USB external extraction risk,USB drive usage,Permission violation,Source code leak,Source leak,Code leak",Yes
+Shared sensitive contract details over a personal messaging app.,user_005,35.0,MEDIUM,0.6596607724362438,en,,Contract leak,Yes
+Created a presentation summarizing the company’s internal roadmap.,user_001,10.0,LOW,0.0,unknown,,,Yes
+I sent internal accounting materials to my personal email.,user_002,100.0,CRITICAL,1.0,en,"POL-002,POL-026,POL-009","Email information leak,Personal email usage",Yes
+An employee who was about to resign downloaded large amounts of data from the company server.,user_003,40.0,HIGH,0.7034167222083918,en,,Insider threat - resign,Yes
+Shared a customer contract with an external partner via messenger.,user_004,58.0,HIGH,0.7324024771125933,en,,"Contract leak,Partner company security",Yes
+Uploaded new product design blueprints to my personal cloud.,user_005,100.0,CRITICAL,0.9175275213548506,en,POL-001,"Design information leak,Cloud unauthorized upload,Personal cloud usage,New product information",Yes
+Reviewed company policy documents to prevent external leaks.,user_001,0.0,LOW,0.6770888896322533,en,,,Yes
+Saved part of the R&D experimental data to an external USB drive.,user_002,100.0,CRITICAL,1.0,en,"POL-013,POL-030,POL-001","R&D materials leak,Experimental data leak,USB external extraction risk,USB drive usage",Yes
+Copied the sales client list to my personal laptop.,user_003,10.0,LOW,0.0,unknown,,,Yes
+Installed unapproved software on a company computer.,user_004,10.0,LOW,0.0,unknown,,,Yes
+Shared team meeting minutes with an external collaborator.,user_005,0.0,LOW,0.6191652849316314,en,,,Yes
+Sent the project schedule management file to my personal email.,user_001,10.0,LOW,0.0,unknown,,,Yes
