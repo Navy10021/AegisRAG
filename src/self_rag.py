@@ -20,8 +20,9 @@ logger = logging.getLogger(__name__)
 try:
     import openai
     OPENAI_AVAILABLE = True
-except:
+except (ImportError, ModuleNotFoundError) as e:
     OPENAI_AVAILABLE = False
+    logger.warning(f"OpenAI module not available: {e}")
 
 
 # ============================================================
@@ -292,7 +293,11 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
             )
             result = json.loads(response.choices[0].message.content)
             return RetrievalNeed[result.get('need', 'OPTIONAL')]
-        except:
+        except (KeyError, json.JSONDecodeError, AttributeError) as e:
+            logger.warning(f"LLM response parsing failed: {e}")
+            return RetrievalNeed.OPTIONAL
+        except Exception as e:
+            logger.error(f"LLM request failed: {e}")
             return RetrievalNeed.OPTIONAL
     
     def assess_relevance(self, text: str, result) -> Dict[str, RelevanceScore]:

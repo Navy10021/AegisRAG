@@ -20,8 +20,9 @@ _embedding_model_cache = None
 try:
     from sentence_transformers import SentenceTransformer
     SENTENCE_TRANSFORMERS_AVAILABLE = True
-except:
+except (ImportError, ModuleNotFoundError) as e:
     SENTENCE_TRANSFORMERS_AVAILABLE = False
+    logger.warning(f"Sentence Transformers not available: {e}")
 
 
 # ============================================================
@@ -92,7 +93,7 @@ def get_embedding_model():
         _embedding_model_cache = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
         logger.info("✅ Embedding model loaded")
         return _embedding_model_cache
-    except Exception as e:
+    except (OSError, RuntimeError, ValueError) as e:
         logger.error(f"Model load failed: {e}")
         return None
 
