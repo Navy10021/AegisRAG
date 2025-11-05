@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Main Analyzer
-메인 보안 분석기 (Self-RAG 통합)
+Main security analyzer with Self-RAG integration
 """
 
 import json
@@ -31,7 +31,7 @@ from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
 
 logger = logging.getLogger(__name__)
 
-# OpenAI 가용성 체크
+# Check OpenAI availability
 try:
     import openai
     OPENAI_AVAILABLE = True
@@ -106,7 +106,7 @@ class AdvancedRAGAnalyzer:
         self.language_detector = LanguageDetector() if enable_advanced else None
         self.analysis_history = deque(maxlen=self.config.MAX_HISTORY_SIZE)
 
-        # API 키 관리 (환경변수 직접 수정 금지)
+        # API key management (do not modify environment variables directly)
         if api_key:
             self._api_key = api_key
             logger.info("API key provided via parameter")
@@ -116,12 +116,12 @@ class AdvancedRAGAnalyzer:
                 logger.info("API key loaded from environment")
             else:
                 logger.warning("No API key found - LLM features will be disabled")
-        
-        # Self-RAG 엔진 초기화
+
+        # Initialize Self-RAG engine
         if self.enable_self_rag:
             self.self_rag_engine = SelfRAGEngine(self, use_llm=self.use_llm)
-        
-        # Hybrid Search 초기화
+
+        # Initialize Hybrid Search
         if self.use_embeddings:
             try:
                 self.embedding_model = get_embedding_model()
