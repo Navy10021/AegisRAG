@@ -2,14 +2,29 @@
 
 [![Python](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF.svg)](https://github.com/Navy10021/aegisrag/actions)
+[![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC.svg)](https://docs.pytest.org/)
 [![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-orange.svg)](https://openai.com/)
 [![Version](https://img.shields.io/badge/version-3.0.0-brightgreen.svg)](https://github.com/Navy10021/aegisrag)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Navy10021/aegisrag/graphs/commit-activity)
+[![Documentation](https://img.shields.io/badge/docs-English-blue.svg)](README.md)
 
 > **AegisRAG v3.0 introduces Self-RAG: A self-reflective retrieval-augmented intelligence framework with explainable AI, context memory, and adaptive threat analysis.**
 
 AegisRAG combines **Self-RAG meta-evaluation**, **hybrid semantic retrieval**, **explainable AI reasoning**, and **LLM-augmented analysis** to detect insider threats, data breaches, and policy violations with unprecedented transparency and accuracy. Built for enterprise security teams, compliance officers, and security researchers who demand interpretable and reliable threat detection.
+
+## 🎯 Recent Updates (v3.0.1 - 2025-01)
+
+### ✨ Phase 1 Improvements Complete
+- **🌍 Full Internationalization**: All codebase documentation now in English for global accessibility
+- **🔒 Enhanced Security**: Improved API key management with instance isolation
+- **🧪 Expanded Test Coverage**: Added comprehensive tests for Self-RAG, Memory, XAI, and Retrieval systems
+- **📦 CI/CD Pipeline**: GitHub Actions for automated testing, linting, and security scanning
+- **📄 MIT License**: Open source license added
+- **📚 Better Documentation**: Usage examples and contributor guidelines
+
+[View Full Changelog](#changelog)
 
 ---
 
@@ -616,6 +631,57 @@ MIT License - see [LICENSE](LICENSE)
 - **Email:** iyunseob4@gmail.com
 - **GitHub:** [@Navy10021](https://github.com/Navy10021)
 - **Issues:** [Report Bug](https://github.com/Navy10021/aegisrag/issues)
+
+---
+
+## 📋 Changelog {#changelog}
+
+### v3.0.1 (2025-01-05) - Phase 1 Complete
+
+**🌍 Internationalization**
+- Converted all Python source files to English documentation (8 files, 302+ lines)
+- Improved accessibility for international contributors
+- Enhanced code maintainability and readability
+
+**🔒 Security Enhancements**
+- Improved API key management with OpenAI client instances
+- Eliminated global state modification for better isolation
+- Enhanced multi-tenant environment support
+
+**🧪 Testing**
+- Added `test_self_rag.py`: 150+ lines of Self-RAG engine tests
+- Added `test_memory.py`: Comprehensive context memory tests
+- Added `test_explainer.py`: XAI system validation tests
+- Added `test_retriever.py`: Hybrid retrieval system tests
+- Total: 600+ lines of new test coverage
+
+**📦 Infrastructure**
+- Added GitHub Actions CI/CD pipeline
+  - Python 3.8-3.11 compatibility testing
+  - Automated linting (flake8)
+  - Code formatting checks (black)
+  - Type checking (mypy)
+  - Security scanning (bandit, safety)
+  - Test coverage reporting (pytest, codecov)
+- Added MIT License file
+- Added usage examples (`examples/basic_usage.py`, `examples/advanced_usage.py`)
+- Added CONTRIBUTING.md for contributor guidelines
+- Added .env.example for environment configuration
+
+**📚 Documentation**
+- Updated README with Phase 1 achievements
+- Added CI/CD badges
+- Improved installation and usage instructions
+
+### v3.0.0 (2024-11)
+
+**Initial Release**
+- Self-RAG meta-evaluation pipeline
+- 900+ security pattern detection
+- Hybrid retrieval (Semantic + BM25 + Keyword)
+- Explainable AI (XAI) system
+- Context memory and user profiling
+- Multi-language support (Korean, English, Japanese, Chinese)
 
 ---
 

@@ -345,10 +345,10 @@ class AdvancedRAGAnalyzer:
             return result
         except Exception as e:
             self.stats['errors'] += 1
-            logger.error(f"Error: {e}")
+            logger.error(f"Analysis error: {type(e).__name__}: {str(e)}", exc_info=True)
             return AnalysisResult(
                 text=text, risk_score=0, risk_level='LOW',
-                explanation=f"Error: {str(e)}",
+                explanation="Analysis failed due to internal error. Please contact support.",
                 processing_time=(datetime.now() - start).total_seconds(),
                 user_id=user_id
             )
