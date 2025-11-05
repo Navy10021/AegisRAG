@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Retrieval System
-검색 시스템 (BM25, Semantic Search, Hybrid Search)
+Retrieval system (BM25, Semantic Search, Hybrid Search)
 """
 
 import logging
@@ -13,10 +13,10 @@ from .models import SecurityPolicy
 
 logger = logging.getLogger(__name__)
 
-# 임베딩 모델 캐시
+# Embedding model cache
 _embedding_model_cache = None
 
-# Sentence Transformers 가용성 체크
+# Sentence Transformers availability check
 try:
     from sentence_transformers import SentenceTransformer
     SENTENCE_TRANSFORMERS_AVAILABLE = True
@@ -30,7 +30,7 @@ except (ImportError, ModuleNotFoundError) as e:
 # ============================================================
 
 class BM25:
-    """BM25 알고리즘 - 키워드 기반 검색 강화"""
+    """BM25 algorithm - Enhanced keyword-based search"""
     
     def __init__(self, k1=1.5, b=0.75):
         self.k1 = k1
@@ -41,7 +41,7 @@ class BM25:
         self.corpus = []
     
     def fit(self, corpus):
-        """코퍼스로 BM25 학습"""
+        """Train BM25 with corpus"""
         self.corpus = corpus
         self.doc_len = [len(doc.split()) for doc in corpus]
         self.avgdl = sum(self.doc_len) / len(self.doc_len) if self.doc_len else 0
@@ -58,7 +58,7 @@ class BM25:
             self.idf[word] = np.log((num_docs - freq + 0.5) / (freq + 0.5) + 1)
     
     def get_scores(self, query):
-        """쿼리에 대한 각 문서의 BM25 스코어 계산"""
+        """Calculate BM25 score for each document against query"""
         query_words = query.lower().split()
         scores = np.zeros(len(self.corpus))
         
@@ -83,7 +83,7 @@ class BM25:
 # ============================================================
 
 def get_embedding_model():
-    """임베딩 모델 로드 (캐싱)"""
+    """Load embedding model (with caching)"""
     global _embedding_model_cache
     if not SENTENCE_TRANSFORMERS_AVAILABLE:
         return None
@@ -99,7 +99,7 @@ def get_embedding_model():
 
 
 def encode_texts(texts, model=None):
-    """텍스트를 임베딩 벡터로 변환"""
+    """Convert texts to embedding vectors"""
     if not texts:
         return np.array([])
     model = model or get_embedding_model()
@@ -112,7 +112,7 @@ def encode_texts(texts, model=None):
 
 
 def batch_cosine_similarity(query_vec, corpus_vecs):
-    """쿼리 벡터와 코퍼스 벡터들 간의 코사인 유사도 계산"""
+    """Calculate cosine similarity between query vector and corpus vectors"""
     if query_vec.size == 0 or corpus_vecs.size == 0:
         return np.array([])
     query_norm = np.linalg.norm(query_vec)
@@ -155,7 +155,7 @@ def hybrid_search(
             semantic_scores = batch_cosine_similarity(query_emb, policy_embeddings)
         except:
             pass
-    
+
     # 2. BM25 Keyword Search
     bm25_scores = np.zeros(n_policies)
     if bm25_model:
@@ -163,7 +163,7 @@ def hybrid_search(
             bm25_scores = bm25_model.get_scores(text)
         except:
             pass
-    
+
     # 3. Simple Keyword Matching
     text_lower = text.lower()
     keyword_scores = np.zeros(n_policies)
@@ -171,25 +171,25 @@ def hybrid_search(
         match_count = sum(1 for kw in policy.keywords if kw.lower() in text_lower)
         if match_count > 0:
             keyword_scores[i] = match_count / max(len(policy.keywords), 1)
-    
-    # 4. 점수 정규화
+
+    # 4. Score normalization
     def normalize(scores):
         if len(scores) == 0 or scores.max() == scores.min():
             return np.zeros_like(scores)
         return (scores - scores.min()) / (scores.max() - scores.min() + 1e-10)
-    
+
     semantic_norm = normalize(semantic_scores)
     bm25_norm = normalize(bm25_scores)
     keyword_norm = keyword_scores
-    
-    # 5. 가중합으로 결합
+
+    # 5. Combine with weighted sum
     combined_scores = (
         semantic_weight * semantic_norm +
         bm25_weight * bm25_norm +
         keyword_weight * keyword_norm
     )
-    
-    # 6. Top 3 결과
+
+    # 6. Top 3 results
     top_indices = np.argsort(combined_scores)[::-1][:3]
     
     for idx in top_indices:

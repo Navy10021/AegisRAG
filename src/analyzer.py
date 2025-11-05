@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 
 # Check OpenAI availability
 try:
-    import openai
+    from openai import OpenAI
     OPENAI_AVAILABLE = True
 except (ImportError, ModuleNotFoundError) as e:
     OPENAI_AVAILABLE = False
@@ -144,10 +144,12 @@ class AdvancedRAGAnalyzer:
                 self.bm25_model = None
         
         if self.use_llm and self._api_key:
-            openai.api_key = self._api_key
+            # Initialize OpenAI client (avoids global state modification)
+            self.openai_client = OpenAI(api_key=self._api_key)
             logger.info("✅ LLM ready")
         else:
             self.use_llm = False
+            self.openai_client = None
 
         self._search_cached = lru_cache(maxsize=self.config.CACHE_SIZE)(self._search_impl)
         
@@ -460,7 +462,7 @@ JSON:
     "explanation": "why"
 }}"""
         try:
-            response = openai.chat.completions.create(
+            response = self.openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "Security expert. JSON only."},

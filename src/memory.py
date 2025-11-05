@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Memory System
-컨텍스트 기억 및 관계형 분석 시스템
+Context memory and relational analysis system
 """
 
 import logging
@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 class ContextMemorySystem:
-    """사용자 행동 패턴 학습 및 컨텍스트 기억"""
+    """User behavior pattern learning and context memory"""
     
     def __init__(self):
         self.user_profiles = defaultdict(lambda: {
@@ -33,10 +33,10 @@ class ContextMemorySystem:
         })
     
     def update_user_context(self, user_id: str, result):
-        """사용자 프로필 업데이트"""
-        # result가 SelfRAGResult인 경우 처리
+        """Update user profile"""
+        # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
-        
+
         profile = self.user_profiles[user_id]
         profile['analyses_count'] += 1
         n = profile['analyses_count']
@@ -48,8 +48,8 @@ class ContextMemorySystem:
         })
         for v in analysis.violations:
             profile['violation_patterns'][v] += 1
-        
-        # 행동 트렌드 분석
+
+        # Behavior trend analysis
         if len(profile['risk_history']) >= 10:
             recent = [h['score'] for h in list(profile['risk_history'])[-10:]]
             x = np.arange(len(recent))
@@ -57,7 +57,7 @@ class ContextMemorySystem:
             profile['behavior_trend'] = 'increasing' if slope > 5 else 'decreasing' if slope < -5 else 'stable'
     
     def get_context_adjustment(self, user_id: str, base_score: float) -> float:
-        """컨텍스트 기반 점수 조정"""
+        """Context-based score adjustment"""
         profile = self.user_profiles.get(user_id)
         if not profile or profile['analyses_count'] < 5:
             return 0.0
@@ -72,7 +72,7 @@ class ContextMemorySystem:
         return min(adjustment, 30)
     
     def get_user_summary(self, user_id: str) -> Dict:
-        """사용자 요약 정보"""
+        """Get user summary information"""
         profile = self.user_profiles.get(user_id)
         if not profile:
             return {'status': 'no_data'}
@@ -90,15 +90,15 @@ class ContextMemorySystem:
 # ============================================================
 
 class RelationshipAnalyzer:
-    """이벤트 간 관계 분석"""
+    """Inter-event relationship analysis"""
     
     def __init__(self):
         self.event_graph = nx.DiGraph()
         self.temporal_window = timedelta(hours=24)
     
     def add_event(self, event_id: str, result):
-        """이벤트 추가"""
-        # result가 SelfRAGResult인 경우 처리
+        """Add event"""
+        # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
         
         self.event_graph.add_node(
@@ -111,7 +111,7 @@ class RelationshipAnalyzer:
         )
     
     def build_relationships(self):
-        """이벤트 간 관계 구축"""
+        """Build inter-event relationships"""
         nodes = list(self.event_graph.nodes(data=True))
         for i, (id1, data1) in enumerate(nodes):
             for id2, data2 in nodes[i+1:]:
@@ -127,7 +127,7 @@ class RelationshipAnalyzer:
                         self.event_graph.add_edge(id1, id2, weight=relationship_score)
     
     def detect_compound_threats(self, min_chain: int = 3) -> List[Dict]:
-        """복합 위협 탐지"""
+        """Detect compound threats"""
         threats = []
         for component in nx.weakly_connected_components(self.event_graph):
             if len(component) >= min_chain:
@@ -143,7 +143,7 @@ class RelationshipAnalyzer:
         return sorted(threats, key=lambda x: x['avg_risk_score'], reverse=True)
     
     def visualize(self, output: str = 'output/threat_graph.png'):
-        """그래프 시각화"""
+        """Graph visualization"""
         try:
             import matplotlib.pyplot as plt
             plt.figure(figsize=(12, 8))

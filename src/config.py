@@ -1,6 +1,6 @@
 """
 AegisRAG Configuration Management
-설정 관리 시스템
+Configuration management system
 """
 
 import os
@@ -10,7 +10,7 @@ from typing import Dict
 
 @dataclass
 class AnalyzerConfig:
-    """Analyzer 설정"""
+    """Analyzer configuration"""
 
     # Severity settings
     SEVERITY_MULTIPLIERS: Dict[str, float] = None
@@ -71,7 +71,7 @@ class AnalyzerConfig:
 
 @dataclass
 class SecurityConfig:
-    """보안 설정"""
+    """Security configuration"""
 
     # API Key management
     OPENAI_API_KEY: str = None
@@ -90,7 +90,7 @@ class SecurityConfig:
 
 @dataclass
 class LoggingConfig:
-    """로깅 설정"""
+    """Logging configuration"""
 
     LOG_LEVEL: str = "INFO"
     LOG_FILE: str = "logs/aegis.log"

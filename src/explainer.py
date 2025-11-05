@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Explainable AI
-설명 가능한 AI (XAI) 시스템
+Explainable AI (XAI) System
 """
 
 import logging
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 # ============================================================
 
 class ExplainableAI:
-    """설명 가능한 AI - 분석 결과의 근거 제공"""
+    """Explainable AI - Provides rationale for analysis results"""
     
     @staticmethod
     def generate_explanation(
@@ -28,32 +28,32 @@ class ExplainableAI:
         score_breakdown: ScoreBreakdown,
         similar_cases: Optional[List] = None
     ) -> ExplanationData:
-        """설명 데이터 생성"""
-        # result가 SelfRAGResult인 경우 처리
+        """Generate explanation data"""
+        # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
-        
-        # 주요 요인 추출
+
+        # Extract key factors
         key_factors = []
         for keyword, score in score_breakdown.keyword_matches.items():
             if score > 5:
                 importance = 'CRITICAL' if score > 30 else 'HIGH' if score > 15 else 'MEDIUM'
-                key_factors.append((keyword, score, importance, f"'{keyword}' 키워드 감지"))
-        
+                key_factors.append((keyword, score, importance, f"'{keyword}' keyword detected"))
+
         for policy_id, score in score_breakdown.policy_similarities.items():
             if score > 10:
-                key_factors.append((policy_id, score, 'HIGH', f"정책 {policy_id} 매칭"))
-        
+                key_factors.append((policy_id, score, 'HIGH', f"Policy {policy_id} matched"))
+
         key_factors.sort(key=lambda x: x[1], reverse=True)
-        
-        # 반사실적 설명 (Counterfactual)
+
+        # Counterfactual explanations
         counterfactuals = []
         if score_breakdown.keyword_matches:
             top_kw = max(score_breakdown.keyword_matches.items(), key=lambda x: x[1])
             counterfactuals.append(
-                f"만약 '{top_kw[0]}' 키워드가 없었다면: {analysis.risk_score - top_kw[1]:.1f}점"
+                f"If '{top_kw[0]}' keyword was absent: {analysis.risk_score - top_kw[1]:.1f} points"
             )
-        
-        # 유사 사례
+
+        # Similar cases
         similar_case_data = []
         if similar_cases:
             for case in similar_cases[:3]:
@@ -65,7 +65,7 @@ class ExplainableAI:
                     case_analysis.risk_level,
                     case_analysis.risk_score
                 ))
-        
+
         return ExplanationData(
             score_breakdown=score_breakdown,
             key_factors=key_factors,
@@ -75,8 +75,8 @@ class ExplainableAI:
     
     @staticmethod
     def _calc_similarity(case1, case2) -> float:
-        """두 케이스 간의 유사도 계산"""
-        # 둘 다 AnalysisResult로 변환
+        """Calculate similarity between two cases"""
+        # Convert both to AnalysisResult
         a1 = get_analysis_result(case1) if not isinstance(case1, AnalysisResult) else case1
         a2 = get_analysis_result(case2) if not isinstance(case2, AnalysisResult) else case2
         
@@ -87,7 +87,7 @@ class ExplainableAI:
     
     @staticmethod
     def print_explanation(result):
-        """설명을 콘솔에 출력"""
+        """Print explanation to console"""
         analysis = get_analysis_result(result)
         
         if not analysis.explanation_data:
