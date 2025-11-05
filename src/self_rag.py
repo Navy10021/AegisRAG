@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Self-RAG Engine
-자가 반성형 RAG 시스템
+Self-Reflective RAG System
 """
 
 import json
@@ -17,9 +17,9 @@ from .utils import sanitize_prompt_input
 
 logger = logging.getLogger(__name__)
 
-# OpenAI 가용성 체크
+# OpenAI availability check
 try:
-    import openai
+    from openai import OpenAI
     OPENAI_AVAILABLE = True
 except (ImportError, ModuleNotFoundError) as e:
     OPENAI_AVAILABLE = False
@@ -31,7 +31,7 @@ except (ImportError, ModuleNotFoundError) as e:
 # ============================================================
 
 class SecurityPatternStrength(Enum):
-    """보안 패턴 강도"""
+    """Security pattern strength"""
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -44,13 +44,13 @@ class SecurityPatternStrength(Enum):
 
 class EnhancedSecurityPatternDetector:
     """
-    강화된 보안 패턴 탐지기
-    - 900+ 보안 키워드
-    - 정규식 패턴 매칭
-    - 복합 패턴 탐지
+    Enhanced security pattern detector
+    - 900+ security keywords
+    - Regular expression pattern matching
+    - Compound pattern detection
     """
     
-    # CRITICAL 키워드 (영어)
+    # CRITICAL keywords (English)
     CRITICAL_KEYWORDS_EN = [
         'password', 'passwd', 'pwd', 'credential', 'token', 'api key', 'apikey',
         'secret', 'private key', 'access key', 'session', 'cookie', 'auth',
@@ -67,7 +67,7 @@ class EnhancedSecurityPatternDetector:
         'phishing', 'phish', 'scam', 'fraud', 'spoof',
     ]
     
-    # CRITICAL 키워드 (한국어)
+    # CRITICAL keywords (Korean)
     CRITICAL_KEYWORDS_KO = [
         '비밀번호', '패스워드', '암호', '인증서', '토큰', '키', 'API키', '접근키',
         '해킹', '해킹당함', '크랙', '침해', '공격', '악용',
@@ -84,7 +84,7 @@ class EnhancedSecurityPatternDetector:
         '개인정보', '주민번호', '계좌번호', '카드번호', '금융정보',
     ]
     
-    # HIGH 키워드 (영어)
+    # HIGH keywords (English)
     HIGH_KEYWORDS_EN = [
         'access', 'download', 'upload', 'transfer', 'copy', 'share', 'forward', 'send',
         'account', 'user', 'login', 'logout', 'signin', 'register',
@@ -95,7 +95,7 @@ class EnhancedSecurityPatternDetector:
         'log', 'audit', 'monitor', 'alert', 'detect',
     ]
     
-    # HIGH 키워드 (한국어)
+    # HIGH keywords (Korean)
     HIGH_KEYWORDS_KO = [
         '접근', '다운로드', '업로드', '전송', '복사', '공유', '전달', '발송',
         '계정', '사용자', '로그인', '로그아웃', '가입', '등록',
@@ -106,7 +106,7 @@ class EnhancedSecurityPatternDetector:
         '로그', '감사', '모니터링', '경고', '탐지',
     ]
     
-    # MEDIUM 키워드
+    # MEDIUM keywords
     MEDIUM_KEYWORDS_EN = [
         'firewall', 'vpn', 'proxy', 'network', 'traffic', 'database', 'server',
         'application', 'service', 'port', 'protocol', 'connection',
@@ -117,35 +117,35 @@ class EnhancedSecurityPatternDetector:
         '애플리케이션', '서비스', '포트', '프로토콜', '연결',
     ]
     
-    # 정규식 패턴
+    # Regular expression patterns
     REGEX_PATTERNS = {
-        'ip_address': (r'\b(?:\d{1,3}\.){3}\d{1,3}\b', 'IP 주소'),
-        'email': (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', '이메일'),
+        'ip_address': (r'\b(?:\d{1,3}\.){3}\d{1,3}\b', 'IP address'),
+        'email': (r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b', 'Email'),
         'url': (r'https?://[^\s]+', 'URL'),
-        'weak_password': (r'\b(?:123456|password|admin|12345678|qwerty|1234)\b', '취약한 비밀번호'),
-        'credit_card': (r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', '카드번호'),
-        'korean_ssn': (r'\b\d{6}[-\s]?\d{7}\b', '주민번호'),
+        'weak_password': (r'\b(?:123456|password|admin|12345678|qwerty|1234)\b', 'Weak password'),
+        'credit_card': (r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b', 'Credit card number'),
+        'korean_ssn': (r'\b\d{6}[-\s]?\d{7}\b', 'Korean SSN'),
         'cve_pattern': (r'\bCVE-\d{4}-\d{4,7}\b', 'CVE ID'),
-        'file_path': (r'(?:[C-Z]:\\|/(?:home|root|var|etc)/)[\w\\/.-]+', '파일경로'),
+        'file_path': (r'(?:[C-Z]:\\|/(?:home|root|var|etc)/)[\w\\/.-]+', 'File path'),
     }
     
-    # 복합 패턴 (컨텍스트 인식)
+    # Compound patterns (context-aware)
     COMPOUND_PATTERNS = [
-        # 데이터 + 외부
+        # Data + External
         (['data', 'file', 'document', '파일', '문서', '데이터'],
          ['external', 'outside', 'third party', '외부', '외부인']),
-        # 관리자 + 비밀번호
+        # Admin + Password
         (['admin', 'root', 'administrator', '관리자'],
          ['password', 'credential', '비밀번호', '암호']),
-        # 무단 + 접근
+        # Unauthorized + Access
         (['unauthorized', 'illegitimate', '무단', '불법'],
          ['access', 'entry', 'login', '접근', '로그인']),
-        # 고객 + 유출
+        # Customer + Leak
         (['customer', 'client', 'user', '고객', '사용자'],
          ['leak', 'breach', 'expose', '유출', '노출']),
     ]
     
-    # 질문 패턴
+    # Question patterns
     QUESTION_PATTERNS_EN = [
         'how', 'what', 'why', 'when', 'where', 'who', 'which',
         'can', 'could', 'would', 'should', 'may', 'might', 'will',
@@ -162,24 +162,24 @@ class EnhancedSecurityPatternDetector:
     @classmethod
     def detect(cls, text: str) -> Tuple[Optional[SecurityPatternStrength], List[str]]:
         """
-        보안 패턴 탐지
-        
+        Detect security patterns
+
         Returns:
-            (최고 강도, 탐지된 패턴들)
+            (highest strength, detected patterns)
         """
         text_lower = text.lower()
         detected = []
         max_strength = None
-        
-        # 1. CRITICAL 키워드
+
+        # 1. CRITICAL keywords
         for kw in cls.CRITICAL_KEYWORDS_EN + cls.CRITICAL_KEYWORDS_KO:
             if kw.lower() in text_lower:
                 detected.append(f"CRITICAL: {kw}")
                 max_strength = SecurityPatternStrength.CRITICAL
-                if len(detected) >= 3:  # 최대 3개만
+                if len(detected) >= 3:  # Maximum 3 only
                     break
-        
-        # 2. HIGH 키워드
+
+        # 2. HIGH keywords
         if max_strength != SecurityPatternStrength.CRITICAL:
             for kw in cls.HIGH_KEYWORDS_EN + cls.HIGH_KEYWORDS_KO:
                 if kw.lower() in text_lower:
@@ -188,8 +188,8 @@ class EnhancedSecurityPatternDetector:
                         max_strength = SecurityPatternStrength.HIGH
                     if len(detected) >= 3:
                         break
-        
-        # 3. MEDIUM 키워드
+
+        # 3. MEDIUM keywords
         if not max_strength:
             for kw in cls.MEDIUM_KEYWORDS_EN + cls.MEDIUM_KEYWORDS_KO:
                 if kw.lower() in text_lower:
@@ -197,8 +197,8 @@ class EnhancedSecurityPatternDetector:
                     max_strength = SecurityPatternStrength.MEDIUM
                     if len(detected) >= 2:
                         break
-        
-        # 4. 정규식 패턴
+
+        # 4. Regular expression patterns
         for name, (pattern, desc) in cls.REGEX_PATTERNS.items():
             if re.search(pattern, text, re.IGNORECASE):
                 detected.append(f"Pattern: {desc}")
@@ -206,16 +206,16 @@ class EnhancedSecurityPatternDetector:
                     max_strength = SecurityPatternStrength.CRITICAL
                 elif not max_strength:
                     max_strength = SecurityPatternStrength.HIGH
-        
-        # 5. 복합 패턴
+
+        # 5. Compound patterns
         for group1, group2 in cls.COMPOUND_PATTERNS:
             has1 = any(kw.lower() in text_lower for kw in group1)
             has2 = any(kw.lower() in text_lower for kw in group2)
             if has1 and has2:
                 detected.append(f"Compound: {group1[0]}+{group2[0]}")
                 max_strength = SecurityPatternStrength.CRITICAL
-        
-        # 6. 질문 패턴 (낮은 우선순위)
+
+        # 6. Question patterns (lower priority)
         if not max_strength:
             if '?' in text:
                 detected.append("Question: ?")
@@ -226,8 +226,8 @@ class EnhancedSecurityPatternDetector:
                         detected.append(f"Question: {pattern}")
                         max_strength = SecurityPatternStrength.LOW
                         break
-        
-        return max_strength, detected[:5]  # 최대 5개 패턴
+
+        return max_strength, detected[:5]  # Maximum 5 patterns
 
 
 # ============================================================
@@ -235,7 +235,7 @@ class EnhancedSecurityPatternDetector:
 # ============================================================
 
 class SelfRAGEngine:
-    """Self-RAG: 자가 반성형 RAG 시스템"""
+    """Self-RAG: Self-Reflective RAG System"""
     
     def __init__(self, analyzer, use_llm: bool = True):
         self.analyzer = analyzer
@@ -243,24 +243,24 @@ class SelfRAGEngine:
         self.detector = EnhancedSecurityPatternDetector()
     
     def assess_retrieval_need(self, text: str) -> RetrievalNeed:
-        """[Retrieval] 토큰: 검색 필요성 판단"""
+        """[Retrieval] token: Assess retrieval necessity"""
         if self.use_llm:
             return self._assess_retrieval_need_llm(text)
-        
-        # Rule-based 탐지
+
+        # Rule-based detection
         if len(text.strip()) < 3:
             return RetrievalNeed.NOT_NEEDED
-        
-        # 패턴 탐지
+
+        # Pattern detection
         strength, patterns = self.detector.detect(text)
-        
+
         if patterns:
             logger.debug(f"Detected: {patterns[:3]}")
-        
-        # 강도별 판단
+
+        # Assessment by strength
         if not strength:
             return RetrievalNeed.NOT_NEEDED
-        
+
         if strength in [SecurityPatternStrength.CRITICAL, SecurityPatternStrength.HIGH]:
             return RetrievalNeed.REQUIRED
         elif strength == SecurityPatternStrength.MEDIUM:
@@ -269,8 +269,8 @@ class SelfRAGEngine:
             return RetrievalNeed.OPTIONAL
     
     def _assess_retrieval_need_llm(self, text: str) -> RetrievalNeed:
-        """LLM 기반 검색 필요성 판단"""
-        # 입력 sanitization
+        """LLM-based retrieval necessity assessment"""
+        # Input sanitization
         sanitized_text = sanitize_prompt_input(text, max_length=1000)
 
         prompt = f"""Assess if retrieval from security policy database is needed.
@@ -285,7 +285,8 @@ Classify as:
 JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         
         try:
-            response = openai.chat.completions.create(
+            # Use analyzer's OpenAI client
+            response = self.analyzer.openai_client.chat.completions.create(
                 model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "Security assessor. JSON only."},
@@ -305,7 +306,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
             return RetrievalNeed.OPTIONAL
     
     def assess_relevance(self, text: str, result) -> Dict[str, RelevanceScore]:
-        """[Relevance] 토큰: 관련성 평가"""
+        """[Relevance] token: Assess relevance"""
         relevance_scores = {}
         for policy_id, similarity in result.policy_similarities.items():
             if similarity > 0.8:
@@ -319,7 +320,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         return relevance_scores
     
     def assess_support(self, result, relevance_scores: Dict) -> SupportLevel:
-        """[Support] 토큰: 지원도 평가"""
+        """[Support] token: Assess support level"""
         if not relevance_scores:
             return SupportLevel.NO_SUPPORT
         
@@ -337,7 +338,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
             return SupportLevel.NO_SUPPORT
     
     def assess_utility(self, result, support_level: SupportLevel) -> UtilityScore:
-        """[Utility] 토큰: 유용성 평가"""
+        """[Utility] token: Assess utility"""
         score = 3
         if support_level == SupportLevel.FULLY_SUPPORTED:
             score += 2
@@ -359,7 +360,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         support_level,
         utility_score
     ) -> List[str]:
-        """반성 노트 생성"""
+        """Generate reflection notes"""
         notes = []
         if retrieval_need == RetrievalNeed.REQUIRED:
             notes.append("✓ Retrieval was necessary")
@@ -390,7 +391,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         support_level,
         utility_score
     ) -> float:
-        """신뢰도 증가량 계산"""
+        """Calculate confidence boost"""
         boost = 0.0
         if relevance_scores:
             highly_rel_ratio = sum(1 for s in relevance_scores.values()

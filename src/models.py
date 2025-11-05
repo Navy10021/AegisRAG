@@ -1,6 +1,6 @@
 """
 RAG Security Analyzer - Data Models
-데이터 모델 정의 (SecurityPolicy, AnalysisResult, SelfRAGResult 등)
+Data model definitions (SecurityPolicy, AnalysisResult, SelfRAGResult, etc.)
 """
 
 from dataclasses import dataclass, field
@@ -17,7 +17,7 @@ from pydantic import BaseModel, Field, validator
 
 @dataclass
 class SecurityPolicy:
-    """보안 정책 데이터 모델"""
+    """Security policy data model"""
     
     # Core fields (required)
     id: str
@@ -87,7 +87,7 @@ class SecurityPolicy:
 
 
 class ScoreBreakdown(BaseModel):
-    """점수 세부 분석"""
+    """Score breakdown details"""
     keyword_matches: Dict[str, float] = Field(default_factory=dict)
     policy_similarities: Dict[str, float] = Field(default_factory=dict)
     semantic_scores: Dict[str, float] = Field(default_factory=dict)
@@ -97,7 +97,7 @@ class ScoreBreakdown(BaseModel):
 
 
 class ExplanationData(BaseModel):
-    """XAI 설명 데이터"""
+    """XAI explanation data"""
     score_breakdown: ScoreBreakdown
     key_factors: List[Tuple[str, float, str, str]] = Field(default_factory=list)
     counterfactuals: List[str] = Field(default_factory=list)
@@ -105,7 +105,7 @@ class ExplanationData(BaseModel):
 
 
 class AnalysisResult(BaseModel):
-    """보안 분석 결과"""
+    """Security analysis result"""
     text: str
     risk_score: float = Field(ge=0, le=100)
     risk_level: str
@@ -136,14 +136,14 @@ class AnalysisResult(BaseModel):
 # ============================================================
 
 class RetrievalNeed(Enum):
-    """검색 필요성 판단"""
+    """Retrieval necessity assessment"""
     REQUIRED = "required"
     OPTIONAL = "optional"
     NOT_NEEDED = "not_needed"
 
 
 class RelevanceScore(Enum):
-    """검색 결과 관련성"""
+    """Retrieval result relevance"""
     HIGHLY_RELEVANT = "highly_relevant"
     RELEVANT = "relevant"
     PARTIALLY_RELEVANT = "partially_relevant"
@@ -151,14 +151,14 @@ class RelevanceScore(Enum):
 
 
 class SupportLevel(Enum):
-    """답변 근거 지원 수준"""
+    """Answer evidence support level"""
     FULLY_SUPPORTED = "fully_supported"
     PARTIALLY_SUPPORTED = "partially_supported"
     NO_SUPPORT = "no_support"
 
 
 class UtilityScore(Enum):
-    """답변 유용성"""
+    """Answer utility"""
     HIGHLY_USEFUL = 5
     USEFUL = 4
     MODERATELY_USEFUL = 3
@@ -168,7 +168,7 @@ class UtilityScore(Enum):
 
 @dataclass
 class SelfRAGResult:
-    """Self-RAG 분석 결과"""
+    """Self-RAG analysis result"""
     original_result: AnalysisResult
     retrieval_need: RetrievalNeed
     relevance_scores: Dict[str, RelevanceScore]
@@ -184,7 +184,7 @@ class SelfRAGResult:
 
 def get_analysis_result(result: Union[AnalysisResult, SelfRAGResult]) -> AnalysisResult:
     """
-    SelfRAGResult 또는 AnalysisResult에서 실제 분석 결과 추출
+    Extract actual analysis result from SelfRAGResult or AnalysisResult
     """
     if isinstance(result, SelfRAGResult) or hasattr(result, 'original_result'):
         return result.original_result
@@ -192,5 +192,5 @@ def get_analysis_result(result: Union[AnalysisResult, SelfRAGResult]) -> Analysi
 
 
 def is_self_rag_result(result) -> bool:
-    """결과가 SelfRAGResult인지 확인"""
+    """Check if result is SelfRAGResult"""
     return isinstance(result, SelfRAGResult) or hasattr(result, 'original_result')
