@@ -14,16 +14,6 @@
 
 AegisRAG combines **Self-RAG meta-evaluation**, **hybrid semantic retrieval**, **explainable AI reasoning**, and **LLM-augmented analysis** to detect insider threats, data breaches, and policy violations with unprecedented transparency and accuracy. Built for enterprise security teams, compliance officers, and security researchers who demand interpretable and reliable threat detection.
 
-## 🎯 Recent Updates (v3.0.1 - 2025-01)
-
-### ✨ Phase 1 Improvements Complete
-- **🌍 Full Internationalization**: All codebase documentation now in English for global accessibility
-- **🔒 Enhanced Security**: Improved API key management with instance isolation
-- **🧪 Expanded Test Coverage**: Added comprehensive tests for Self-RAG, Memory, XAI, and Retrieval systems
-- **📦 CI/CD Pipeline**: GitHub Actions for automated testing, linting, and security scanning
-- **📄 MIT License**: Open source license added
-- **📚 Better Documentation**: Usage examples and contributor guidelines
-
 [View Full Changelog](#changelog)
 
 ---
