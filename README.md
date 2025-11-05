@@ -634,57 +634,6 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 📋 Changelog {#changelog}
-
-### v3.0.1 (2025-01-05) - Phase 1 Complete
-
-**🌍 Internationalization**
-- Converted all Python source files to English documentation (8 files, 302+ lines)
-- Improved accessibility for international contributors
-- Enhanced code maintainability and readability
-
-**🔒 Security Enhancements**
-- Improved API key management with OpenAI client instances
-- Eliminated global state modification for better isolation
-- Enhanced multi-tenant environment support
-
-**🧪 Testing**
-- Added `test_self_rag.py`: 150+ lines of Self-RAG engine tests
-- Added `test_memory.py`: Comprehensive context memory tests
-- Added `test_explainer.py`: XAI system validation tests
-- Added `test_retriever.py`: Hybrid retrieval system tests
-- Total: 600+ lines of new test coverage
-
-**📦 Infrastructure**
-- Added GitHub Actions CI/CD pipeline
-  - Python 3.8-3.11 compatibility testing
-  - Automated linting (flake8)
-  - Code formatting checks (black)
-  - Type checking (mypy)
-  - Security scanning (bandit, safety)
-  - Test coverage reporting (pytest, codecov)
-- Added MIT License file
-- Added usage examples (`examples/basic_usage.py`, `examples/advanced_usage.py`)
-- Added CONTRIBUTING.md for contributor guidelines
-- Added .env.example for environment configuration
-
-**📚 Documentation**
-- Updated README with Phase 1 achievements
-- Added CI/CD badges
-- Improved installation and usage instructions
-
-### v3.0.0 (2024-11)
-
-**Initial Release**
-- Self-RAG meta-evaluation pipeline
-- 900+ security pattern detection
-- Hybrid retrieval (Semantic + BM25 + Keyword)
-- Explainable AI (XAI) system
-- Context memory and user profiling
-- Multi-language support (Korean, English, Japanese, Chinese)
-
----
-
 ## 📚 Citation
 
 ```bibtex
