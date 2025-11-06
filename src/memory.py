@@ -111,20 +111,42 @@ class RelationshipAnalyzer:
         )
     
     def build_relationships(self):
-        """Build inter-event relationships"""
+        """
+        Build inter-event relationships using optimized time-window approach
+
+        Optimized from O(n²) to O(n*k) where k is the average number of events
+        within the temporal window. Uses sorted events and early termination.
+        """
         nodes = list(self.event_graph.nodes(data=True))
-        for i, (id1, data1) in enumerate(nodes):
-            for id2, data2 in nodes[i+1:]:
+
+        # Sort events by timestamp for time-window optimization
+        sorted_nodes = sorted(nodes, key=lambda x: x[1]['timestamp'])
+
+        # Build relationships using sliding window approach
+        for i, (id1, data1) in enumerate(sorted_nodes):
+            # Only compare with subsequent events within temporal window
+            for j in range(i + 1, len(sorted_nodes)):
+                id2, data2 = sorted_nodes[j]
+
                 time_diff = abs(data1['timestamp'] - data2['timestamp'])
-                if time_diff <= self.temporal_window:
-                    temporal_score = 1.0 - (time_diff.total_seconds() / self.temporal_window.total_seconds())
-                    v1, v2 = set(data1['violations']), set(data2['violations'])
-                    semantic_score = len(v1 & v2) / max(len(v1 | v2), 1)
-                    user_score = 1.0 if data1.get('user_id') == data2.get('user_id') else 0.5
-                    relationship_score = temporal_score * 0.3 + semantic_score * 0.5 + user_score * 0.2
-                    
-                    if relationship_score > 0.3:
-                        self.event_graph.add_edge(id1, id2, weight=relationship_score)
+
+                # Early termination: if time difference exceeds window, no need to continue
+                # since events are sorted by timestamp
+                if time_diff > self.temporal_window:
+                    break
+
+                # Calculate relationship scores
+                temporal_score = 1.0 - (time_diff.total_seconds() / self.temporal_window.total_seconds())
+
+                v1, v2 = set(data1['violations']), set(data2['violations'])
+                semantic_score = len(v1 & v2) / max(len(v1 | v2), 1)
+
+                user_score = 1.0 if data1.get('user_id') == data2.get('user_id') else 0.5
+
+                relationship_score = temporal_score * 0.3 + semantic_score * 0.5 + user_score * 0.2
+
+                if relationship_score > 0.3:
+                    self.event_graph.add_edge(id1, id2, weight=relationship_score)
     
     def detect_compound_threats(self, min_chain: int = 3) -> List[Dict]:
         """Detect compound threats"""
