@@ -24,7 +24,7 @@ from .retriever import (
 )
 from .memory import ContextMemorySystem, RelationshipAnalyzer
 from .explainer import ExplainableAI
-from .utils import LanguageDetector, sanitize_prompt_input
+from .utils import LanguageDetector, sanitize_prompt_input, sanitize_input
 from .self_rag import SelfRAGEngine
 from .models import RetrievalNeed, SupportLevel, UtilityScore
 from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
@@ -90,6 +90,42 @@ class AdvancedRAGAnalyzer:
             enable_self_rag: Enable Self-RAG meta-evaluation
             config: Custom configuration (uses defaults if None)
         """
+        # Basic initialization
+        self._initialize_basic_components(
+            policies, config, use_llm, use_embeddings,
+            enable_bm25, enable_self_rag, enable_advanced
+        )
+
+        # API key setup
+        self._setup_api_key(api_key)
+
+        # Initialize Self-RAG engine
+        if self.enable_self_rag:
+            self.self_rag_engine = SelfRAGEngine(self, use_llm=self.use_llm)
+
+        # Initialize search components (embeddings + BM25)
+        self._initialize_search_components(policies)
+
+        # Initialize LLM
+        self._initialize_llm()
+
+        # Setup cache and finalize
+        self._search_cached = lru_cache(maxsize=self.config.CACHE_SIZE)(self._search_impl)
+
+        version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
+        logger.info(f"✅ Analyzer {version} ready")
+
+    def _initialize_basic_components(
+        self,
+        policies: List[SecurityPolicy],
+        config: Optional[AnalyzerConfig],
+        use_llm: bool,
+        use_embeddings: bool,
+        enable_bm25: bool,
+        enable_self_rag: bool,
+        enable_advanced: bool
+    ):
+        """Initialize basic components and settings"""
         self.policies = policies
         self.config = config or DEFAULT_ANALYZER_CONFIG
         self.use_llm = use_llm and OPENAI_AVAILABLE
@@ -100,13 +136,15 @@ class AdvancedRAGAnalyzer:
             'total': 0, 'llm': 0, 'rule': 0, 'errors': 0,
             'self_rag': 0, 'self_rag_skipped': 0
         }
-        
+
+        # Initialize advanced components if enabled
         self.context_memory = ContextMemorySystem() if enable_advanced else None
         self.relationship_analyzer = RelationshipAnalyzer() if enable_advanced else None
         self.language_detector = LanguageDetector() if enable_advanced else None
         self.analysis_history = deque(maxlen=self.config.MAX_HISTORY_SIZE)
 
-        # API key management (do not modify environment variables directly)
+    def _setup_api_key(self, api_key: Optional[str]):
+        """Setup API key from parameter or environment"""
         if api_key:
             self._api_key = api_key
             logger.info("API key provided via parameter")
@@ -117,32 +155,36 @@ class AdvancedRAGAnalyzer:
             else:
                 logger.warning("No API key found - LLM features will be disabled")
 
-        # Initialize Self-RAG engine
-        if self.enable_self_rag:
-            self.self_rag_engine = SelfRAGEngine(self, use_llm=self.use_llm)
+    def _initialize_search_components(self, policies: List[SecurityPolicy]):
+        """Initialize embedding model and BM25 for hybrid search"""
+        if not self.use_embeddings:
+            return
 
-        # Initialize Hybrid Search
-        if self.use_embeddings:
-            try:
-                self.embedding_model = get_embedding_model()
-                if self.embedding_model:
-                    policy_texts = [f"{p.title}. {p.content}. {' '.join(p.keywords)}" for p in policies]
-                    self.policy_embeddings = encode_texts(policy_texts, self.embedding_model)
+        try:
+            self.embedding_model = get_embedding_model()
+            if self.embedding_model:
+                policy_texts = [
+                    f"{p.title}. {p.content}. {' '.join(p.keywords)}"
+                    for p in policies
+                ]
+                self.policy_embeddings = encode_texts(policy_texts, self.embedding_model)
 
-                    if self.enable_bm25:
-                        self.bm25_model = BM25()
-                        self.bm25_model.fit(policy_texts)
-                        logger.info("✅ Hybrid Search (Semantic + BM25 + Keyword) ready")
-                    else:
-                        self.bm25_model = None
+                if self.enable_bm25:
+                    self.bm25_model = BM25()
+                    self.bm25_model.fit(policy_texts)
+                    logger.info("✅ Hybrid Search (Semantic + BM25 + Keyword) ready")
                 else:
-                    self.use_embeddings = False
                     self.bm25_model = None
-            except (RuntimeError, ValueError, OSError) as e:
-                logger.warning(f"Embedding initialization failed: {e}")
+            else:
                 self.use_embeddings = False
                 self.bm25_model = None
-        
+        except (RuntimeError, ValueError, OSError) as e:
+            logger.warning(f"Embedding initialization failed: {e}")
+            self.use_embeddings = False
+            self.bm25_model = None
+
+    def _initialize_llm(self):
+        """Initialize OpenAI LLM client"""
         if self.use_llm and self._api_key:
             # Initialize OpenAI client (avoids global state modification)
             self.openai_client = OpenAI(api_key=self._api_key)
@@ -150,11 +192,6 @@ class AdvancedRAGAnalyzer:
         else:
             self.use_llm = False
             self.openai_client = None
-
-        self._search_cached = lru_cache(maxsize=self.config.CACHE_SIZE)(self._search_impl)
-        
-        version = "v3.0 (Self-RAG)" if self.enable_self_rag else "v2.5"
-        logger.info(f"✅ Analyzer {version} ready")
     
     def _search_impl(self, text: str):
         """Hybrid Search"""
@@ -208,6 +245,13 @@ class AdvancedRAGAnalyzer:
             >>> print(f"Confidence: {result.confidence_score:.0%}")
             Confidence: 92%
         """
+        # Sanitize input to prevent injection attacks
+        text = sanitize_input(text, max_length=self.config.MAX_INPUT_LENGTH)
+
+        # Validate sanitized input
+        if not text or not text.strip():
+            raise ValueError("Text is empty or invalid after sanitization")
+
         should_use_self_rag = use_self_rag if use_self_rag is not None else self.enable_self_rag
         
         if should_use_self_rag and self.enable_self_rag:
@@ -531,9 +575,28 @@ JSON:
         )
     
     def analyze_batch(self, texts: List[str], user_ids: Optional[List[str]] = None, use_self_rag: Optional[bool] = None):
-        """배치 분석"""
+        """
+        Batch analysis of multiple texts
+
+        Args:
+            texts: List of texts to analyze
+            user_ids: Optional list of user IDs corresponding to each text
+            use_self_rag: Override Self-RAG setting
+
+        Returns:
+            List of analysis results (AnalysisResult or SelfRAGResult)
+
+        Raises:
+            ValueError: If texts is empty or None
+        """
+        # Validate input
+        if not texts:
+            raise ValueError("Batch analysis requires at least one text")
+
         if user_ids is None:
             user_ids = [None] * len(texts)
+
+        # Each text will be sanitized in analyze() method
         return [self.analyze(t, user_id=uid, use_self_rag=use_self_rag)
                 for t, uid in zip(texts, user_ids)]
     

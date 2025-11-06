@@ -107,7 +107,8 @@ def encode_texts(texts, model=None):
         return np.array([])
     try:
         return model.encode(texts, show_progress_bar=False, normalize_embeddings=True)
-    except:
+    except (RuntimeError, ValueError, AttributeError, TypeError) as e:
+        logger.warning(f"Text encoding failed: {type(e).__name__}: {str(e)}")
         return np.array([])
 
 
@@ -128,70 +129,124 @@ def batch_cosine_similarity(query_vec, corpus_vecs):
 # Hybrid Search
 # ============================================================
 
-def hybrid_search(
-    text: str,
-    policies: List[SecurityPolicy],
-    policy_embeddings: np.ndarray,
-    model=None,
-    bm25_model: Optional[BM25] = None,
-    semantic_weight: float = 0.5,
-    keyword_weight: float = 0.3,
-    bm25_weight: float = 0.2
-) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
+def _normalize_scores(scores: np.ndarray) -> np.ndarray:
     """
-    Hybrid Search: Semantic + Keyword + BM25
-    
+    Normalize scores to [0, 1] range using min-max normalization
+
+    Args:
+        scores: Array of scores to normalize
+
     Returns:
-        List of (policy, score, score_breakdown)
+        Normalized scores
     """
-    results = []
-    n_policies = len(policies)
-    
-    # 1. Semantic Search
+    if len(scores) == 0 or scores.max() == scores.min():
+        return np.zeros_like(scores)
+    return (scores - scores.min()) / (scores.max() - scores.min() + 1e-10)
+
+
+def _compute_semantic_scores(
+    text: str,
+    policy_embeddings: np.ndarray,
+    model,
+    n_policies: int
+) -> np.ndarray:
+    """
+    Compute semantic similarity scores using embeddings
+
+    Args:
+        text: Query text
+        policy_embeddings: Pre-computed policy embeddings
+        model: Embedding model
+        n_policies: Number of policies
+
+    Returns:
+        Array of semantic similarity scores
+    """
     semantic_scores = np.zeros(n_policies)
     if model and len(policy_embeddings) > 0:
         try:
             query_emb = model.encode([text], normalize_embeddings=True)[0]
             semantic_scores = batch_cosine_similarity(query_emb, policy_embeddings)
-        except:
-            pass
+        except (RuntimeError, ValueError, AttributeError, IndexError) as e:
+            logger.debug(f"Semantic search failed: {type(e).__name__}: {str(e)}")
+    return semantic_scores
 
-    # 2. BM25 Keyword Search
+
+def _compute_bm25_scores(
+    text: str,
+    bm25_model: Optional[BM25],
+    n_policies: int
+) -> np.ndarray:
+    """
+    Compute BM25 keyword search scores
+
+    Args:
+        text: Query text
+        bm25_model: BM25 model instance
+        n_policies: Number of policies
+
+    Returns:
+        Array of BM25 scores
+    """
     bm25_scores = np.zeros(n_policies)
     if bm25_model:
         try:
             bm25_scores = bm25_model.get_scores(text)
-        except:
-            pass
+        except (AttributeError, ValueError, TypeError) as e:
+            logger.debug(f"BM25 search failed: {type(e).__name__}: {str(e)}")
+    return bm25_scores
 
-    # 3. Simple Keyword Matching
+
+def _compute_keyword_scores(
+    text: str,
+    policies: List[SecurityPolicy],
+    n_policies: int
+) -> np.ndarray:
+    """
+    Compute simple keyword matching scores
+
+    Args:
+        text: Query text
+        policies: List of security policies
+        n_policies: Number of policies
+
+    Returns:
+        Array of keyword match scores
+    """
     text_lower = text.lower()
     keyword_scores = np.zeros(n_policies)
     for i, policy in enumerate(policies):
         match_count = sum(1 for kw in policy.keywords if kw.lower() in text_lower)
         if match_count > 0:
             keyword_scores[i] = match_count / max(len(policy.keywords), 1)
+    return keyword_scores
 
-    # 4. Score normalization
-    def normalize(scores):
-        if len(scores) == 0 or scores.max() == scores.min():
-            return np.zeros_like(scores)
-        return (scores - scores.min()) / (scores.max() - scores.min() + 1e-10)
 
-    semantic_norm = normalize(semantic_scores)
-    bm25_norm = normalize(bm25_scores)
-    keyword_norm = keyword_scores
+def _extract_top_results(
+    policies: List[SecurityPolicy],
+    combined_scores: np.ndarray,
+    semantic_norm: np.ndarray,
+    bm25_norm: np.ndarray,
+    keyword_norm: np.ndarray,
+    top_k: int = 3
+) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
+    """
+    Extract top-k results with score breakdowns
 
-    # 5. Combine with weighted sum
-    combined_scores = (
-        semantic_weight * semantic_norm +
-        bm25_weight * bm25_norm +
-        keyword_weight * keyword_norm
-    )
+    Args:
+        policies: List of security policies
+        combined_scores: Combined weighted scores
+        semantic_norm: Normalized semantic scores
+        bm25_norm: Normalized BM25 scores
+        keyword_norm: Keyword match scores
+        top_k: Number of top results to return
 
-    # 6. Top 3 results
-    top_indices = np.argsort(combined_scores)[::-1][:3]
-    
+    Returns:
+        List of (policy, score, score_breakdown) tuples
+    """
+    results = []
+    top_indices = np.argsort(combined_scores)[::-1][:top_k]
+
     for idx in top_indices:
         score = combined_scores[idx]
         if score > 0:
@@ -204,5 +259,67 @@ def hybrid_search(
                     'keyword': float(keyword_norm[idx])
                 }
             ))
-    
+
     return results
+
+
+def hybrid_search(
+    text: str,
+    policies: List[SecurityPolicy],
+    policy_embeddings: np.ndarray,
+    model=None,
+    bm25_model: Optional[BM25] = None,
+    semantic_weight: float = 0.5,
+    keyword_weight: float = 0.3,
+    bm25_weight: float = 0.2
+) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
+    """
+    Hybrid Search: Semantic + Keyword + BM25
+
+    Combines three search strategies with weighted scoring:
+    - Semantic similarity using embeddings (default: 50%)
+    - BM25 keyword search (default: 20%)
+    - Simple keyword matching (default: 30%)
+
+    Args:
+        text: Query text
+        policies: List of security policies to search
+        policy_embeddings: Pre-computed policy embeddings
+        model: Embedding model for semantic search
+        bm25_model: BM25 model for keyword search
+        semantic_weight: Weight for semantic similarity (0-1)
+        keyword_weight: Weight for keyword matching (0-1)
+        bm25_weight: Weight for BM25 search (0-1)
+
+    Returns:
+        List of (policy, score, score_breakdown) tuples, sorted by score
+
+    Example:
+        >>> results = hybrid_search("password leak", policies, embeddings)
+        >>> for policy, score, breakdown in results:
+        >>>     print(f"{policy.title}: {score:.2f}")
+    """
+    n_policies = len(policies)
+
+    # Compute individual scores
+    semantic_scores = _compute_semantic_scores(text, policy_embeddings, model, n_policies)
+    bm25_scores = _compute_bm25_scores(text, bm25_model, n_policies)
+    keyword_scores = _compute_keyword_scores(text, policies, n_policies)
+
+    # Normalize scores
+    semantic_norm = _normalize_scores(semantic_scores)
+    bm25_norm = _normalize_scores(bm25_scores)
+    keyword_norm = keyword_scores  # Already normalized in computation
+
+    # Combine with weighted sum
+    combined_scores = (
+        semantic_weight * semantic_norm +
+        bm25_weight * bm25_norm +
+        keyword_weight * keyword_norm
+    )
+
+    # Extract top results
+    return _extract_top_results(
+        policies, combined_scores,
+        semantic_norm, bm25_norm, keyword_norm
+    )
