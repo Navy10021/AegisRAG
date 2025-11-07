@@ -10,6 +10,7 @@ from typing import List, Optional, Tuple, Dict
 import numpy as np
 
 from .models import SecurityPolicy
+from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +35,10 @@ except (ImportError, ModuleNotFoundError) as e:
 class BM25:
     """BM25 algorithm - Enhanced keyword-based search"""
 
-    def __init__(self, k1=1.5, b=0.75):
-        self.k1 = k1
-        self.b = b
+    def __init__(self, k1=None, b=None, config: AnalyzerConfig = None):
+        config = config or DEFAULT_ANALYZER_CONFIG
+        self.k1 = k1 if k1 is not None else config.BM25_K1
+        self.b = b if b is not None else config.BM25_B
         self.doc_len = []
         self.avgdl = 0
         self.idf = {}
@@ -119,15 +121,16 @@ def encode_texts(texts, model=None):
         return np.array([])
 
 
-def batch_cosine_similarity(query_vec, corpus_vecs):
+def batch_cosine_similarity(query_vec, corpus_vecs, config: AnalyzerConfig = None):
     """Calculate cosine similarity between query vector and corpus vectors"""
+    config = config or DEFAULT_ANALYZER_CONFIG
     if query_vec.size == 0 or corpus_vecs.size == 0:
         return np.array([])
     query_norm = np.linalg.norm(query_vec)
     corpus_norms = np.linalg.norm(corpus_vecs, axis=1)
     if query_norm == 0:
         return np.zeros(len(corpus_vecs))
-    corpus_norms[corpus_norms == 0] = 1e-10
+    corpus_norms[corpus_norms == 0] = config.EPSILON
     similarities = np.dot(corpus_vecs, query_vec) / (corpus_norms * query_norm)
     return np.clip(similarities, -1.0, 1.0)
 
@@ -137,23 +140,29 @@ def batch_cosine_similarity(query_vec, corpus_vecs):
 # ============================================================
 
 
-def _normalize_scores(scores: np.ndarray) -> np.ndarray:
+def _normalize_scores(scores: np.ndarray, config: AnalyzerConfig = None) -> np.ndarray:
     """
     Normalize scores to [0, 1] range using min-max normalization
 
     Args:
         scores: Array of scores to normalize
+        config: Analyzer configuration
 
     Returns:
         Normalized scores
     """
+    config = config or DEFAULT_ANALYZER_CONFIG
     if len(scores) == 0 or scores.max() == scores.min():
         return np.zeros_like(scores)
-    return (scores - scores.min()) / (scores.max() - scores.min() + 1e-10)
+    return (scores - scores.min()) / (scores.max() - scores.min() + config.EPSILON)
 
 
 def _compute_semantic_scores(
-    text: str, policy_embeddings: np.ndarray, model, n_policies: int
+    text: str,
+    policy_embeddings: np.ndarray,
+    model,
+    n_policies: int,
+    config: AnalyzerConfig = None,
 ) -> np.ndarray:
     """
     Compute semantic similarity scores using embeddings
@@ -163,6 +172,7 @@ def _compute_semantic_scores(
         policy_embeddings: Pre-computed policy embeddings
         model: Embedding model
         n_policies: Number of policies
+        config: Analyzer configuration
 
     Returns:
         Array of semantic similarity scores
@@ -171,7 +181,9 @@ def _compute_semantic_scores(
     if model and len(policy_embeddings) > 0:
         try:
             query_emb = model.encode([text], normalize_embeddings=True)[0]
-            semantic_scores = batch_cosine_similarity(query_emb, policy_embeddings)
+            semantic_scores = batch_cosine_similarity(
+                query_emb, policy_embeddings, config
+            )
         except (RuntimeError, ValueError, AttributeError, IndexError) as e:
             logger.debug(f"Semantic search failed: {type(e).__name__}: {str(e)}")
     return semantic_scores
@@ -275,6 +287,7 @@ def hybrid_search(
     semantic_weight: float = 0.5,
     keyword_weight: float = 0.3,
     bm25_weight: float = 0.2,
+    config: AnalyzerConfig = None,
 ) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
     """
     Hybrid Search: Semantic + Keyword + BM25
@@ -293,6 +306,7 @@ def hybrid_search(
         semantic_weight: Weight for semantic similarity (0-1)
         keyword_weight: Weight for keyword matching (0-1)
         bm25_weight: Weight for BM25 search (0-1)
+        config: Analyzer configuration
 
     Returns:
         List of (policy, score, score_breakdown) tuples, sorted by score
@@ -302,18 +316,19 @@ def hybrid_search(
         >>> for policy, score, breakdown in results:
         >>>     print(f"{policy.title}: {score:.2f}")
     """
+    config = config or DEFAULT_ANALYZER_CONFIG
     n_policies = len(policies)
 
     # Compute individual scores
     semantic_scores = _compute_semantic_scores(
-        text, policy_embeddings, model, n_policies
+        text, policy_embeddings, model, n_policies, config
     )
     bm25_scores = _compute_bm25_scores(text, bm25_model, n_policies)
     keyword_scores = _compute_keyword_scores(text, policies, n_policies)
 
     # Normalize scores
-    semantic_norm = _normalize_scores(semantic_scores)
-    bm25_norm = _normalize_scores(bm25_scores)
+    semantic_norm = _normalize_scores(semantic_scores, config)
+    bm25_norm = _normalize_scores(bm25_scores, config)
     keyword_norm = keyword_scores  # Already normalized in computation
 
     # Combine with weighted sum

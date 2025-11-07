@@ -51,6 +51,36 @@ class AnalyzerConfig:
     # Input limits
     MAX_INPUT_LENGTH: int = 10000
 
+    # Direct analysis patterns (threat keywords and scores)
+    DIRECT_ANALYSIS_PATTERNS: Dict[str, int] = None
+
+    # LLM configuration
+    MAX_POLICIES_FOR_LLM: int = 10
+
+    # Memory and context
+    MAX_USER_HISTORY: int = 100
+    BEHAVIOR_TREND_THRESHOLD_UP: float = 5.0
+    BEHAVIOR_TREND_THRESHOLD_DOWN: float = -5.0
+    CONTEXT_ADJUSTMENT_BASE: int = 10
+    CONTEXT_ADJUSTMENT_VIOLATION_MULTIPLIER: int = 5
+    CONTEXT_ADJUSTMENT_MAX: int = 30
+    CONTEXT_ADJUSTMENT_VIOLATION_THRESHOLD: int = 3
+
+    # Explanation thresholds
+    EXPLANATION_MIN_SCORE: float = 5.0
+    EXPLANATION_FACTOR_THRESHOLD_HIGH: float = 30.0
+    EXPLANATION_FACTOR_THRESHOLD_MEDIUM: float = 15.0
+    EXPLANATION_FACTOR_THRESHOLD_LOW: float = 10.0
+    MAX_SIMILAR_CASES: int = 3
+    VISUALIZATION_BAR_SCALE: int = 5
+
+    # BM25 parameters
+    BM25_K1: float = 1.5
+    BM25_B: float = 0.75
+
+    # Numerical epsilon
+    EPSILON: float = 1e-10
+
     def __post_init__(self):
         if self.SEVERITY_MULTIPLIERS is None:
             self.SEVERITY_MULTIPLIERS = {
@@ -62,6 +92,18 @@ class AnalyzerConfig:
 
         if self.SEVERITY_POINTS is None:
             self.SEVERITY_POINTS = {"critical": 30, "high": 20, "medium": 10, "low": 5}
+
+        if self.DIRECT_ANALYSIS_PATTERNS is None:
+            self.DIRECT_ANALYSIS_PATTERNS = {
+                "hack": 20,
+                "crack": 20,
+                "exploit": 25,
+                "breach": 25,
+                "steal": 15,
+                "leak": 20,
+                "unauthorized": 18,
+                "malicious": 22,
+            }
 
 
 @dataclass
