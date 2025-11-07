@@ -76,10 +76,9 @@ class TestAdvancedRAGAnalyzer:
 
     def test_analyze_empty_text(self, analyzer_no_llm):
         """Test analysis with empty text"""
-        result = analyzer_no_llm.analyze("")
-
-        # Should handle gracefully
-        assert isinstance(result, AnalysisResult)
+        # Empty text should now raise ValueError after Phase 3 input validation
+        with pytest.raises(ValueError, match="empty"):
+            analyzer_no_llm.analyze("")
 
     def test_analyze_with_user_id(self, analyzer_no_llm):
         """Test analysis with user tracking"""
@@ -291,12 +290,12 @@ class TestAnalyzerEdgeCases:
 
     def test_malformed_input_types(self, analyzer):
         """Test with unexpected input types"""
-        # Integer input
-        with pytest.raises(AttributeError):
+        # Integer input - should raise TypeError from sanitize_input
+        with pytest.raises(TypeError):
             analyzer.analyze(12345)
 
-        # List input
-        with pytest.raises(AttributeError):
+        # List input - should raise TypeError from sanitize_input
+        with pytest.raises(TypeError):
             analyzer.analyze(["test"])
 
     def test_extremely_long_word(self, analyzer):

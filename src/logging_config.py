@@ -5,7 +5,6 @@ AegisRAG Logging Configuration
 
 import logging
 import logging.handlers
-import os
 from pathlib import Path
 
 from .config import DEFAULT_LOGGING_CONFIG, LoggingConfig

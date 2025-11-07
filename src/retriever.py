@@ -5,7 +5,7 @@ Retrieval system (BM25, Semantic Search, Hybrid Search)
 
 import logging
 from collections import defaultdict
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict
 
 import numpy as np
 

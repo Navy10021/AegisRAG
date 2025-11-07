@@ -685,9 +685,9 @@ JSON:
             f"🕒 Time: {analysis.processing_time:.3f}s | 🎯 Confidence: {analysis.confidence_score:.0%}"
         )
         if analysis.context_adjusted:
-            print(f"📊 Context-adjusted")
+            print("📊 Context-adjusted")
         print(f"{emoji} Risk: {analysis.risk_score:.1f}/100 ({analysis.risk_level})")
-        print(f"\n📊 Analysis:")
+        print("\n📊 Analysis:")
         print(f"   • Violations: {len(analysis.violations)}")
         if analysis.violations:
             print(f"     → {', '.join(analysis.violations)}")
@@ -695,7 +695,7 @@ JSON:
         for i, t in enumerate(analysis.threats[:3], 1):
             print(f"     {i}. {t}")
         if analysis.remediation_suggestions:
-            print(f"\n💡 Remediation:")
+            print("\n💡 Remediation:")
             for i, s in enumerate(analysis.remediation_suggestions[:3], 1):
                 print(f"     {i}. {s}")
         print(f"\n💭 {analysis.explanation}")
@@ -732,7 +732,7 @@ JSON:
             f"   Confidence: {result.confidence_score:.0%} (+{self_rag_result.confidence_boost:.1%} from Self-RAG)"
         )
 
-        print(f"\n🔍 Self-RAG Evaluation:")
+        print("\n🔍 Self-RAG Evaluation:")
         print(f"   Retrieval Need: {self_rag_result.retrieval_need.value}")
         print(f"   Support Level: {self_rag_result.support_level.value}")
         print(
@@ -740,7 +740,7 @@ JSON:
         )
 
         if self_rag_result.relevance_scores:
-            print(f"\n📊 Policy Relevance:")
+            print("\n📊 Policy Relevance:")
             for policy_id, score in self_rag_result.relevance_scores.items():
                 emoji_rel = {
                     RelevanceScore.HIGHLY_RELEVANT: "🟢",
@@ -761,12 +761,12 @@ JSON:
                 print(f"   {i}. {t}")
 
         if result.remediation_suggestions:
-            print(f"\n💡 Remediation:")
+            print("\n💡 Remediation:")
             for i, s in enumerate(result.remediation_suggestions[:3], 1):
                 print(f"   {i}. {s}")
 
         if self_rag_result.reflection_notes:
-            print(f"\n💭 Self-Reflection:")
+            print("\n💭 Self-Reflection:")
             for note in self_rag_result.reflection_notes:
                 print(f"   {note}")
 
@@ -804,7 +804,7 @@ JSON:
         print(f"Errors: {self.stats['errors']}")
 
         if self.enable_self_rag:
-            print(f"\n🧠 Self-RAG:")
+            print("\n🧠 Self-RAG:")
             print(f"   With Self-RAG: {self.stats['self_rag']}")
             print(f"   Direct: {self.stats['self_rag_skipped']}")
 

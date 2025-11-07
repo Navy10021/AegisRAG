@@ -6,12 +6,12 @@ Context memory and relational analysis system
 import logging
 from collections import deque, defaultdict, Counter
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 import numpy as np
 import networkx as nx
 
-from .models import AnalysisResult, SelfRAGResult, get_analysis_result
+from .models import get_analysis_result
 
 logger = logging.getLogger(__name__)
 

@@ -14,8 +14,6 @@ from .models import (
     RelevanceScore,
     SupportLevel,
     UtilityScore,
-    SelfRAGResult,
-    get_analysis_result,
 )
 from .utils import sanitize_prompt_input
 
@@ -23,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # OpenAI availability check
 try:
-    from openai import OpenAI
+    pass
 
     OPENAI_AVAILABLE = True
 except (ImportError, ModuleNotFoundError) as e:
@@ -585,8 +583,14 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
 
     def assess_relevance(self, text: str, result) -> Dict[str, RelevanceScore]:
         """[Relevance] token: Assess relevance"""
+        from .models import get_analysis_result
+
+        get_analysis_result(result)
         relevance_scores = {}
-        for policy_id, similarity in result.policy_similarities.items():
+        policy_similarities = (
+            result.policy_similarities if hasattr(result, "policy_similarities") else {}
+        )
+        for policy_id, similarity in policy_similarities.items():
             if similarity > 0.8:
                 relevance_scores[policy_id] = RelevanceScore.HIGHLY_RELEVANT
             elif similarity > 0.6:
@@ -599,9 +603,12 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
 
     def assess_support(self, result, relevance_scores: Dict) -> SupportLevel:
         """[Support] token: Assess support level"""
+        from .models import get_analysis_result
+
         if not relevance_scores:
             return SupportLevel.NO_SUPPORT
 
+        analysis = get_analysis_result(result)
         highly_relevant = sum(
             1 for s in relevance_scores.values() if s == RelevanceScore.HIGHLY_RELEVANT
         )
@@ -610,7 +617,7 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
             for s in relevance_scores.values()
             if s in [RelevanceScore.HIGHLY_RELEVANT, RelevanceScore.RELEVANT]
         )
-        violation_support = len(set(result.violations) & set(relevance_scores.keys()))
+        violation_support = len(set(analysis.violations) & set(relevance_scores.keys()))
 
         if highly_relevant >= 2 and violation_support >= 2:
             return SupportLevel.FULLY_SUPPORTED
@@ -621,16 +628,22 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
 
     def assess_utility(self, result, support_level: SupportLevel) -> UtilityScore:
         """[Utility] token: Assess utility"""
+        from .models import get_analysis_result
+
+        analysis = get_analysis_result(result)
         score = 3
         if support_level == SupportLevel.FULLY_SUPPORTED:
             score += 2
         elif support_level == SupportLevel.PARTIALLY_SUPPORTED:
             score += 1
-        if result.violations and result.threats:
+        if analysis.violations and analysis.threats:
             score += 1
-        if result.remediation_suggestions:
+        if (
+            hasattr(analysis, "remediation_suggestions")
+            and analysis.remediation_suggestions
+        ):
             score += 1
-        if result.confidence_score > 0.7:
+        if analysis.confidence_score > 0.7:
             score += 1
         score = max(1, min(5, score))
         return UtilityScore(score)
