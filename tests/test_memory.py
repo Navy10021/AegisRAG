@@ -25,7 +25,7 @@ class TestContextMemorySystem:
             risk_level="HIGH",
             violations=["P001", "P002"],
             threats=["Threat 1", "Threat 2"],
-            explanation="Test explanation"
+            explanation="Test explanation",
         )
 
     def test_initialization(self, memory_system):
@@ -39,11 +39,11 @@ class TestContextMemorySystem:
         memory_system.update_user_context(user_id, sample_result)
 
         profile = memory_system.user_profiles[user_id]
-        assert profile['analyses_count'] == 1
-        assert profile['avg_risk_score'] == 75.0
-        assert len(profile['risk_history']) == 1
-        assert profile['violation_patterns']['P001'] == 1
-        assert profile['violation_patterns']['P002'] == 1
+        assert profile["analyses_count"] == 1
+        assert profile["avg_risk_score"] == 75.0
+        assert len(profile["risk_history"]) == 1
+        assert profile["violation_patterns"]["P001"] == 1
+        assert profile["violation_patterns"]["P002"] == 1
 
     def test_update_user_context_multiple_times(self, memory_system, sample_result):
         """Test multiple context updates"""
@@ -59,15 +59,15 @@ class TestContextMemorySystem:
             risk_level="MEDIUM",
             violations=["P001"],
             threats=["Threat 3"],
-            explanation="Test"
+            explanation="Test",
         )
         memory_system.update_user_context(user_id, result2)
 
         profile = memory_system.user_profiles[user_id]
-        assert profile['analyses_count'] == 2
-        assert profile['avg_risk_score'] == (75.0 + 50.0) / 2
-        assert len(profile['risk_history']) == 2
-        assert profile['violation_patterns']['P001'] == 2
+        assert profile["analyses_count"] == 2
+        assert profile["avg_risk_score"] == (75.0 + 50.0) / 2
+        assert len(profile["risk_history"]) == 2
+        assert profile["violation_patterns"]["P001"] == 2
 
     def test_behavior_trend_increasing(self, memory_system):
         """Test increasing behavior trend detection"""
@@ -81,12 +81,12 @@ class TestContextMemorySystem:
                 risk_level="LOW",
                 violations=[],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
         profile = memory_system.user_profiles[user_id]
-        assert profile['behavior_trend'] == 'increasing'
+        assert profile["behavior_trend"] == "increasing"
 
     def test_behavior_trend_decreasing(self, memory_system):
         """Test decreasing behavior trend detection"""
@@ -100,12 +100,12 @@ class TestContextMemorySystem:
                 risk_level="LOW",
                 violations=[],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
         profile = memory_system.user_profiles[user_id]
-        assert profile['behavior_trend'] == 'decreasing'
+        assert profile["behavior_trend"] == "decreasing"
 
     def test_behavior_trend_stable(self, memory_system):
         """Test stable behavior trend detection"""
@@ -119,12 +119,12 @@ class TestContextMemorySystem:
                 risk_level="MEDIUM",
                 violations=[],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
         profile = memory_system.user_profiles[user_id]
-        assert profile['behavior_trend'] == 'stable'
+        assert profile["behavior_trend"] == "stable"
 
     def test_get_context_adjustment_new_user(self, memory_system):
         """Test context adjustment for new user"""
@@ -143,7 +143,7 @@ class TestContextMemorySystem:
                 risk_level="LOW",
                 violations=["P001"],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
@@ -162,7 +162,7 @@ class TestContextMemorySystem:
                 risk_level="MEDIUM",
                 violations=["P001"],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
@@ -172,7 +172,7 @@ class TestContextMemorySystem:
     def test_get_user_summary_no_data(self, memory_system):
         """Test user summary for non-existent user"""
         summary = memory_system.get_user_summary("unknown_user")
-        assert summary['status'] == 'no_data'
+        assert summary["status"] == "no_data"
 
     def test_get_user_summary_with_data(self, memory_system, sample_result):
         """Test user summary with existing data"""
@@ -180,11 +180,11 @@ class TestContextMemorySystem:
         memory_system.update_user_context(user_id, sample_result)
 
         summary = memory_system.get_user_summary(user_id)
-        assert summary['analyses_count'] == 1
-        assert summary['avg_risk_score'] == 75.0
-        assert summary['behavior_trend'] == 'stable'
-        assert len(summary['top_violations']) > 0
-        assert summary['recent_level'] == 'HIGH'
+        assert summary["analyses_count"] == 1
+        assert summary["avg_risk_score"] == 75.0
+        assert summary["behavior_trend"] == "stable"
+        assert len(summary["top_violations"]) > 0
+        assert summary["recent_level"] == "HIGH"
 
     def test_risk_history_limit(self, memory_system):
         """Test that risk history respects max length"""
@@ -198,12 +198,12 @@ class TestContextMemorySystem:
                 risk_level="MEDIUM",
                 violations=[],
                 threats=[],
-                explanation=""
+                explanation="",
             )
             memory_system.update_user_context(user_id, result)
 
         profile = memory_system.user_profiles[user_id]
-        assert len(profile['risk_history']) <= 100
+        assert len(profile["risk_history"]) <= 100
 
 
 class TestRelationshipAnalyzer:
@@ -225,7 +225,7 @@ class TestRelationshipAnalyzer:
                 violations=["P001", "P002"],
                 threats=["Threat 1"],
                 explanation="",
-                user_id="user001"
+                user_id="user001",
             ),
             AnalysisResult(
                 text="threat 2",
@@ -234,7 +234,7 @@ class TestRelationshipAnalyzer:
                 violations=["P001", "P003"],
                 threats=["Threat 2"],
                 explanation="",
-                user_id="user001"
+                user_id="user001",
             ),
             AnalysisResult(
                 text="threat 3",
@@ -243,7 +243,7 @@ class TestRelationshipAnalyzer:
                 violations=["P004"],
                 threats=["Threat 3"],
                 explanation="",
-                user_id="user002"
+                user_id="user002",
             ),
         ]
 
@@ -258,8 +258,8 @@ class TestRelationshipAnalyzer:
 
         assert relationship_analyzer.event_graph.number_of_nodes() == 1
         node_data = relationship_analyzer.event_graph.nodes["event1"]
-        assert node_data['risk_score'] == 75.0
-        assert node_data['user_id'] == "user001"
+        assert node_data["risk_score"] == 75.0
+        assert node_data["user_id"] == "user001"
 
     def test_add_multiple_events(self, relationship_analyzer, sample_results):
         """Test adding multiple events"""
@@ -296,7 +296,7 @@ class TestRelationshipAnalyzer:
                 violations=["P001", "P002"],
                 threats=[f"Threat {i}"],
                 explanation="",
-                user_id="user001"
+                user_id="user001",
             )
             relationship_analyzer.add_event(f"event{i}", result)
 
@@ -306,10 +306,10 @@ class TestRelationshipAnalyzer:
         assert isinstance(threats, list)
         if len(threats) > 0:
             threat = threats[0]
-            assert 'threat_id' in threat
-            assert 'chain_length' in threat
-            assert 'avg_risk_score' in threat
-            assert 'severity' in threat
+            assert "threat_id" in threat
+            assert "chain_length" in threat
+            assert "avg_risk_score" in threat
+            assert "severity" in threat
 
     def test_visualize(self, relationship_analyzer, sample_results, tmp_path):
         """Test graph visualization"""

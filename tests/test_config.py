@@ -24,7 +24,9 @@ class TestAnalyzerConfig:
 
         assert "critical" in config.SEVERITY_MULTIPLIERS
         assert "high" in config.SEVERITY_MULTIPLIERS
-        assert config.SEVERITY_MULTIPLIERS["critical"] > config.SEVERITY_MULTIPLIERS["low"]
+        assert (
+            config.SEVERITY_MULTIPLIERS["critical"] > config.SEVERITY_MULTIPLIERS["low"]
+        )
 
     def test_severity_points(self):
         """Test severity points are set"""
@@ -58,18 +60,18 @@ class TestSecurityConfig:
         import os
 
         # Save original
-        original = os.environ.get('OPENAI_API_KEY')
+        original = os.environ.get("OPENAI_API_KEY")
 
         try:
-            os.environ['OPENAI_API_KEY'] = 'test-key-123'
+            os.environ["OPENAI_API_KEY"] = "test-key-123"
             config = SecurityConfig()
-            assert config.OPENAI_API_KEY == 'test-key-123'
+            assert config.OPENAI_API_KEY == "test-key-123"
         finally:
             # Restore original
             if original:
-                os.environ['OPENAI_API_KEY'] = original
-            elif 'OPENAI_API_KEY' in os.environ:
-                del os.environ['OPENAI_API_KEY']
+                os.environ["OPENAI_API_KEY"] = original
+            elif "OPENAI_API_KEY" in os.environ:
+                del os.environ["OPENAI_API_KEY"]
 
 
 class TestLoggingConfig:

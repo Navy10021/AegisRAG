@@ -70,6 +70,7 @@ output/*.png
 output/*.json
 output/*.html
 output/*.txt
+output/*.csv
 !output/.gitkeep
 
 # Cache

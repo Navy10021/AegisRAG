@@ -32,10 +32,7 @@ def setup_logging(config: LoggingConfig = None) -> logging.Logger:
     log_level = getattr(logging, config.LOG_LEVEL, logging.INFO)
 
     # 포매터 생성
-    formatter = logging.Formatter(
-        config.LOG_FORMAT,
-        datefmt=config.LOG_DATE_FORMAT
-    )
+    formatter = logging.Formatter(config.LOG_FORMAT, datefmt=config.LOG_DATE_FORMAT)
 
     # 콘솔 핸들러
     console_handler = logging.StreamHandler()
@@ -47,7 +44,7 @@ def setup_logging(config: LoggingConfig = None) -> logging.Logger:
         config.LOG_FILE,
         maxBytes=config.MAX_LOG_SIZE_MB * 1024 * 1024,
         backupCount=config.BACKUP_COUNT,
-        encoding='utf-8'
+        encoding="utf-8",
     )
     file_handler.setLevel(log_level)
     file_handler.setFormatter(formatter)
@@ -64,11 +61,11 @@ def setup_logging(config: LoggingConfig = None) -> logging.Logger:
     root_logger.addHandler(file_handler)
 
     # 초기 로그
-    root_logger.info("="*80)
+    root_logger.info("=" * 80)
     root_logger.info("AegisRAG Logging System Initialized")
     root_logger.info(f"Log Level: {config.LOG_LEVEL}")
     root_logger.info(f"Log File: {config.LOG_FILE}")
-    root_logger.info("="*80)
+    root_logger.info("=" * 80)
 
     return root_logger
 

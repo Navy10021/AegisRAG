@@ -19,6 +19,7 @@ _embedding_model_cache = None
 # Sentence Transformers availability check
 try:
     from sentence_transformers import SentenceTransformer
+
     SENTENCE_TRANSFORMERS_AVAILABLE = True
 except (ImportError, ModuleNotFoundError) as e:
     SENTENCE_TRANSFORMERS_AVAILABLE = False
@@ -29,9 +30,10 @@ except (ImportError, ModuleNotFoundError) as e:
 # BM25 Implementation
 # ============================================================
 
+
 class BM25:
     """BM25 algorithm - Enhanced keyword-based search"""
-    
+
     def __init__(self, k1=1.5, b=0.75):
         self.k1 = k1
         self.b = b
@@ -39,48 +41,51 @@ class BM25:
         self.avgdl = 0
         self.idf = {}
         self.corpus = []
-    
+
     def fit(self, corpus):
         """Train BM25 with corpus"""
         self.corpus = corpus
         self.doc_len = [len(doc.split()) for doc in corpus]
         self.avgdl = sum(self.doc_len) / len(self.doc_len) if self.doc_len else 0
-        
+
         df = defaultdict(int)
         for doc in corpus:
             words = set(doc.lower().split())
             for word in words:
                 df[word] += 1
-        
+
         num_docs = len(corpus)
         self.idf = {}
         for word, freq in df.items():
             self.idf[word] = np.log((num_docs - freq + 0.5) / (freq + 0.5) + 1)
-    
+
     def get_scores(self, query):
         """Calculate BM25 score for each document against query"""
         query_words = query.lower().split()
         scores = np.zeros(len(self.corpus))
-        
+
         for i, doc in enumerate(self.corpus):
             doc_words = doc.lower().split()
             doc_len = self.doc_len[i]
-            
+
             for word in query_words:
                 if word not in self.idf:
                     continue
-                
+
                 tf = doc_words.count(word)
                 numerator = tf * (self.k1 + 1)
-                denominator = tf + self.k1 * (1 - self.b + self.b * (doc_len / self.avgdl))
+                denominator = tf + self.k1 * (
+                    1 - self.b + self.b * (doc_len / self.avgdl)
+                )
                 scores[i] += self.idf[word] * (numerator / denominator)
-        
+
         return scores
 
 
 # ============================================================
 # Embedding Utilities
 # ============================================================
+
 
 def get_embedding_model():
     """Load embedding model (with caching)"""
@@ -90,7 +95,9 @@ def get_embedding_model():
     if _embedding_model_cache:
         return _embedding_model_cache
     try:
-        _embedding_model_cache = SentenceTransformer('paraphrase-multilingual-MiniLM-L12-v2')
+        _embedding_model_cache = SentenceTransformer(
+            "paraphrase-multilingual-MiniLM-L12-v2"
+        )
         logger.info("✅ Embedding model loaded")
         return _embedding_model_cache
     except (OSError, RuntimeError, ValueError) as e:
@@ -129,6 +136,7 @@ def batch_cosine_similarity(query_vec, corpus_vecs):
 # Hybrid Search
 # ============================================================
 
+
 def _normalize_scores(scores: np.ndarray) -> np.ndarray:
     """
     Normalize scores to [0, 1] range using min-max normalization
@@ -145,10 +153,7 @@ def _normalize_scores(scores: np.ndarray) -> np.ndarray:
 
 
 def _compute_semantic_scores(
-    text: str,
-    policy_embeddings: np.ndarray,
-    model,
-    n_policies: int
+    text: str, policy_embeddings: np.ndarray, model, n_policies: int
 ) -> np.ndarray:
     """
     Compute semantic similarity scores using embeddings
@@ -173,9 +178,7 @@ def _compute_semantic_scores(
 
 
 def _compute_bm25_scores(
-    text: str,
-    bm25_model: Optional[BM25],
-    n_policies: int
+    text: str, bm25_model: Optional[BM25], n_policies: int
 ) -> np.ndarray:
     """
     Compute BM25 keyword search scores
@@ -198,9 +201,7 @@ def _compute_bm25_scores(
 
 
 def _compute_keyword_scores(
-    text: str,
-    policies: List[SecurityPolicy],
-    n_policies: int
+    text: str, policies: List[SecurityPolicy], n_policies: int
 ) -> np.ndarray:
     """
     Compute simple keyword matching scores
@@ -228,7 +229,7 @@ def _extract_top_results(
     semantic_norm: np.ndarray,
     bm25_norm: np.ndarray,
     keyword_norm: np.ndarray,
-    top_k: int = 3
+    top_k: int = 3,
 ) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
     """
     Extract top-k results with score breakdowns
@@ -250,15 +251,17 @@ def _extract_top_results(
     for idx in top_indices:
         score = combined_scores[idx]
         if score > 0:
-            results.append((
-                policies[idx],
-                float(score),
-                {
-                    'semantic': float(semantic_norm[idx]),
-                    'bm25': float(bm25_norm[idx]),
-                    'keyword': float(keyword_norm[idx])
-                }
-            ))
+            results.append(
+                (
+                    policies[idx],
+                    float(score),
+                    {
+                        "semantic": float(semantic_norm[idx]),
+                        "bm25": float(bm25_norm[idx]),
+                        "keyword": float(keyword_norm[idx]),
+                    },
+                )
+            )
 
     return results
 
@@ -271,7 +274,7 @@ def hybrid_search(
     bm25_model: Optional[BM25] = None,
     semantic_weight: float = 0.5,
     keyword_weight: float = 0.3,
-    bm25_weight: float = 0.2
+    bm25_weight: float = 0.2,
 ) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
     """
     Hybrid Search: Semantic + Keyword + BM25
@@ -302,7 +305,9 @@ def hybrid_search(
     n_policies = len(policies)
 
     # Compute individual scores
-    semantic_scores = _compute_semantic_scores(text, policy_embeddings, model, n_policies)
+    semantic_scores = _compute_semantic_scores(
+        text, policy_embeddings, model, n_policies
+    )
     bm25_scores = _compute_bm25_scores(text, bm25_model, n_policies)
     keyword_scores = _compute_keyword_scores(text, policies, n_policies)
 
@@ -313,13 +318,12 @@ def hybrid_search(
 
     # Combine with weighted sum
     combined_scores = (
-        semantic_weight * semantic_norm +
-        bm25_weight * bm25_norm +
-        keyword_weight * keyword_norm
+        semantic_weight * semantic_norm
+        + bm25_weight * bm25_norm
+        + keyword_weight * keyword_norm
     )
 
     # Extract top results
     return _extract_top_results(
-        policies, combined_scores,
-        semantic_norm, bm25_norm, keyword_norm
+        policies, combined_scores, semantic_norm, bm25_norm, keyword_norm
     )
