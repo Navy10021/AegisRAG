@@ -9,7 +9,6 @@ import os
 import re
 from functools import lru_cache
 from enum import Enum
-from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
@@ -102,10 +101,21 @@ def sanitize_input(
     Returns:
         Sanitized text
 
+    Raises:
+        TypeError: If text is not a string
+
     Example:
         >>> sanitize_input("Test\\x00malicious")
         'Testmalicious'
     """
+    # Handle None gracefully
+    if text is None:
+        return ""
+
+    # Type validation
+    if not isinstance(text, str):
+        raise TypeError(f"Expected str, got {type(text).__name__}")
+
     if not text:
         return ""
 

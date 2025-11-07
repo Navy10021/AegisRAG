@@ -68,10 +68,10 @@ class TestExplainableAI:
         explanation = ExplainableAI.generate_explanation(sample_result, score_breakdown)
 
         assert len(explanation.counterfactuals) > 0
-        # Check counterfactual format
+        # Check counterfactual format (English)
         for cf in explanation.counterfactuals:
             assert isinstance(cf, str)
-            assert "만약" in cf or "점" in cf  # Korean format check
+            assert "If" in cf or "keyword" in cf or "absent" in cf
 
     def test_similar_cases_integration(self, sample_result, score_breakdown):
         """Test similar cases integration"""

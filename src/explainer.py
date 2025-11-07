@@ -8,7 +8,6 @@ from typing import List, Optional
 
 from .models import (
     AnalysisResult,
-    SelfRAGResult,
     ExplanationData,
     ScoreBreakdown,
     get_analysis_result,
@@ -125,7 +124,7 @@ class ExplainableAI:
                 print(f"     {desc}")
 
         if exp.counterfactuals:
-            print(f"\n💭 What-If:")
+            print("\n💭 What-If:")
             for cf in exp.counterfactuals:
                 print(f"  • {cf}")
 

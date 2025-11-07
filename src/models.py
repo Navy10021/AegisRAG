@@ -51,10 +51,10 @@ class SecurityPolicy:
             raise ValueError(f"severity must be one of {valid}")
 
         if not 0 <= self.risk_score <= 100:
-            raise ValueError(f"risk_score must be 0-100")
+            raise ValueError("risk_score must be 0-100")
 
         if not 1 <= self.priority <= 5:
-            raise ValueError(f"priority must be 1-5")
+            raise ValueError("priority must be 1-5")
 
         if not self.notification_channels:
             self.notification_channels = ["email"]
