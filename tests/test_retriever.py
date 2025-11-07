@@ -10,7 +10,7 @@ from src.retriever import (
     encode_texts,
     batch_cosine_similarity,
     hybrid_search,
-    SENTENCE_TRANSFORMERS_AVAILABLE
+    SENTENCE_TRANSFORMERS_AVAILABLE,
 )
 from src.models import SecurityPolicy
 
@@ -25,7 +25,7 @@ class TestBM25:
             "password leak detected in system",
             "malware attack on server",
             "unauthorized access to database",
-            "normal business communication"
+            "normal business communication",
         ]
 
     @pytest.fixture
@@ -107,7 +107,10 @@ class TestEmbeddingUtilities:
         if SENTENCE_TRANSFORMERS_AVAILABLE:
             assert model1 is model2  # Should return same cached instance
 
-    @pytest.mark.skipif(not SENTENCE_TRANSFORMERS_AVAILABLE, reason="sentence-transformers not available")
+    @pytest.mark.skipif(
+        not SENTENCE_TRANSFORMERS_AVAILABLE,
+        reason="sentence-transformers not available",
+    )
     def test_encode_texts(self):
         """Test text encoding"""
         texts = ["test sentence", "another test"]
@@ -122,7 +125,10 @@ class TestEmbeddingUtilities:
         embeddings = encode_texts([])
         assert embeddings.shape[0] == 0
 
-    @pytest.mark.skipif(not SENTENCE_TRANSFORMERS_AVAILABLE, reason="sentence-transformers not available")
+    @pytest.mark.skipif(
+        not SENTENCE_TRANSFORMERS_AVAILABLE,
+        reason="sentence-transformers not available",
+    )
     def test_batch_cosine_similarity(self):
         """Test cosine similarity calculation"""
         model = get_embedding_model()
@@ -171,7 +177,7 @@ class TestHybridSearch:
                 content="Protect passwords and credentials from leaks",
                 severity="critical",
                 keywords=["password", "credential", "leak"],
-                category="security"
+                category="security",
             ),
             SecurityPolicy(
                 id="P002",
@@ -179,7 +185,7 @@ class TestHybridSearch:
                 content="Detect and prevent malware attacks",
                 severity="critical",
                 keywords=["malware", "virus", "attack"],
-                category="malware"
+                category="malware",
             ),
             SecurityPolicy(
                 id="P003",
@@ -187,7 +193,7 @@ class TestHybridSearch:
                 content="Unauthorized access prevention",
                 severity="high",
                 keywords=["unauthorized", "access", "breach"],
-                category="access"
+                category="access",
             ),
         ]
 
@@ -214,12 +220,7 @@ class TestHybridSearch:
         query = "password leak"
         model = get_embedding_model()
 
-        results = hybrid_search(
-            query,
-            sample_policies,
-            policy_embeddings,
-            model=model
-        )
+        results = hybrid_search(query, sample_policies, policy_embeddings, model=model)
 
         assert isinstance(results, list)
         assert len(results) <= 3  # Top-3 results
@@ -229,7 +230,9 @@ class TestHybridSearch:
             assert isinstance(score, float)
             assert isinstance(breakdown, dict)
 
-    def test_hybrid_search_with_bm25(self, sample_policies, policy_embeddings, bm25_model):
+    def test_hybrid_search_with_bm25(
+        self, sample_policies, policy_embeddings, bm25_model
+    ):
         """Test hybrid search with BM25"""
         query = "password credential leak"
         model = get_embedding_model()
@@ -239,7 +242,7 @@ class TestHybridSearch:
             sample_policies,
             policy_embeddings,
             model=model,
-            bm25_model=bm25_model
+            bm25_model=bm25_model,
         )
 
         assert isinstance(results, list)
@@ -247,7 +250,9 @@ class TestHybridSearch:
         if len(results) > 0:
             assert results[0][0].id == "P001"
 
-    def test_hybrid_search_weights(self, sample_policies, policy_embeddings, bm25_model):
+    def test_hybrid_search_weights(
+        self, sample_policies, policy_embeddings, bm25_model
+    ):
         """Test hybrid search with custom weights"""
         query = "malware attack"
         model = get_embedding_model()
@@ -260,7 +265,7 @@ class TestHybridSearch:
             bm25_model=bm25_model,
             semantic_weight=0.7,
             keyword_weight=0.2,
-            bm25_weight=0.1
+            bm25_weight=0.1,
         )
 
         assert isinstance(results, list)
@@ -269,7 +274,9 @@ class TestHybridSearch:
             top_policy = results[0][0]
             assert top_policy.id in ["P002", "P001", "P003"]
 
-    def test_hybrid_search_score_breakdown(self, sample_policies, policy_embeddings, bm25_model):
+    def test_hybrid_search_score_breakdown(
+        self, sample_policies, policy_embeddings, bm25_model
+    ):
         """Test that score breakdown is provided"""
         query = "password"
         model = get_embedding_model()
@@ -279,24 +286,20 @@ class TestHybridSearch:
             sample_policies,
             policy_embeddings,
             model=model,
-            bm25_model=bm25_model
+            bm25_model=bm25_model,
         )
 
         if len(results) > 0:
             _, _, breakdown = results[0]
-            assert 'semantic' in breakdown
-            assert 'bm25' in breakdown
-            assert 'keyword' in breakdown
+            assert "semantic" in breakdown
+            assert "bm25" in breakdown
+            assert "keyword" in breakdown
 
     def test_hybrid_search_no_embeddings(self, sample_policies):
         """Test hybrid search without embeddings"""
         query = "password leak"
         results = hybrid_search(
-            query,
-            sample_policies,
-            np.array([]),
-            model=None,
-            bm25_model=None
+            query, sample_policies, np.array([]), model=None, bm25_model=None
         )
 
         # Should still work with keyword matching
@@ -313,7 +316,7 @@ class TestHybridSearch:
             bm25_model=None,
             keyword_weight=1.0,
             semantic_weight=0.0,
-            bm25_weight=0.0
+            bm25_weight=0.0,
         )
 
         # Should find P001 based on keyword match
@@ -326,12 +329,7 @@ class TestHybridSearch:
         query = ""
         model = get_embedding_model()
 
-        results = hybrid_search(
-            query,
-            sample_policies,
-            policy_embeddings,
-            model=model
-        )
+        results = hybrid_search(query, sample_policies, policy_embeddings, model=model)
 
         assert isinstance(results, list)
 
@@ -340,12 +338,7 @@ class TestHybridSearch:
         query = "completely unrelated xyz abc"
         model = get_embedding_model()
 
-        results = hybrid_search(
-            query,
-            sample_policies,
-            policy_embeddings,
-            model=model
-        )
+        results = hybrid_search(query, sample_policies, policy_embeddings, model=model)
 
         # May return results with low scores or empty list
         assert isinstance(results, list)
@@ -365,7 +358,7 @@ class TestIntegration:
                 content="Prevent data leakage and unauthorized transfers",
                 severity="critical",
                 keywords=["data", "leak", "transfer", "unauthorized"],
-                category="dlp"
+                category="dlp",
             ),
         ]
 
@@ -389,11 +382,7 @@ class TestIntegration:
 
         # Search
         results = hybrid_search(
-            query,
-            sample_policies,
-            embeddings,
-            model=model,
-            bm25_model=bm25
+            query, sample_policies, embeddings, model=model, bm25_model=bm25
         )
 
         assert isinstance(results, list)

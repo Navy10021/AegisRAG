@@ -57,16 +57,11 @@ class AnalyzerConfig:
                 "critical": 1.5,
                 "high": 1.2,
                 "medium": 1.0,
-                "low": 0.8
+                "low": 0.8,
             }
 
         if self.SEVERITY_POINTS is None:
-            self.SEVERITY_POINTS = {
-                'critical': 30,
-                'high': 20,
-                'medium': 10,
-                'low': 5
-            }
+            self.SEVERITY_POINTS = {"critical": 30, "high": 20, "medium": 10, "low": 5}
 
 
 @dataclass
@@ -85,7 +80,7 @@ class SecurityConfig:
 
     def __post_init__(self):
         if self.OPENAI_API_KEY is None:
-            self.OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+            self.OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 
 @dataclass
@@ -100,7 +95,7 @@ class LoggingConfig:
     BACKUP_COUNT: int = 5
 
     def __post_init__(self):
-        self.LOG_LEVEL = os.getenv('LOG_LEVEL', self.LOG_LEVEL).upper()
+        self.LOG_LEVEL = os.getenv("LOG_LEVEL", self.LOG_LEVEL).upper()
 
 
 # Default configurations

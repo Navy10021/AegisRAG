@@ -21,7 +21,7 @@ class TestAdvancedRAGAnalyzer:
                 content="Prevent unauthorized data transfer",
                 severity="critical",
                 keywords=["password", "leak", "credential", "secret"],
-                category="data_protection"
+                category="data_protection",
             ),
             SecurityPolicy(
                 id="P002",
@@ -29,7 +29,7 @@ class TestAdvancedRAGAnalyzer:
                 content="Unauthorized access detection",
                 severity="high",
                 keywords=["unauthorized", "access", "login", "breach"],
-                category="access_control"
+                category="access_control",
             ),
             SecurityPolicy(
                 id="P003",
@@ -37,8 +37,8 @@ class TestAdvancedRAGAnalyzer:
                 content="Detect malicious software",
                 severity="critical",
                 keywords=["virus", "malware", "trojan", "ransomware"],
-                category="malware"
-            )
+                category="malware",
+            ),
         ]
 
     @pytest.fixture
@@ -48,18 +48,15 @@ class TestAdvancedRAGAnalyzer:
             policies=sample_policies,
             use_llm=False,
             use_embeddings=False,
-            enable_self_rag=False
+            enable_self_rag=False,
         )
 
     def test_analyzer_initialization(self, sample_policies):
         """Test analyzer initialization"""
-        analyzer = AdvancedRAGAnalyzer(
-            policies=sample_policies,
-            use_llm=False
-        )
+        analyzer = AdvancedRAGAnalyzer(policies=sample_policies, use_llm=False)
         assert analyzer.policies == sample_policies
         assert analyzer.config is not None
-        assert analyzer.stats['total'] == 0
+        assert analyzer.stats["total"] == 0
 
     def test_analyze_critical_threat(self, analyzer_no_llm):
         """Test analysis of critical threat"""
@@ -67,7 +64,7 @@ class TestAdvancedRAGAnalyzer:
 
         assert isinstance(result, AnalysisResult)
         assert result.risk_score > 0
-        assert result.risk_level in ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']
+        assert result.risk_level in ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
         assert len(result.threats) > 0
 
     def test_analyze_low_risk_text(self, analyzer_no_llm):
@@ -75,7 +72,7 @@ class TestAdvancedRAGAnalyzer:
         result = analyzer_no_llm.analyze("hello world")
 
         assert isinstance(result, AnalysisResult)
-        assert result.risk_level == 'LOW'
+        assert result.risk_level == "LOW"
 
     def test_analyze_empty_text(self, analyzer_no_llm):
         """Test analysis with empty text"""
@@ -87,19 +84,14 @@ class TestAdvancedRAGAnalyzer:
     def test_analyze_with_user_id(self, analyzer_no_llm):
         """Test analysis with user tracking"""
         result = analyzer_no_llm.analyze(
-            "unauthorized access attempt",
-            user_id="user123"
+            "unauthorized access attempt", user_id="user123"
         )
 
         assert result.user_id == "user123"
 
     def test_batch_analysis(self, analyzer_no_llm):
         """Test batch analysis"""
-        texts = [
-            "password leak",
-            "malware detected",
-            "normal activity"
-        ]
+        texts = ["password leak", "malware detected", "normal activity"]
 
         results = analyzer_no_llm.analyze_batch(texts)
 
@@ -112,28 +104,26 @@ class TestAdvancedRAGAnalyzer:
         custom_config.RISK_CRITICAL_THRESHOLD = 70
 
         analyzer = AdvancedRAGAnalyzer(
-            policies=sample_policies,
-            use_llm=False,
-            config=custom_config
+            policies=sample_policies, use_llm=False, config=custom_config
         )
 
         assert analyzer.config.RISK_CRITICAL_THRESHOLD == 70
 
     def test_stats_tracking(self, analyzer_no_llm):
         """Test statistics tracking"""
-        initial_total = analyzer_no_llm.stats['total']
+        initial_total = analyzer_no_llm.stats["total"]
 
         analyzer_no_llm.analyze("test text")
 
-        assert analyzer_no_llm.stats['total'] == initial_total + 1
-        assert analyzer_no_llm.stats['rule'] > 0
+        assert analyzer_no_llm.stats["total"] == initial_total + 1
+        assert analyzer_no_llm.stats["rule"] > 0
 
     def test_policy_matching(self, analyzer_no_llm):
         """Test policy violation detection"""
         result = analyzer_no_llm.analyze("password credential leak")
 
         # Should match P001 (Data Loss Prevention)
-        assert 'P001' in result.violations or len(result.threats) > 0
+        assert "P001" in result.violations or len(result.threats) > 0
 
 
 class TestAnalyzerEdgeCases:
@@ -148,7 +138,7 @@ class TestAnalyzerEdgeCases:
                 title="Test Policy",
                 content="Test policy content",
                 severity="medium",
-                keywords=["test", "security"]
+                keywords=["test", "security"],
             )
         ]
 
@@ -159,7 +149,7 @@ class TestAnalyzerEdgeCases:
             policies=sample_policies,
             use_llm=False,
             use_embeddings=False,
-            enable_self_rag=False
+            enable_self_rag=False,
         )
 
     def test_empty_string_input(self, analyzer):
@@ -260,7 +250,7 @@ class TestAnalyzerEdgeCases:
         assert len(results) == 10
         assert all(isinstance(r, AnalysisResult) for r in results)
         # Stats should track all analyses
-        assert analyzer.stats['total'] >= 10
+        assert analyzer.stats["total"] >= 10
 
     def test_max_length_boundary(self, analyzer):
         """Test input at exact MAX_INPUT_LENGTH"""

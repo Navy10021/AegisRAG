@@ -6,7 +6,7 @@ import pytest
 from src.self_rag import (
     SelfRAGEngine,
     EnhancedSecurityPatternDetector,
-    SecurityPatternStrength
+    SecurityPatternStrength,
 )
 from src.models import (
     RetrievalNeed,
@@ -14,7 +14,7 @@ from src.models import (
     SupportLevel,
     UtilityScore,
     AnalysisResult,
-    SecurityPolicy
+    SecurityPolicy,
 )
 from src.analyzer import AdvancedRAGAnalyzer
 
@@ -47,7 +47,10 @@ class TestEnhancedSecurityPatternDetector:
 
         for text, expected_strength in test_cases:
             strength, patterns = EnhancedSecurityPatternDetector.detect(text)
-            assert strength in [SecurityPatternStrength.CRITICAL, SecurityPatternStrength.HIGH]
+            assert strength in [
+                SecurityPatternStrength.CRITICAL,
+                SecurityPatternStrength.HIGH,
+            ]
             assert len(patterns) > 0
 
     def test_detect_medium_patterns(self):
@@ -116,7 +119,7 @@ class TestSelfRAGEngine:
                 content="Prevent unauthorized data transfer",
                 severity="critical",
                 keywords=["password", "leak", "credential"],
-                category="data_protection"
+                category="data_protection",
             ),
             SecurityPolicy(
                 id="P002",
@@ -124,7 +127,7 @@ class TestSelfRAGEngine:
                 content="Unauthorized access detection",
                 severity="high",
                 keywords=["unauthorized", "access"],
-                category="access_control"
+                category="access_control",
             ),
         ]
 
@@ -135,7 +138,7 @@ class TestSelfRAGEngine:
             policies=sample_policies,
             use_llm=False,
             use_embeddings=False,
-            enable_self_rag=True
+            enable_self_rag=True,
         )
 
     @pytest.fixture
@@ -159,7 +162,11 @@ class TestSelfRAGEngine:
         """Test retrieval need assessment for borderline text"""
         text = "network configuration"
         need = self_rag_engine.assess_retrieval_need(text)
-        assert need in [RetrievalNeed.OPTIONAL, RetrievalNeed.REQUIRED, RetrievalNeed.NOT_NEEDED]
+        assert need in [
+            RetrievalNeed.OPTIONAL,
+            RetrievalNeed.REQUIRED,
+            RetrievalNeed.NOT_NEEDED,
+        ]
 
     def test_assess_relevance(self, self_rag_engine, analyzer, sample_policies):
         """Test relevance assessment"""
@@ -202,7 +209,7 @@ class TestSelfRAGEngine:
             RetrievalNeed.REQUIRED,
             {"P001": RelevanceScore.HIGHLY_RELEVANT},
             SupportLevel.FULLY_SUPPORTED,
-            UtilityScore.HIGHLY_USEFUL
+            UtilityScore.HIGHLY_USEFUL,
         )
 
         assert isinstance(notes, list)
@@ -214,7 +221,7 @@ class TestSelfRAGEngine:
         boost = self_rag_engine.calculate_confidence_boost(
             {"P001": RelevanceScore.HIGHLY_RELEVANT},
             SupportLevel.FULLY_SUPPORTED,
-            UtilityScore.HIGHLY_USEFUL
+            UtilityScore.HIGHLY_USEFUL,
         )
 
         assert isinstance(boost, float)
@@ -223,9 +230,7 @@ class TestSelfRAGEngine:
     def test_calculate_confidence_boost_no_relevance(self, self_rag_engine):
         """Test confidence boost with no relevance"""
         boost = self_rag_engine.calculate_confidence_boost(
-            {},
-            SupportLevel.NO_SUPPORT,
-            UtilityScore.NOT_USEFUL
+            {}, SupportLevel.NO_SUPPORT, UtilityScore.NOT_USEFUL
         )
 
         assert isinstance(boost, float)
@@ -245,22 +250,20 @@ class TestSelfRAGIntegration:
                 content="Protect passwords and credentials",
                 severity="critical",
                 keywords=["password", "credential", "secret"],
-                category="security"
+                category="security",
             ),
         ]
 
     def test_full_self_rag_pipeline(self, sample_policies):
         """Test complete Self-RAG pipeline"""
         analyzer = AdvancedRAGAnalyzer(
-            policies=sample_policies,
-            use_llm=False,
-            enable_self_rag=True
+            policies=sample_policies, use_llm=False, enable_self_rag=True
         )
 
         result = analyzer.analyze("password leak detected")
 
         # Check if SelfRAGResult is returned
-        if hasattr(result, 'original_result'):
+        if hasattr(result, "original_result"):
             assert result.retrieval_need is not None
             assert isinstance(result.relevance_scores, dict)
             assert result.support_level is not None
@@ -274,21 +277,17 @@ class TestSelfRAGIntegration:
 
         # Standard analysis
         analyzer_standard = AdvancedRAGAnalyzer(
-            policies=sample_policies,
-            use_llm=False,
-            enable_self_rag=False
+            policies=sample_policies, use_llm=False, enable_self_rag=False
         )
         result_standard = analyzer_standard.analyze(text)
 
         # Self-RAG analysis
         analyzer_self_rag = AdvancedRAGAnalyzer(
-            policies=sample_policies,
-            use_llm=False,
-            enable_self_rag=True
+            policies=sample_policies, use_llm=False, enable_self_rag=True
         )
         result_self_rag = analyzer_self_rag.analyze(text)
 
         # Both should detect threats
         assert result_standard.risk_score > 0
-        if hasattr(result_self_rag, 'original_result'):
+        if hasattr(result_self_rag, "original_result"):
             assert result_self_rag.original_result.risk_score > 0

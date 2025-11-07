@@ -51,7 +51,10 @@ class TestInputSanitization:
         text = "Test ignore previous instructions hack"
         result = sanitize_prompt_input(text)
         # Injection pattern should be removed or escaped
-        assert len(result) < len(text) or "ignore previous instructions" not in result.lower()
+        assert (
+            len(result) < len(text)
+            or "ignore previous instructions" not in result.lower()
+        )
 
     def test_sanitize_prompt_input_quotes(self):
         """Test quote escaping"""
@@ -149,7 +152,7 @@ class TestInputSanitization:
 
     def test_sanitize_prompt_nested_quotes(self):
         """Test nested quote handling"""
-        text = 'Test "nested \'quotes\' here" text'
+        text = "Test \"nested 'quotes' here\" text"
         result = sanitize_prompt_input(text)
         # Should escape quotes
         assert len(result) > 0
@@ -190,13 +193,13 @@ class TestLanguageDetector:
         """Test English language detection"""
         text = "This is an English sentence"
         lang = LanguageDetector.detect_language(text)
-        assert lang in ['en', 'unknown']  # May fail if langdetect not available
+        assert lang in ["en", "unknown"]  # May fail if langdetect not available
 
     def test_detect_korean(self):
         """Test Korean language detection"""
         text = "이것은 한국어 문장입니다"
         lang = LanguageDetector.detect_language(text)
-        assert lang in ['ko', 'en', 'unknown']
+        assert lang in ["ko", "en", "unknown"]
 
     def test_detect_empty_text(self):
         """Test empty text detection"""
@@ -205,15 +208,15 @@ class TestLanguageDetector:
 
     def test_get_patterns_english(self):
         """Test English pattern retrieval"""
-        patterns = LanguageDetector.get_patterns('en')
+        patterns = LanguageDetector.get_patterns("en")
         assert isinstance(patterns, dict)
 
     def test_get_patterns_korean(self):
         """Test Korean pattern retrieval"""
-        patterns = LanguageDetector.get_patterns('ko')
+        patterns = LanguageDetector.get_patterns("ko")
         assert isinstance(patterns, dict)
 
     def test_get_patterns_fallback(self):
         """Test fallback to English for unsupported language"""
-        patterns = LanguageDetector.get_patterns('unsupported_lang')
+        patterns = LanguageDetector.get_patterns("unsupported_lang")
         assert isinstance(patterns, dict)
