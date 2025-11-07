@@ -6,7 +6,7 @@ Context memory and relational analysis system
 import logging
 from collections import deque, defaultdict, Counter
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 
 import numpy as np
 import networkx as nx
@@ -25,11 +25,11 @@ logger = logging.getLogger(__name__)
 class ContextMemorySystem:
     """User behavior pattern learning and context memory"""
 
-    def __init__(self, config: AnalyzerConfig = None):
+    def __init__(self, config: Optional[AnalyzerConfig] = None):
         from .config import DEFAULT_ANALYZER_CONFIG
 
         self.config = config or DEFAULT_ANALYZER_CONFIG
-        self.user_profiles = defaultdict(
+        self.user_profiles: defaultdict[str, Dict[str, Any]] = defaultdict(
             lambda: {
                 "analyses_count": 0,
                 "avg_risk_score": 0.0,

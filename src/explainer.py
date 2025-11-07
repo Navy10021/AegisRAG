@@ -30,7 +30,7 @@ class ExplainableAI:
         result,
         score_breakdown: ScoreBreakdown,
         similar_cases: Optional[List] = None,
-        config: AnalyzerConfig = None,
+        config: Optional[AnalyzerConfig] = None,
     ) -> ExplanationData:
         """Generate explanation data"""
         config = config or DEFAULT_ANALYZER_CONFIG
@@ -113,7 +113,7 @@ class ExplainableAI:
         return viol_sim * 0.6 + score_sim * 0.4
 
     @staticmethod
-    def print_explanation(result, config: AnalyzerConfig = None):
+    def print_explanation(result, config: Optional[AnalyzerConfig] = None):
         """Print explanation to console"""
         config = config or DEFAULT_ANALYZER_CONFIG
         analysis = get_analysis_result(result)

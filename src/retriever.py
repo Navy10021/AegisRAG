@@ -35,14 +35,19 @@ except (ImportError, ModuleNotFoundError) as e:
 class BM25:
     """BM25 algorithm - Enhanced keyword-based search"""
 
-    def __init__(self, k1=None, b=None, config: AnalyzerConfig = None):
+    def __init__(
+        self,
+        k1: Optional[float] = None,
+        b: Optional[float] = None,
+        config: Optional[AnalyzerConfig] = None,
+    ):
         config = config or DEFAULT_ANALYZER_CONFIG
-        self.k1 = k1 if k1 is not None else config.BM25_K1
-        self.b = b if b is not None else config.BM25_B
-        self.doc_len = []
-        self.avgdl = 0
-        self.idf = {}
-        self.corpus = []
+        self.k1: float = k1 if k1 is not None else config.BM25_K1
+        self.b: float = b if b is not None else config.BM25_B
+        self.doc_len: list[int] = []
+        self.avgdl: float = 0.0
+        self.idf: dict[str, float] = {}
+        self.corpus: list[str] = []
 
     def fit(self, corpus):
         """Train BM25 with corpus"""
@@ -121,7 +126,9 @@ def encode_texts(texts, model=None):
         return np.array([])
 
 
-def batch_cosine_similarity(query_vec, corpus_vecs, config: AnalyzerConfig = None):
+def batch_cosine_similarity(
+    query_vec, corpus_vecs, config: Optional[AnalyzerConfig] = None
+):
     """Calculate cosine similarity between query vector and corpus vectors"""
     config = config or DEFAULT_ANALYZER_CONFIG
     if query_vec.size == 0 or corpus_vecs.size == 0:
@@ -140,7 +147,9 @@ def batch_cosine_similarity(query_vec, corpus_vecs, config: AnalyzerConfig = Non
 # ============================================================
 
 
-def _normalize_scores(scores: np.ndarray, config: AnalyzerConfig = None) -> np.ndarray:
+def _normalize_scores(
+    scores: np.ndarray, config: Optional[AnalyzerConfig] = None
+) -> np.ndarray:
     """
     Normalize scores to [0, 1] range using min-max normalization
 
@@ -162,7 +171,7 @@ def _compute_semantic_scores(
     policy_embeddings: np.ndarray,
     model,
     n_policies: int,
-    config: AnalyzerConfig = None,
+    config: Optional[AnalyzerConfig] = None,
 ) -> np.ndarray:
     """
     Compute semantic similarity scores using embeddings
@@ -287,7 +296,7 @@ def hybrid_search(
     semantic_weight: float = 0.5,
     keyword_weight: float = 0.3,
     bm25_weight: float = 0.2,
-    config: AnalyzerConfig = None,
+    config: Optional[AnalyzerConfig] = None,
 ) -> List[Tuple[SecurityPolicy, float, Dict[str, float]]]:
     """
     Hybrid Search: Semantic + Keyword + BM25

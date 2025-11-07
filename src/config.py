@@ -4,8 +4,8 @@ Configuration management system
 """
 
 import os
-from dataclasses import dataclass
-from typing import Dict
+from dataclasses import dataclass, field
+from typing import Dict, Optional
 
 
 @dataclass
@@ -13,8 +13,8 @@ class AnalyzerConfig:
     """Analyzer configuration"""
 
     # Severity settings
-    SEVERITY_MULTIPLIERS: Dict[str, float] = None
-    SEVERITY_POINTS: Dict[str, int] = None
+    SEVERITY_MULTIPLIERS: Optional[Dict[str, float]] = None
+    SEVERITY_POINTS: Optional[Dict[str, int]] = None
 
     # Cache settings
     CACHE_SIZE: int = 256
@@ -52,7 +52,7 @@ class AnalyzerConfig:
     MAX_INPUT_LENGTH: int = 10000
 
     # Direct analysis patterns (threat keywords and scores)
-    DIRECT_ANALYSIS_PATTERNS: Dict[str, int] = None
+    DIRECT_ANALYSIS_PATTERNS: Optional[Dict[str, int]] = None
 
     # LLM configuration
     MAX_POLICIES_FOR_LLM: int = 10
@@ -111,7 +111,7 @@ class SecurityConfig:
     """Security configuration"""
 
     # API Key management
-    OPENAI_API_KEY: str = None
+    OPENAI_API_KEY: Optional[str] = None
 
     # Input sanitization
     ENABLE_INPUT_SANITIZATION: bool = True
