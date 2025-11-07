@@ -232,5 +232,9 @@ class RelationshipAnalyzer:
             plt.savefig(output, dpi=150, bbox_inches="tight")
             plt.close()
             logger.info(f"✅ Graph saved: {output}")
-        except Exception as e:
-            logger.error(f"Graph error: {e}")
+        except (ImportError, ModuleNotFoundError) as e:
+            logger.error(f"Graph visualization module error: {e}")
+        except (OSError, PermissionError, FileNotFoundError) as e:
+            logger.error(f"Graph file save error: {type(e).__name__}: {e}")
+        except (ValueError, TypeError, AttributeError) as e:
+            logger.error(f"Graph rendering error: {type(e).__name__}: {e}")

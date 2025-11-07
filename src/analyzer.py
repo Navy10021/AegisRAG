@@ -374,9 +374,15 @@ class AdvancedRAGAnalyzer:
                 confidence_boost=confidence_boost,
             )
 
-        except Exception as e:
+        except (AttributeError, KeyError, ValueError, TypeError) as e:
             self.stats["errors"] += 1
-            logger.error(f"Self-RAG error: {e}")
+            self.stats["self_rag_skipped"] += 1
+            logger.error(f"Self-RAG processing error: {type(e).__name__}: {e}")
+            return self._analyze_standard(text, user_id, session_id)
+        except (RuntimeError, IndexError) as e:
+            self.stats["errors"] += 1
+            self.stats["self_rag_skipped"] += 1
+            logger.warning(f"Self-RAG fallback to standard: {type(e).__name__}: {e}")
             return self._analyze_standard(text, user_id, session_id)
 
     def _analyze_standard(
@@ -584,8 +590,17 @@ JSON:
             )
             result_dict = json.loads(response.choices[0].message.content)
             return AnalysisResult(text=text, **result_dict)
-        except Exception as e:
-            logger.error(f"LLM error: {e}")
+        except json.JSONDecodeError as e:
+            logger.error(f"LLM response JSON parsing error: {e}")
+            return self._analyze_rules(text, policies, {}, "unknown")
+        except (IndexError, KeyError, AttributeError) as e:
+            logger.error(f"LLM response structure error: {type(e).__name__}: {e}")
+            return self._analyze_rules(text, policies, {}, "unknown")
+        except (TimeoutError, ConnectionError, OSError) as e:
+            logger.error(f"LLM API connection error: {type(e).__name__}: {e}")
+            return self._analyze_rules(text, policies, {}, "unknown")
+        except (ValueError, TypeError) as e:
+            logger.error(f"LLM result validation error: {type(e).__name__}: {e}")
             return self._analyze_rules(text, policies, {}, "unknown")
 
     def _analyze_rules(
