@@ -12,6 +12,7 @@ from .models import (
     ScoreBreakdown,
     get_analysis_result,
 )
+from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
 
 logger = logging.getLogger(__name__)
 
@@ -26,25 +27,35 @@ class ExplainableAI:
 
     @staticmethod
     def generate_explanation(
-        result, score_breakdown: ScoreBreakdown, similar_cases: Optional[List] = None
+        result,
+        score_breakdown: ScoreBreakdown,
+        similar_cases: Optional[List] = None,
+        config: Optional[AnalyzerConfig] = None,
     ) -> ExplanationData:
         """Generate explanation data"""
+        config = config or DEFAULT_ANALYZER_CONFIG
         # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
 
         # Extract key factors
         key_factors = []
         for keyword, score in score_breakdown.keyword_matches.items():
-            if score > 5:
+            if score > config.EXPLANATION_MIN_SCORE:
                 importance = (
-                    "CRITICAL" if score > 30 else "HIGH" if score > 15 else "MEDIUM"
+                    "CRITICAL"
+                    if score > config.EXPLANATION_FACTOR_THRESHOLD_HIGH
+                    else (
+                        "HIGH"
+                        if score > config.EXPLANATION_FACTOR_THRESHOLD_MEDIUM
+                        else "MEDIUM"
+                    )
                 )
                 key_factors.append(
                     (keyword, score, importance, f"'{keyword}' keyword detected")
                 )
 
         for policy_id, score in score_breakdown.policy_similarities.items():
-            if score > 10:
+            if score > config.EXPLANATION_FACTOR_THRESHOLD_LOW:
                 key_factors.append(
                     (policy_id, score, "HIGH", f"Policy {policy_id} matched")
                 )
@@ -62,7 +73,7 @@ class ExplainableAI:
         # Similar cases
         similar_case_data = []
         if similar_cases:
-            for case in similar_cases[:3]:
+            for case in similar_cases[: config.MAX_SIMILAR_CASES]:
                 case_analysis = get_analysis_result(case)
                 sim = ExplainableAI._calc_similarity(analysis, case_analysis)
                 similar_case_data.append(
@@ -102,8 +113,9 @@ class ExplainableAI:
         return viol_sim * 0.6 + score_sim * 0.4
 
     @staticmethod
-    def print_explanation(result):
+    def print_explanation(result, config: Optional[AnalyzerConfig] = None):
         """Print explanation to console"""
+        config = config or DEFAULT_ANALYZER_CONFIG
         analysis = get_analysis_result(result)
 
         if not analysis.explanation_data:
@@ -119,7 +131,7 @@ class ExplainableAI:
             print("\n🎯 Key Factors:")
             for i, (factor, score, imp, desc) in enumerate(exp.key_factors[:5], 1):
                 emoji = "🔴" if imp == "CRITICAL" else "🟠" if imp == "HIGH" else "🟡"
-                bar = "█" * int(score / 5)
+                bar = "█" * int(score / config.VISUALIZATION_BAR_SCALE)
                 print(f"  {i}. {emoji} {factor}: +{score:.1f} {bar}")
                 print(f"     {desc}")
 

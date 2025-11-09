@@ -577,8 +577,11 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         except (KeyError, json.JSONDecodeError, AttributeError) as e:
             logger.warning(f"LLM response parsing failed: {e}")
             return RetrievalNeed.OPTIONAL
-        except Exception as e:
-            logger.error(f"LLM request failed: {e}")
+        except (TimeoutError, ConnectionError, OSError) as e:
+            logger.error(f"LLM API connection failed: {type(e).__name__}: {e}")
+            return RetrievalNeed.OPTIONAL
+        except (ValueError, TypeError, RuntimeError) as e:
+            logger.error(f"LLM request error: {type(e).__name__}: {e}")
             return RetrievalNeed.OPTIONAL
 
     def assess_relevance(self, text: str, result) -> Dict[str, RelevanceScore]:

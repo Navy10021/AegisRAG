@@ -6,11 +6,12 @@ AegisRAG Logging Configuration
 import logging
 import logging.handlers
 from pathlib import Path
+from typing import Optional
 
 from .config import DEFAULT_LOGGING_CONFIG, LoggingConfig
 
 
-def setup_logging(config: LoggingConfig = None) -> logging.Logger:
+def setup_logging(config: Optional[LoggingConfig] = None) -> logging.Logger:
     """
     로깅 시스템 설정
 

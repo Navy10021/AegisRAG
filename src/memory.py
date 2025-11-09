@@ -6,12 +6,13 @@ Context memory and relational analysis system
 import logging
 from collections import deque, defaultdict, Counter
 from datetime import datetime, timedelta
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 
 import numpy as np
 import networkx as nx
 
 from .models import get_analysis_result
+from .config import AnalyzerConfig
 
 logger = logging.getLogger(__name__)
 
@@ -24,12 +25,15 @@ logger = logging.getLogger(__name__)
 class ContextMemorySystem:
     """User behavior pattern learning and context memory"""
 
-    def __init__(self):
-        self.user_profiles = defaultdict(
+    def __init__(self, config: Optional[AnalyzerConfig] = None):
+        from .config import DEFAULT_ANALYZER_CONFIG
+
+        self.config = config or DEFAULT_ANALYZER_CONFIG
+        self.user_profiles: defaultdict[str, Dict[str, Any]] = defaultdict(
             lambda: {
                 "analyses_count": 0,
                 "avg_risk_score": 0.0,
-                "risk_history": deque(maxlen=100),
+                "risk_history": deque(maxlen=self.config.MAX_USER_HISTORY),
                 "violation_patterns": Counter(),
                 "behavior_trend": "stable",
             }
@@ -62,7 +66,13 @@ class ContextMemorySystem:
             x = np.arange(len(recent))
             slope = np.polyfit(x, recent, 1)[0]
             profile["behavior_trend"] = (
-                "increasing" if slope > 5 else "decreasing" if slope < -5 else "stable"
+                "increasing"
+                if slope > self.config.BEHAVIOR_TREND_THRESHOLD_UP
+                else (
+                    "decreasing"
+                    if slope < self.config.BEHAVIOR_TREND_THRESHOLD_DOWN
+                    else "stable"
+                )
             )
 
     def get_context_adjustment(self, user_id: str, base_score: float) -> float:
@@ -73,12 +83,16 @@ class ContextMemorySystem:
 
         adjustment = 0.0
         if profile["behavior_trend"] == "increasing":
-            adjustment += 10
+            adjustment += self.config.CONTEXT_ADJUSTMENT_BASE
         if profile["violation_patterns"]:
             max_viol = max(profile["violation_patterns"].values())
-            if max_viol >= 3:
-                adjustment += min(max_viol * 5, 20)
-        return min(adjustment, 30)
+            if max_viol >= self.config.CONTEXT_ADJUSTMENT_VIOLATION_THRESHOLD:
+                adjustment += min(
+                    max_viol * self.config.CONTEXT_ADJUSTMENT_VIOLATION_MULTIPLIER,
+                    self.config.CONTEXT_ADJUSTMENT_MAX
+                    - self.config.CONTEXT_ADJUSTMENT_BASE,
+                )
+        return min(adjustment, self.config.CONTEXT_ADJUSTMENT_MAX)
 
     def get_user_summary(self, user_id: str) -> Dict:
         """Get user summary information"""
@@ -218,5 +232,9 @@ class RelationshipAnalyzer:
             plt.savefig(output, dpi=150, bbox_inches="tight")
             plt.close()
             logger.info(f"✅ Graph saved: {output}")
-        except Exception as e:
-            logger.error(f"Graph error: {e}")
+        except (ImportError, ModuleNotFoundError) as e:
+            logger.error(f"Graph visualization module error: {e}")
+        except (OSError, PermissionError, FileNotFoundError) as e:
+            logger.error(f"Graph file save error: {type(e).__name__}: {e}")
+        except (ValueError, TypeError, AttributeError) as e:
+            logger.error(f"Graph rendering error: {type(e).__name__}: {e}")

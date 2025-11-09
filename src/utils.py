@@ -9,6 +9,7 @@ import os
 import re
 from functools import lru_cache
 from enum import Enum
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -88,7 +89,7 @@ class SecurityPatternStrength(Enum):
 
 
 def sanitize_input(
-    text: str, max_length: int = 10000, allowed_chars: str = None
+    text: str, max_length: int = 10000, allowed_chars: Optional[str] = None
 ) -> str:
     """
     Safely sanitize user input
