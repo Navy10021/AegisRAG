@@ -487,31 +487,48 @@ analyzer.visualize_relationships()
 ## 📁 Project Structure
 
 ```
-aegisrag-v3/
-├── src/                       # Core modules (67KB)
-│   ├── __init__.py           # Package init
-│   ├── models.py             # Data models
-│   ├── analyzer.py           # Main analyzer (Self-RAG)
-│   ├── retriever.py          # Hybrid search
-│   ├── self_rag.py           # Self-RAG engine (900+ patterns)
-│   ├── explainer.py          # XAI module
-│   ├── memory.py             # Context + Relationships
-│   └── utils.py              # Utilities
+AegisRAG/
+├── src/                               # 🧠 Core source code
+│   ├── __init__.py                    # Package initialization
+│   ├── models.py                      # Dataclasses for policy, result, and scoring
+│   ├── analyzer.py                    # Main analyzer orchestrating Self-RAG flow
+│   ├── retriever.py                   # Hybrid search (Embedding + BM25 + Keyword)
+│   ├── self_rag.py                    # Self-RAG engine with meta-evaluation pipeline
+│   ├── explainer.py                   # XAI explainer (factor attribution + counterfactual)
+│   ├── memory.py                      # Context memory and user relationship graph
+│   ├── patterns/                      # 900+ language-specific detection patterns
+│   │   ├── patterns_ko.json
+│   │   ├── patterns_en.json
+│   │   └── ...
+│   └── utils.py                       # Utility functions (tokenization, scoring, logging)
 │
-├── notebooks/                # Jupyter notebooks
-│   └── aegis_ver3.ipynb
+├── data/                              # 📂 Dataset and policy resources
+│   ├── policies/                      # Policy JSON files (critical, high, medium, low)
+│   ├── examples/                      # Sample texts for quick testing
+│   └── keywords.json                  # Rule-based keyword sets
 │
-├── data/                     # Data files
-│   └── policies/
+├── notebooks/                         # 📘 Interactive notebooks
+│   ├── aegis_ver3.ipynb               # Demo notebook (Colab ready)
+│   └── evaluation.ipynb               # Evaluation and visualization
 │
-├── output/                   # Results
-│   ├── reports/
-│   ├── charts/
-│   └── logs/
+├── output/                            # 📊 Output directory
+│   ├── reports/                       # Generated threat analysis reports
+│   ├── charts/                        # Visual analytics and trend plots
+│   ├── logs/                          # System and performance logs
+│   └── threat_graphs/                 # Compound threat relationship graphs
 │
-├── requirements.txt
-├── README.md
-└── LICENSE
+├── tests/                             # 🧪 Unit and integration tests
+│   ├── test_analyzer.py
+│   ├── test_self_rag.py
+│   ├── test_retriever.py
+│   └── ...
+│
+├── requirements.txt                   # Core dependencies
+├── requirements-dev.txt               # Dev/test dependencies
+├── CONTRIBUTING.md                    # Contribution guidelines
+├── LICENSE                            # MIT License
+└── README.md                          # Documentation (this file)
+
 ```
 
 ---
