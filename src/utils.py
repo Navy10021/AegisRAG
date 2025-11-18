@@ -9,7 +9,7 @@ import os
 import re
 from functools import lru_cache
 from enum import Enum
-from typing import Optional
+from typing import Optional, Pattern, List
 
 logger = logging.getLogger(__name__)
 
@@ -146,6 +146,16 @@ def sanitize_input(
     return text.strip()
 
 
+# Pre-compiled prompt injection patterns for better performance
+_INJECTION_PATTERNS: List[Pattern] = [
+    re.compile(r"ignore\s+previous\s+instructions", re.IGNORECASE),
+    re.compile(r"disregard\s+all\s+above", re.IGNORECASE),
+    re.compile(r"forget\s+everything", re.IGNORECASE),
+    re.compile(r"system\s*:", re.IGNORECASE),
+    re.compile(r"<\s*script\s*>", re.IGNORECASE),
+]
+
+
 def sanitize_prompt_input(text: str, max_length: int = 1000) -> str:
     """
     Sanitize input for LLM prompts (more strict)
@@ -163,16 +173,8 @@ def sanitize_prompt_input(text: str, max_length: int = 1000) -> str:
     # Escape quotes
     text = text.replace('"', '\\"').replace("'", "\\'")
 
-    # Remove potential prompt injection patterns
-    injection_patterns = [
-        r"ignore\s+previous\s+instructions",
-        r"disregard\s+all\s+above",
-        r"forget\s+everything",
-        r"system\s*:",
-        r"<\s*script\s*>",
-    ]
-
-    for pattern in injection_patterns:
-        text = re.sub(pattern, "", text, flags=re.IGNORECASE)
+    # Remove potential prompt injection patterns using pre-compiled patterns
+    for pattern in _INJECTION_PATTERNS:
+        text = pattern.sub("", text)
 
     return text

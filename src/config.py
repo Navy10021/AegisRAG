@@ -48,6 +48,16 @@ class AnalyzerConfig:
     MIN_CHAIN_LENGTH: int = 3
     MIN_USER_ANALYSES: int = 5
 
+    # Relationship analysis weights
+    RELATIONSHIP_TEMPORAL_WEIGHT: float = 0.3
+    RELATIONSHIP_SEMANTIC_WEIGHT: float = 0.5
+    RELATIONSHIP_USER_WEIGHT: float = 0.2
+    RELATIONSHIP_THRESHOLD: float = 0.3
+
+    # Similarity calculation weights
+    SIMILARITY_VIOLATION_WEIGHT: float = 0.6
+    SIMILARITY_SCORE_WEIGHT: float = 0.4
+
     # Input limits
     MAX_INPUT_LENGTH: int = 10000
 
