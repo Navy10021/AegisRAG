@@ -1,23 +1,24 @@
-# Core dependencies with pinned versions for reproducibility
-# Last updated: 2025-11-04
+# Core dependencies with version ranges for Python 3.8+ compatibility
+# Last updated: 2025-11-18
 
 # LLM and AI
-openai==1.12.0
-sentence-transformers==2.5.1
+openai>=1.12.0,<2.0.0
+sentence-transformers>=2.5.0,<3.0.0
 
 # Data validation and modeling
-pydantic==2.6.3
+pydantic>=2.6.0,<3.0.0
 
 # Scientific computing
-numpy==1.26.4
+# numpy 1.24.x is the last version series supporting Python 3.8
+numpy>=1.24.0,<1.25.0
 
 # Visualization
-matplotlib==3.8.3
-wordcloud==1.9.3
+matplotlib>=3.7.0,<4.0.0
+wordcloud>=1.9.0,<2.0.0
 
 # Graph analysis
-networkx==3.2.1
+networkx>=3.2.0,<4.0.0
 
 # Utilities
-psutil==5.9.8
-langdetect==1.0.9
+psutil>=5.9.0,<6.0.0
+langdetect>=1.0.9,<2.0.0
