@@ -1,29 +1,28 @@
-# Development dependencies for AegisRAG
-# Last updated: 2025-11-04
+# Development and Testing Dependencies
+# Last updated: 2025-11-18
 
-# Include production dependencies
--r requirements.txt
-
-# Testing
+# Testing framework
 pytest==7.4.3
 pytest-cov==4.1.0
+pytest-xdist==3.5.0
 pytest-mock==3.12.0
-pytest-asyncio==0.21.1
+pytest-benchmark==4.0.0
 
-# Code quality
+# Code quality tools
 black==23.12.1
-flake8==6.1.0
 isort==5.13.2
-mypy==1.7.1
+pylint==3.0.3
+flake8==7.0.0
+mypy==1.8.0
 
-# Type stubs
-types-requests==2.31.0.20231231
+# Security scanning
+bandit==1.7.6
+safety==3.0.1
+pip-audit==2.6.3
 
 # Documentation
 sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
-myst-parser==2.0.0
 
-# Development tools
-ipython==8.19.0
-jupyter==1.0.0
+# Type stubs
+types-requests==2.31.0.10
