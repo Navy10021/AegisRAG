@@ -121,9 +121,12 @@ class ContextMemorySystem:
 class RelationshipAnalyzer:
     """Inter-event relationship analysis"""
 
-    def __init__(self):
+    def __init__(self, config: Optional[AnalyzerConfig] = None):
+        from .config import DEFAULT_ANALYZER_CONFIG
+
+        self.config = config or DEFAULT_ANALYZER_CONFIG
         self.event_graph = nx.DiGraph()
-        self.temporal_window = timedelta(hours=24)
+        self.temporal_window = timedelta(hours=self.config.TEMPORAL_WINDOW_HOURS)
 
     def add_event(self, event_id: str, result):
         """Add event"""
@@ -176,11 +179,14 @@ class RelationshipAnalyzer:
                     1.0 if data1.get("user_id") == data2.get("user_id") else 0.5
                 )
 
+                # Use configurable weights
                 relationship_score = (
-                    temporal_score * 0.3 + semantic_score * 0.5 + user_score * 0.2
+                    temporal_score * self.config.RELATIONSHIP_TEMPORAL_WEIGHT
+                    + semantic_score * self.config.RELATIONSHIP_SEMANTIC_WEIGHT
+                    + user_score * self.config.RELATIONSHIP_USER_WEIGHT
                 )
 
-                if relationship_score > 0.3:
+                if relationship_score > self.config.RELATIONSHIP_THRESHOLD:
                     self.event_graph.add_edge(id1, id2, weight=relationship_score)
 
     def detect_compound_threats(self, min_chain: int = 3) -> List[Dict]:

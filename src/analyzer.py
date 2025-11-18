@@ -161,7 +161,9 @@ class AdvancedRAGAnalyzer:
         self.context_memory = (
             ContextMemorySystem(self.config) if enable_advanced else None
         )
-        self.relationship_analyzer = RelationshipAnalyzer() if enable_advanced else None
+        self.relationship_analyzer = (
+            RelationshipAnalyzer(self.config) if enable_advanced else None
+        )
         self.language_detector = LanguageDetector() if enable_advanced else None
         self.analysis_history = deque(maxlen=self.config.MAX_HISTORY_SIZE)
 
@@ -385,10 +387,69 @@ class AdvancedRAGAnalyzer:
             logger.warning(f"Self-RAG fallback to standard: {type(e).__name__}: {e}")
             return self._analyze_standard(text, user_id, session_id)
 
+    def _perform_core_analysis(
+        self, text: str, policies: List[SecurityPolicy], similarities: Dict[str, float], detected_lang: str
+    ) -> AnalysisResult:
+        """Perform core analysis using LLM or rules"""
+        if self.use_llm:
+            result = self._analyze_llm(text, policies)
+            self.stats["llm"] += 1
+        else:
+            result = self._analyze_rules(text, policies, similarities, detected_lang)
+            self.stats["rule"] += 1
+        return result
+
+    def _enrich_result_metadata(
+        self,
+        result: AnalysisResult,
+        user_id: Optional[str],
+        session_id: Optional[str],
+        detected_lang: str,
+        policies: List[SecurityPolicy],
+        similarities: Dict[str, float],
+        start_time: datetime,
+    ) -> None:
+        """Add metadata to analysis result"""
+        result.user_id = user_id
+        result.session_id = session_id
+        result.detected_language = detected_lang
+        result.related_policies = [p.id for p in policies]
+        result.policy_similarities = similarities
+        result.processing_time = (datetime.now() - start_time).total_seconds()
+
+    def _apply_context_adjustment(self, result: AnalysisResult, user_id: Optional[str]) -> None:
+        """Apply context-based risk score adjustment"""
+        if self.context_memory and user_id:
+            adj = self.context_memory.get_context_adjustment(user_id, result.risk_score)
+            if adj != 0:
+                result.risk_score = min(result.risk_score + adj, 100)
+                result.context_adjusted = True
+            self.context_memory.update_user_context(user_id, result)
+
+    def _generate_explanations(
+        self, result: AnalysisResult, similarities: Dict[str, float], policies: List[SecurityPolicy]
+    ) -> None:
+        """Generate XAI explanations and suggestions"""
+        breakdown = self._create_breakdown(result, similarities)
+        similar = self._find_similar(result, 3)
+        result.explanation_data = ExplainableAI.generate_explanation(
+            result, breakdown, similar, config=self.config
+        )
+        result.confidence_score = self._calc_confidence(result, similarities)
+        result.remediation_suggestions = self._get_remediation(result, policies)
+
+    def _update_tracking_systems(self, event_id: str, result: AnalysisResult) -> None:
+        """Update relationship analyzer and history"""
+        if self.relationship_analyzer:
+            self.relationship_analyzer.add_event(event_id, result)
+            self.relationship_analyzer.build_relationships()
+        self.stats["total"] += 1
+        self.analysis_history.append(result)
+
     def _analyze_standard(
         self, text: str, user_id: Optional[str] = None, session_id: Optional[str] = None
     ):
-        """표준 분석 (v2.5 방식)"""
+        """표준 분석 (v2.5 방식) - Refactored for better maintainability"""
         start = datetime.now()
         event_id = f"EVT_{int(time.time()*1000)}"
 
@@ -396,54 +457,32 @@ class AdvancedRAGAnalyzer:
             if not text.strip():
                 raise ValueError("Empty text")
 
+            # Step 1: Detect language
             detected_lang = "unknown"
             if self.language_detector:
                 detected_lang = self.language_detector.detect_language(text)
 
+            # Step 2: Search for relevant policies
             policy_results = list(self._search_cached(text))
             policies = [p for p, _ in policy_results]
             similarities = {p.id: s for p, s in policy_results}
 
-            if self.use_llm:
-                result = self._analyze_llm(text, policies)
-                self.stats["llm"] += 1
-            else:
-                result = self._analyze_rules(
-                    text, policies, similarities, detected_lang
-                )
-                self.stats["rule"] += 1
+            # Step 3: Perform core analysis
+            result = self._perform_core_analysis(text, policies, similarities, detected_lang)
 
-            result.user_id = user_id
-            result.session_id = session_id
-            result.detected_language = detected_lang
-            result.related_policies = [p.id for p in policies]
-            result.policy_similarities = similarities
-            result.processing_time = (datetime.now() - start).total_seconds()
-
-            if self.context_memory and user_id:
-                adj = self.context_memory.get_context_adjustment(
-                    user_id, result.risk_score
-                )
-                if adj != 0:
-                    result.risk_score = min(result.risk_score + adj, 100)
-                    result.context_adjusted = True
-                self.context_memory.update_user_context(user_id, result)
-
-            breakdown = self._create_breakdown(result, similarities)
-            similar = self._find_similar(result, 3)
-            result.explanation_data = ExplainableAI.generate_explanation(
-                result, breakdown, similar, config=self.config
+            # Step 4: Enrich with metadata
+            self._enrich_result_metadata(
+                result, user_id, session_id, detected_lang, policies, similarities, start
             )
 
-            result.confidence_score = self._calc_confidence(result, similarities)
-            result.remediation_suggestions = self._get_remediation(result, policies)
+            # Step 5: Apply context adjustment
+            self._apply_context_adjustment(result, user_id)
 
-            if self.relationship_analyzer:
-                self.relationship_analyzer.add_event(event_id, result)
-                self.relationship_analyzer.build_relationships()
+            # Step 6: Generate explanations
+            self._generate_explanations(result, similarities, policies)
 
-            self.stats["total"] += 1
-            self.analysis_history.append(result)
+            # Step 7: Update tracking systems
+            self._update_tracking_systems(event_id, result)
 
             return result
         except Exception as e:

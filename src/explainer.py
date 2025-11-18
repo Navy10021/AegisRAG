@@ -112,7 +112,13 @@ class ExplainableAI:
         union_len = len(v1 | v2)
         viol_sim = len(v1 & v2) / max(union_len, 1)
         score_sim = 1.0 - abs(a1.risk_score - a2.risk_score) / 100.0
-        return viol_sim * 0.6 + score_sim * 0.4
+
+        # Use configurable weights from DEFAULT_ANALYZER_CONFIG
+        from .config import DEFAULT_ANALYZER_CONFIG
+        return (
+            viol_sim * DEFAULT_ANALYZER_CONFIG.SIMILARITY_VIOLATION_WEIGHT
+            + score_sim * DEFAULT_ANALYZER_CONFIG.SIMILARITY_SCORE_WEIGHT
+        )
 
     @staticmethod
     def print_explanation(result, config: Optional[AnalyzerConfig] = None):
