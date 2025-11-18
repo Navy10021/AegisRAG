@@ -1,0 +1,127 @@
+# Pre-commit hooks for AegisRAG
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        args: [--markdown-linebreak-ext=md]
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--safe]
+      - id: check-json
+      - id: check-toml
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-private-key
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: check-docstring-first
+      - id: debug-statements
+
+  # Python code formatting with Black
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        language_version: python3.8
+        args: [--line-length=127]
+
+  # Import sorting with isort
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        args: [--profile=black, --line-length=127]
+
+  # Linting with flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        args: [
+          --max-line-length=127,
+          --extend-ignore=E203,W503,E501,
+          --max-complexity=15,
+        ]
+        additional_dependencies: [
+          flake8-docstrings,
+          flake8-bugbear,
+          flake8-comprehensions,
+          flake8-simplify,
+        ]
+
+  # Security checks with Bandit
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.6
+    hooks:
+      - id: bandit
+        args: [-r, src/, -ll, -f, screen]
+        exclude: ^tests/
+
+  # Type checking with mypy
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        args: [--ignore-missing-imports, --no-strict-optional]
+        additional_dependencies: [
+          types-requests,
+          pydantic>=2.6.0,
+        ]
+        exclude: ^(tests/|examples/|notebooks/)
+
+  # Docstring coverage
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.5.0
+    hooks:
+      - id: interrogate
+        args: [-vv, --fail-under=70, --exclude=tests]
+        pass_filenames: false
+
+  # YAML formatting
+  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+    rev: v2.12.0
+    hooks:
+      - id: pretty-format-yaml
+        args: [--autofix, --indent, '2']
+
+  # Markdown formatting
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-black
+        args: [--wrap, '100']
+
+  # Commit message linting
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [
+          --types, 'feat,fix,docs,style,refactor,perf,test,build,ci,chore,revert',
+          --optional-scope,
+        ]
+
+# CI configuration
+ci:
+  autofix_commit_msg: |
+    [pre-commit.ci] auto fixes from pre-commit hooks
+
+    for more information, see https://pre-commit.ci
+  autofix_prs: true
+  autoupdate_branch: 'main'
+  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_schedule: weekly
+  skip: [pylint, mypy]  # Skip slow hooks in CI
+  submodules: false

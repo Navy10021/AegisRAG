@@ -1,0 +1,106 @@
+# Git
+.git
+.gitignore
+.gitattributes
+.github
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+dist
+build
+*.egg
+.eggs
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov/
+coverage.xml
+.tox
+.nox
+
+# Documentation
+docs/
+*.md
+!README.md
+notebooks/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Logs and temporary files
+logs/
+*.log
+output/
+temp/
+tmp/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Large model files (if any)
+*.pth
+*.pkl
+*.h5
+*.onnx
+models/
+
+# Data files (keep structure but not content)
+data/*.csv
+data/*.json
+data/*.txt
+!data/.gitkeep
+
+# Test reports
+test-results/
+coverage-reports/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pre-commit
+.pre-commit-config.yaml
+
+# Examples (exclude for production builds)
+examples/
+
+# Jupyter notebooks
+*.ipynb
+.ipynb_checkpoints
+
+# Backup files
+*.bak
+*.backup
+*.old
