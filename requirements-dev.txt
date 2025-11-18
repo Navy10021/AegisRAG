@@ -1,28 +1,23 @@
 # Development and Testing Dependencies
 # Last updated: 2025-11-18
+# Python 3.8+ compatible versions
 
 # Testing framework
-pytest==7.4.3
-pytest-cov==4.1.0
-pytest-xdist==3.5.0
-pytest-mock==3.12.0
-pytest-benchmark==4.0.0
+pytest>=7.4.0,<8.0.0
+pytest-cov>=4.1.0,<5.0.0
+pytest-xdist>=3.3.0,<4.0.0
+pytest-mock>=3.11.0,<4.0.0
 
-# Code quality tools
-black==23.12.1
-isort==5.13.2
-pylint==3.0.3
-flake8==7.0.0
-mypy==1.8.0
+# Code quality tools (Python 3.8 compatible)
+black>=23.3.0,<24.0.0
+isort>=5.12.0,<6.0.0
+pylint>=2.17.0,<3.0.0
+flake8>=6.0.0,<7.0.0
+mypy>=1.4.0,<2.0.0
 
 # Security scanning
-bandit==1.7.6
-safety==3.0.1
-pip-audit==2.6.3
+bandit>=1.7.5,<2.0.0
+safety>=2.3.0,<3.0.0
 
 # Documentation
-sphinx==7.2.6
-sphinx-rtd-theme==2.0.0
-
-# Type stubs
-types-requests==2.31.0.10
+sphinx>=7.0.0,<8.0.0
