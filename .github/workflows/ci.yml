@@ -124,6 +124,10 @@ jobs:
     - name: Create necessary directories
       run: |
         mkdir -p data logs output
+        mkdir -p data/patterns
+        touch data/.gitkeep
+        echo '{}' > data/patterns_en.json
+        echo '{}' > data/patterns_ko.json
 
     - name: Run tests with coverage
       run: |
