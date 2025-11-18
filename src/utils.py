@@ -46,8 +46,11 @@ class LanguageDetector:
             if lang not in LanguageDetector.SUPPORTED:
                 return "en"
             return lang
-        except (LangDetectException, Exception) as e:
+        except LangDetectException as e:
             logger.debug(f"Language detection failed: {e}")
+            return "en"
+        except (ValueError, TypeError) as e:
+            logger.warning(f"Invalid input for language detection: {e}")
             return "en"
 
     @staticmethod

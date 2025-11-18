@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 # OpenAI availability check
 try:
-    pass
+    from openai import OpenAI
 
     OPENAI_AVAILABLE = True
 except (ImportError, ModuleNotFoundError) as e:

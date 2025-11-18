@@ -47,9 +47,10 @@ class ContextMemorySystem:
         profile = self.user_profiles[user_id]
         profile["analyses_count"] += 1
         n = profile["analyses_count"]
+        # Prevent division by zero (though n should always be >= 1 here)
         profile["avg_risk_score"] = (
             profile["avg_risk_score"] * (n - 1) + analysis.risk_score
-        ) / n
+        ) / max(n, 1)
         profile["risk_history"].append(
             {
                 "timestamp": analysis.timestamp,

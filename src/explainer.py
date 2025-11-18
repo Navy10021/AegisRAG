@@ -108,8 +108,10 @@ class ExplainableAI:
         )
 
         v1, v2 = set(a1.violations), set(a2.violations)
-        viol_sim = len(v1 & v2) / max(len(v1 | v2), 1)
-        score_sim = 1.0 - abs(a1.risk_score - a2.risk_score) / 100
+        # Prevent division by zero
+        union_len = len(v1 | v2)
+        viol_sim = len(v1 & v2) / max(union_len, 1)
+        score_sim = 1.0 - abs(a1.risk_score - a2.risk_score) / 100.0
         return viol_sim * 0.6 + score_sim * 0.4
 
     @staticmethod
