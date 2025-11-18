@@ -1,0 +1,145 @@
+version: '3.9'
+
+services:
+  # Development service
+  aegisrag-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegisrag-dev
+    volumes:
+      # Mount source code for hot reloading
+      - ./src:/app/src:ro
+      - ./tests:/app/tests:ro
+      - ./examples:/app/examples:ro
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./output:/app/output
+      # Mount .env file if exists
+      - ./.env:/app/.env:ro
+    environment:
+      - AEGIS_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONPATH=/app
+    command: /bin/bash -c "tail -f /dev/null"
+    networks:
+      - aegisrag-network
+    profiles:
+      - dev
+
+  # Test service
+  aegisrag-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegisrag-test
+    volumes:
+      - ./src:/app/src:ro
+      - ./tests:/app/tests:ro
+      - ./coverage-reports:/app/htmlcov
+    environment:
+      - AEGIS_ENV=test
+      - PYTHONPATH=/app
+    command: >
+      pytest tests/
+      -v
+      --cov=src
+      --cov-report=html
+      --cov-report=term-missing
+      --cov-report=xml
+      -n auto
+    networks:
+      - aegisrag-network
+    profiles:
+      - test
+
+  # Code quality check service
+  aegisrag-lint:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegisrag-lint
+    volumes:
+      - ./src:/app/src:ro
+      - ./tests:/app/tests:ro
+    environment:
+      - PYTHONPATH=/app
+    command: /bin/bash -c "
+      echo '=== Running Black ===' &&
+      black --check src/ tests/ &&
+      echo '=== Running isort ===' &&
+      isort --check-only src/ tests/ &&
+      echo '=== Running flake8 ===' &&
+      flake8 src/ tests/ --max-line-length=127 &&
+      echo '=== Running pylint ===' &&
+      pylint src/ --max-line-length=127 &&
+      echo '=== Running Bandit ===' &&
+      bandit -r src/ -ll &&
+      echo '=== All checks passed ==='
+      "
+    networks:
+      - aegisrag-network
+    profiles:
+      - lint
+
+  # Production service (example analysis)
+  aegisrag-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegisrag-prod
+    volumes:
+      - ./data:/app/data:ro
+      - ./logs:/app/logs
+      - ./output:/app/output
+      - ./.env:/app/.env:ro
+    environment:
+      - AEGIS_ENV=production
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONPATH=/app
+    command: python examples/basic_usage.py
+    networks:
+      - aegisrag-network
+    restart: unless-stopped
+    profiles:
+      - prod
+
+  # Interactive development shell
+  aegisrag-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: aegisrag-shell
+    volumes:
+      - ./src:/app/src
+      - ./tests:/app/tests
+      - ./examples:/app/examples
+      - ./notebooks:/app/notebooks
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./output:/app/output
+      - ./.env:/app/.env:ro
+    environment:
+      - AEGIS_ENV=development
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - PYTHONPATH=/app
+    command: /bin/bash
+    stdin_open: true
+    tty: true
+    networks:
+      - aegisrag-network
+    profiles:
+      - shell
+
+networks:
+  aegisrag-network:
+    driver: bridge
+    name: aegisrag-network
+
+# Usage examples:
+# Development: docker-compose --profile dev up -d
+# Run tests: docker-compose --profile test up --abort-on-container-exit
+# Code quality: docker-compose --profile lint up --abort-on-container-exit
+# Production: docker-compose --profile prod up -d
+# Interactive shell: docker-compose --profile shell run aegisrag-shell
+# Clean up: docker-compose --profile dev --profile test --profile lint --profile prod --profile shell down -v
