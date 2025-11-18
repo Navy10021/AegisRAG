@@ -150,7 +150,61 @@ class LoggingConfig:
         self.LOG_LEVEL = os.getenv("LOG_LEVEL", self.LOG_LEVEL).upper()
 
 
+@dataclass
+class CacheConfig:
+    """LLM Response Cache configuration"""
+
+    # Cache size
+    MAX_CACHE_SIZE: int = 1000
+    DEFAULT_TTL: int = 3600  # 1 hour
+
+    # Cost estimation (USD per request)
+    COST_PER_REQUEST: float = 0.0002  # GPT-4o-mini average cost
+
+    # Enable/disable caching
+    ENABLE_CACHE: bool = True
+
+    # Automatic cleanup interval (seconds)
+    CLEANUP_INTERVAL: int = 300  # 5 minutes
+
+
+@dataclass
+class RateLimitConfig:
+    """Rate limiting configuration"""
+
+    # Rate limit settings
+    MAX_REQUESTS: int = 60  # Maximum requests
+    TIME_WINDOW: int = 60  # Time window in seconds (1 minute)
+    BURST_SIZE: int = 10  # Allow burst of requests
+
+    # Enable/disable rate limiting
+    ENABLE_RATE_LIMIT: bool = True
+
+    # Per-user tracking
+    ENABLE_PER_USER_LIMIT: bool = True
+
+
+@dataclass
+class RetryConfig:
+    """API Retry configuration"""
+
+    # Retry settings
+    MAX_ATTEMPTS: int = 3  # Maximum retry attempts
+    BASE_DELAY: float = 1.0  # Initial delay in seconds
+    MAX_DELAY: float = 60.0  # Maximum delay in seconds
+    EXPONENTIAL_BASE: float = 2.0  # Exponential backoff multiplier
+
+    # Add random jitter to prevent thundering herd
+    ENABLE_JITTER: bool = True
+
+    # Enable/disable retry
+    ENABLE_RETRY: bool = True
+
+
 # Default configurations
 DEFAULT_ANALYZER_CONFIG = AnalyzerConfig()
 DEFAULT_SECURITY_CONFIG = SecurityConfig()
 DEFAULT_LOGGING_CONFIG = LoggingConfig()
+DEFAULT_CACHE_CONFIG = CacheConfig()
+DEFAULT_RATE_LIMIT_CONFIG = RateLimitConfig()
+DEFAULT_RETRY_CONFIG = RetryConfig()
