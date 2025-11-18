@@ -44,16 +44,16 @@ class BM25:
         config = config or DEFAULT_ANALYZER_CONFIG
         self.k1: float = k1 if k1 is not None else config.BM25_K1
         self.b: float = b if b is not None else config.BM25_B
-        self.doc_len: list[int] = []
+        self.doc_len: List[int] = []
         self.avgdl: float = 0.0
-        self.idf: dict[str, float] = {}
-        self.corpus: list[str] = []
+        self.idf: Dict[str, float] = {}
+        self.corpus: List[str] = []
 
     def fit(self, corpus):
         """Train BM25 with corpus"""
         self.corpus = corpus
         self.doc_len = [len(doc.split()) for doc in corpus]
-        self.avgdl = sum(self.doc_len) / len(self.doc_len) if self.doc_len else 0
+        self.avgdl = sum(self.doc_len) / max(len(self.doc_len), 1)
 
         df = defaultdict(int)
         for doc in corpus:
@@ -71,6 +71,9 @@ class BM25:
         query_words = query.lower().split()
         scores = np.zeros(len(self.corpus))
 
+        # Prevent division by zero
+        avgdl_safe = max(self.avgdl, 1e-10)
+
         for i, doc in enumerate(self.corpus):
             doc_words = doc.lower().split()
             doc_len = self.doc_len[i]
@@ -82,9 +85,10 @@ class BM25:
                 tf = doc_words.count(word)
                 numerator = tf * (self.k1 + 1)
                 denominator = tf + self.k1 * (
-                    1 - self.b + self.b * (doc_len / self.avgdl)
+                    1 - self.b + self.b * (doc_len / avgdl_safe)
                 )
-                scores[i] += self.idf[word] * (numerator / denominator)
+                # Additional safety check for denominator
+                scores[i] += self.idf[word] * (numerator / max(denominator, 1e-10))
 
         return scores
 
