@@ -764,15 +764,6 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 🙏 Acknowledgments
-
-- **[Self-RAG Paper](https://arxiv.org/abs/2310.11511)** - Akari Asai et al.
-- **[Sentence-Transformers](https://www.sbert.net/)** - Nils Reimers
-- **[OpenAI](https://openai.com/)** - GPT-4o-mini
-- **[NetworkX](https://networkx.org/)** - Graph analysis
-
----
-
 ## 📧 Contact
 
 - **Author:** Navy Lee
