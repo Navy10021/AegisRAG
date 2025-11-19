@@ -4,7 +4,6 @@
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://img.shields.io/badge/CI-GitHub%20Actions-2088FF.svg)](https://github.com/Navy10021/aegisrag/actions)
 [![Tests](https://img.shields.io/badge/tests-pytest-0A9EDC.svg)](https://docs.pytest.org/)
-[![OpenAI](https://img.shields.io/badge/LLM-GPT--4o--mini-orange.svg)](https://openai.com/)
 [![Version](https://img.shields.io/badge/version-3.0.0-brightgreen.svg)](https://github.com/Navy10021/aegisrag)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Navy10021/aegisrag/graphs/commit-activity)
