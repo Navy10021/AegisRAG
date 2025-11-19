@@ -115,7 +115,7 @@ class RateLimiter:
         self.config = config or RateLimitConfig()
 
         # Calculate refill rate (tokens per second)
-        refill_rate = self.config.max_requests / self.config.time_window
+        refill_rate = self.config.MAX_REQUESTS / self.config.TIME_WINDOW
 
         # Per-user token buckets
         self.buckets: Dict[str, TokenBucket] = {}
@@ -131,15 +131,15 @@ class RateLimiter:
         self.lock = Lock()
 
         logger.info(
-            f"RateLimiter initialized: {self.config.max_requests} req/{self.config.time_window}s, "
-            f"burst={self.config.burst_size}"
+            f"RateLimiter initialized: {self.config.MAX_REQUESTS} req/{self.config.TIME_WINDOW}s, "
+            f"burst={self.config.BURST_SIZE}"
         )
 
     def _get_bucket(self, user_id: str) -> TokenBucket:
         """Get or create token bucket for user"""
         with self.lock:
             if user_id not in self.buckets:
-                self.buckets[user_id] = TokenBucket(max_tokens=self.config.burst_size, refill_rate=self.refill_rate)
+                self.buckets[user_id] = TokenBucket(max_tokens=self.config.BURST_SIZE, refill_rate=self.refill_rate)
             return self.buckets[user_id]
 
     def check_limit(self, user_id: Optional[str] = None) -> bool:
@@ -164,7 +164,7 @@ class RateLimiter:
             # Request allowed
             self.request_history[user_id].append(time.time())
             logger.debug(
-                f"Rate limit OK: user={user_id}, " f"tokens={bucket.get_tokens():.1f}/{self.config.burst_size}"
+                f"Rate limit OK: user={user_id}, " f"tokens={bucket.get_tokens():.1f}/{self.config.BURST_SIZE}"
             )
             return True
         else:
@@ -195,14 +195,14 @@ class RateLimiter:
 
         # Calculate recent request count
         now = time.time()
-        recent_requests = sum(1 for ts in history if now - ts < self.config.time_window)
+        recent_requests = sum(1 for ts in history if now - ts < self.config.TIME_WINDOW)
 
         return {
             "user_id": user_id,
             "tokens_available": bucket.get_tokens(),
-            "max_tokens": self.config.burst_size,
+            "max_tokens": self.config.BURST_SIZE,
             "requests_in_window": recent_requests,
-            "max_requests_per_window": self.config.max_requests,
+            "max_requests_per_window": self.config.MAX_REQUESTS,
             "total_requests": len(history),
             "time_until_token": bucket.time_until_token(),
         }
@@ -220,9 +220,9 @@ class RateLimiter:
             "total_blocked": self.total_blocked,
             "block_rate_pct": (self.total_blocked / self.total_requests * 100) if self.total_requests > 0 else 0,
             "config": {
-                "max_requests": self.config.max_requests,
-                "time_window": self.config.time_window,
-                "burst_size": self.config.burst_size,
+                "max_requests": self.config.MAX_REQUESTS,
+                "time_window": self.config.TIME_WINDOW,
+                "burst_size": self.config.BURST_SIZE,
             },
         }
 
@@ -268,7 +268,7 @@ def rate_limit(
     Raises:
         RateLimitExceeded: When rate limit is exceeded
     """
-    config = RateLimitConfig(max_requests=max_requests, time_window=time_window, burst_size=burst_size)
+    config = RateLimitConfig(MAX_REQUESTS=max_requests, TIME_WINDOW=time_window, BURST_SIZE=burst_size)
 
     limiter = RateLimiter(config)
 
