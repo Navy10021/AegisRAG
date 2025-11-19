@@ -508,7 +508,7 @@ AegisRAG/
 │   └── keywords.json                  # Rule-based keyword sets
 │
 ├── notebooks/                         # 📘 Interactive notebooks
-│   ├── aegis_ver3.ipynb               # Demo notebook (Colab ready)
+│   └── aegis_ver3.ipynb               # Demo notebook (Colab ready)
 │   
 │
 ├── output/                            # 📊 Output directory
