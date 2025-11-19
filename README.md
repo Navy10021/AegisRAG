@@ -786,7 +786,8 @@ MIT License - see [LICENSE](LICENSE)
 
 ```bibtex
 @software{aegisrag2025,
-  author = {Lee, Navy},
+  author = {Lee, Navy, Team Leader},
+  note = {Team Leader},
   title = {AegisRAG v3.0: Self-Reflective Security Intelligence},
   year = {2025},
   url = {https://github.com/Navy10021/aegisrag},
