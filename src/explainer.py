@@ -4,12 +4,13 @@ Explainable AI (XAI) System
 """
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from .models import (
     AnalysisResult,
     ExplanationData,
     ScoreBreakdown,
+    SelfRAGResult,
     get_analysis_result,
 )
 from .config import AnalyzerConfig, DEFAULT_ANALYZER_CONFIG
@@ -27,9 +28,9 @@ class ExplainableAI:
 
     @staticmethod
     def generate_explanation(
-        result,
+        result: Union[AnalysisResult, SelfRAGResult],
         score_breakdown: ScoreBreakdown,
-        similar_cases: Optional[List] = None,
+        similar_cases: Optional[List[Union[AnalysisResult, SelfRAGResult]]] = None,
         config: Optional[AnalyzerConfig] = None,
     ) -> ExplanationData:
         """Generate explanation data"""
@@ -93,7 +94,10 @@ class ExplainableAI:
         )
 
     @staticmethod
-    def _calc_similarity(case1, case2) -> float:
+    def _calc_similarity(
+        case1: Union[AnalysisResult, SelfRAGResult],
+        case2: Union[AnalysisResult, SelfRAGResult]
+    ) -> float:
         """Calculate similarity between two cases"""
         # Convert both to AnalysisResult
         a1 = (
@@ -121,7 +125,10 @@ class ExplainableAI:
         )
 
     @staticmethod
-    def print_explanation(result, config: Optional[AnalyzerConfig] = None):
+    def print_explanation(
+        result: Union[AnalysisResult, SelfRAGResult],
+        config: Optional[AnalyzerConfig] = None
+    ) -> None:
         """Print explanation to console"""
         config = config or DEFAULT_ANALYZER_CONFIG
         analysis = get_analysis_result(result)

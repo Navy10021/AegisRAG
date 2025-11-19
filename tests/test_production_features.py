@@ -151,15 +151,15 @@ class TestRateLimiter:
 
     def test_rate_limiter_initialization(self):
         """Test rate limiter initialization"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=5)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=5)
         limiter = RateLimiter(config)
 
-        assert limiter.config.max_requests == 10
+        assert limiter.config.MAX_REQUESTS == 10
         assert limiter.total_requests == 0
 
     def test_rate_limit_allows_requests(self):
         """Test that requests within limit are allowed"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=5)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=5)
         limiter = RateLimiter(config)
 
         # Should allow burst_size requests immediately
@@ -168,7 +168,7 @@ class TestRateLimiter:
 
     def test_rate_limit_blocks_excess(self):
         """Test that excess requests are blocked"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=3)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=3)
         limiter = RateLimiter(config)
 
         # Use up burst tokens
@@ -184,7 +184,7 @@ class TestRateLimiter:
 
     def test_rate_limit_per_user(self):
         """Test per-user rate limiting"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=2)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=2)
         limiter = RateLimiter(config)
 
         # User 1 uses their burst
@@ -215,7 +215,7 @@ class TestRateLimiter:
 
     def test_rate_limit_stats(self):
         """Test rate limiter statistics"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=3)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=3)
         limiter = RateLimiter(config)
 
         limiter.check_limit("user1")
@@ -229,7 +229,7 @@ class TestRateLimiter:
 
     def test_rate_limit_reset(self):
         """Test rate limit reset"""
-        config = RateLimitConfig(max_requests=10, time_window=60, burst_size=2)
+        config = RateLimitConfig(MAX_REQUESTS=10, TIME_WINDOW=60, BURST_SIZE=2)
         limiter = RateLimiter(config)
 
         # Use up tokens
@@ -248,14 +248,14 @@ class TestRetryLogic:
 
     def test_retry_config(self):
         """Test retry configuration"""
-        config = RetryConfig(max_attempts=3, base_delay=1.0)
+        config = RetryConfig(MAX_ATTEMPTS=3, BASE_DELAY=1.0)
 
-        assert config.max_attempts == 3
-        assert config.base_delay == 1.0
+        assert config.MAX_ATTEMPTS == 3
+        assert config.BASE_DELAY == 1.0
 
     def test_calculate_delay(self):
         """Test exponential backoff delay calculation"""
-        config = RetryConfig(base_delay=1.0, exponential_base=2.0, jitter=False)
+        config = RetryConfig(BASE_DELAY=1.0, EXPONENTIAL_BASE=2.0, ENABLE_JITTER=False)
 
         # Attempt 0: 1.0 * 2^0 = 1.0
         assert calculate_delay(0, config) == 1.0
@@ -268,7 +268,7 @@ class TestRetryLogic:
 
     def test_calculate_delay_with_max(self):
         """Test delay respects max_delay"""
-        config = RetryConfig(base_delay=10.0, max_delay=20.0, exponential_base=2.0, jitter=False)
+        config = RetryConfig(BASE_DELAY=10.0, MAX_DELAY=20.0, EXPONENTIAL_BASE=2.0, ENABLE_JITTER=False)
 
         # Would be 40.0 but capped at max_delay
         delay = calculate_delay(2, config)
@@ -385,7 +385,7 @@ class TestProductionIntegration:
     def test_cache_with_rate_limit(self):
         """Test cache and rate limiting working together"""
         cache = LLMCache(max_size=10)
-        config = RateLimitConfig(max_requests=5, time_window=60, burst_size=2)
+        config = RateLimitConfig(MAX_REQUESTS=5, TIME_WINDOW=60, BURST_SIZE=2)
         limiter = RateLimiter(config)
 
         def analyze_with_protections(text, user_id):

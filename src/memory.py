@@ -6,12 +6,12 @@ Context memory and relational analysis system
 import logging
 from collections import deque, defaultdict, Counter
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional, Any, Union
 
 import numpy as np
 import networkx as nx
 
-from .models import get_analysis_result
+from .models import AnalysisResult, SelfRAGResult, get_analysis_result
 from .config import AnalyzerConfig
 
 logger = logging.getLogger(__name__)
@@ -39,7 +39,9 @@ class ContextMemorySystem:
             }
         )
 
-    def update_user_context(self, user_id: str, result):
+    def update_user_context(
+        self, user_id: str, result: Union[AnalysisResult, SelfRAGResult]
+    ) -> None:
         """Update user profile"""
         # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
@@ -128,7 +130,9 @@ class RelationshipAnalyzer:
         self.event_graph = nx.DiGraph()
         self.temporal_window = timedelta(hours=self.config.TEMPORAL_WINDOW_HOURS)
 
-    def add_event(self, event_id: str, result):
+    def add_event(
+        self, event_id: str, result: Union[AnalysisResult, SelfRAGResult]
+    ) -> None:
         """Add event"""
         # Handle SelfRAGResult case
         analysis = get_analysis_result(result)
@@ -142,7 +146,7 @@ class RelationshipAnalyzer:
             user_id=analysis.user_id,
         )
 
-    def build_relationships(self):
+    def build_relationships(self) -> None:
         """
         Build inter-event relationships using optimized time-window approach
 
@@ -189,7 +193,7 @@ class RelationshipAnalyzer:
                 if relationship_score > self.config.RELATIONSHIP_THRESHOLD:
                     self.event_graph.add_edge(id1, id2, weight=relationship_score)
 
-    def detect_compound_threats(self, min_chain: int = 3) -> List[Dict]:
+    def detect_compound_threats(self, min_chain: int = 3) -> List[Dict[str, Any]]:
         """Detect compound threats"""
         threats = []
         for component in nx.weakly_connected_components(self.event_graph):
@@ -209,7 +213,7 @@ class RelationshipAnalyzer:
                     )
         return sorted(threats, key=lambda x: x["avg_risk_score"], reverse=True)
 
-    def visualize(self, output: str = "output/threat_graph.png"):
+    def visualize(self, output: str = "output/threat_graph.png") -> None:
         """Graph visualization"""
         try:
             import matplotlib.pyplot as plt

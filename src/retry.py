@@ -11,35 +11,9 @@ import random
 import time
 from typing import Any, Callable, Optional, Tuple, Type
 
+from .config import RetryConfig
+
 logger = logging.getLogger(__name__)
-
-
-class RetryConfig:
-    """Configuration for retry behavior"""
-
-    def __init__(
-        self,
-        max_attempts: int = 3,
-        base_delay: float = 1.0,
-        max_delay: float = 60.0,
-        exponential_base: float = 2.0,
-        jitter: bool = True,
-    ):
-        """
-        Initialize retry configuration.
-
-        Args:
-            max_attempts: Maximum number of retry attempts (including initial)
-            base_delay: Initial delay between retries in seconds
-            max_delay: Maximum delay between retries in seconds
-            exponential_base: Base for exponential backoff (2.0 = double each time)
-            jitter: Add random jitter to prevent thundering herd
-        """
-        self.max_attempts = max_attempts
-        self.base_delay = base_delay
-        self.max_delay = max_delay
-        self.exponential_base = exponential_base
-        self.jitter = jitter
 
 
 def calculate_delay(attempt: int, config: RetryConfig) -> float:
@@ -53,14 +27,14 @@ def calculate_delay(attempt: int, config: RetryConfig) -> float:
     Returns:
         Delay in seconds
     """
-    # Exponential backoff: base_delay * (exponential_base ^ attempt)
-    delay = config.base_delay * (config.exponential_base**attempt)
+    # Exponential backoff: BASE_DELAY * (EXPONENTIAL_BASE ^ attempt)
+    delay = config.BASE_DELAY * (config.EXPONENTIAL_BASE**attempt)
 
-    # Cap at max_delay
-    delay = min(delay, config.max_delay)
+    # Cap at MAX_DELAY
+    delay = min(delay, config.MAX_DELAY)
 
     # Add jitter to prevent thundering herd
-    if config.jitter:
+    if config.ENABLE_JITTER:
         # Add random jitter between 0% and 25% of delay
         jitter = delay * random.uniform(0, 0.25)
         delay += jitter
@@ -134,11 +108,11 @@ def retry_with_backoff(
         Decorated function with retry logic
     """
     config = RetryConfig(
-        max_attempts=max_attempts,
-        base_delay=base_delay,
-        max_delay=max_delay,
-        exponential_base=exponential_base,
-        jitter=jitter,
+        MAX_ATTEMPTS=max_attempts,
+        BASE_DELAY=base_delay,
+        MAX_DELAY=max_delay,
+        EXPONENTIAL_BASE=exponential_base,
+        ENABLE_JITTER=jitter,
     )
 
     def decorator(func: Callable) -> Callable:
@@ -146,7 +120,7 @@ def retry_with_backoff(
         def wrapper(*args, **kwargs) -> Any:
             last_exception = None
 
-            for attempt in range(config.max_attempts):
+            for attempt in range(config.MAX_ATTEMPTS):
                 try:
                     # Attempt function call
                     result = func(*args, **kwargs)
@@ -154,7 +128,7 @@ def retry_with_backoff(
                     # Success - log if this was a retry
                     if attempt > 0:
                         logger.info(
-                            f"Retry SUCCESS on attempt {attempt + 1}/{config.max_attempts} " f"for {func.__name__}"
+                            f"Retry SUCCESS on attempt {attempt + 1}/{config.MAX_ATTEMPTS} " f"for {func.__name__}"
                         )
 
                     return result
@@ -165,11 +139,11 @@ def retry_with_backoff(
                     # Check if we should retry
                     should_retry = is_retryable_error(e, retryable_exceptions)
 
-                    if not should_retry or attempt == config.max_attempts - 1:
+                    if not should_retry or attempt == config.MAX_ATTEMPTS - 1:
                         # Don't retry or last attempt - raise exception
                         if attempt > 0:
                             logger.error(
-                                f"Retry FAILED after {attempt + 1}/{config.max_attempts} attempts "
+                                f"Retry FAILED after {attempt + 1}/{config.MAX_ATTEMPTS} attempts "
                                 f"for {func.__name__}: {type(e).__name__}: {str(e)}"
                             )
                         raise
@@ -178,7 +152,7 @@ def retry_with_backoff(
                     delay = calculate_delay(attempt, config)
 
                     logger.warning(
-                        f"Retry attempt {attempt + 1}/{config.max_attempts} for {func.__name__} "
+                        f"Retry attempt {attempt + 1}/{config.MAX_ATTEMPTS} for {func.__name__} "
                         f"after {type(e).__name__}: {str(e)}. "
                         f"Waiting {delay:.2f}s before retry..."
                     )
@@ -234,11 +208,11 @@ class RetryableAPICall:
     ):
         """Initialize retryable API call context"""
         self.config = RetryConfig(
-            max_attempts=max_attempts,
-            base_delay=base_delay,
-            max_delay=max_delay,
-            exponential_base=exponential_base,
-            jitter=jitter,
+            MAX_ATTEMPTS=max_attempts,
+            BASE_DELAY=base_delay,
+            MAX_DELAY=max_delay,
+            EXPONENTIAL_BASE=exponential_base,
+            ENABLE_JITTER=jitter,
         )
         self.retryable_exceptions = retryable_exceptions
         self.current_attempt = 0
@@ -250,7 +224,7 @@ class RetryableAPICall:
 
     def __next__(self) -> int:
         """Get next retry attempt"""
-        if self.current_attempt >= self.config.max_attempts:
+        if self.current_attempt >= self.config.MAX_ATTEMPTS:
             raise StopIteration
 
         attempt = self.current_attempt
@@ -259,7 +233,7 @@ class RetryableAPICall:
         # Wait before retry (except first attempt)
         if attempt > 0:
             delay = calculate_delay(attempt - 1, self.config)
-            logger.info(f"Retrying (attempt {attempt + 1}/{self.config.max_attempts}), waiting {delay:.2f}s...")
+            logger.info(f"Retrying (attempt {attempt + 1}/{self.config.MAX_ATTEMPTS}), waiting {delay:.2f}s...")
             time.sleep(delay)
 
         return attempt
@@ -277,7 +251,7 @@ class RetryableAPICall:
         self.last_exception = exception
 
         # Check if max attempts reached
-        if self.current_attempt >= self.config.max_attempts:
+        if self.current_attempt >= self.config.MAX_ATTEMPTS:
             return False
 
         # Check if exception is retryable
