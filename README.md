@@ -779,6 +779,7 @@ MIT License - see [LICENSE](LICENSE)
 - **Email:** iyunseob4@gmail.com
 - **GitHub:** [@Navy10021](https://github.com/Navy10021)
 - **Issues:** [Report Bug](https://github.com/Navy10021/aegisrag/issues)
+- **Paper:** *AegisRAG: A Self-Reflective Retrieval-Augmented Framework for Enterprise Security Threat Detection*
 
 ---
 
@@ -800,8 +801,6 @@ MIT License - see [LICENSE](LICENSE)
 <div align="center">
 
 **⭐ Star us on GitHub!**
-
-[🏠 Homepage](https://github.com/Navy10021/aegisrag) • [📖 Docs](https://aegisrag.readthedocs.io) • [🐛 Issues](https://github.com/Navy10021/aegisrag/issues)
 
 Made with ❤️ by the AegisRAG Team
 
