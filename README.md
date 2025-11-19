@@ -509,7 +509,7 @@ AegisRAG/
 │
 ├── notebooks/                         # 📘 Interactive notebooks
 │   ├── aegis_ver3.ipynb               # Demo notebook (Colab ready)
-│   └── evaluation.ipynb               # Evaluation and visualization
+│   
 │
 ├── output/                            # 📊 Output directory
 │   ├── reports/                       # Generated threat analysis reports
