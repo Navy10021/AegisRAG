@@ -782,19 +782,13 @@ MIT License - see [LICENSE](LICENSE)
 - **Paper:** *AegisRAG: A Self-Reflective Retrieval-Augmented Framework for Enterprise Security Threat Detection*
 
 ---
-
-## 📚 Citation
-
-```bibtex
 @software{aegisrag2025,
-  author = {Lee, Navy, Team Leader},
-  note = {Team Leader},
+  author = {Navy Lee},
   title = {AegisRAG v3.0: Self-Reflective Security Intelligence},
   year = {2025},
   url = {https://github.com/Navy10021/aegisrag},
   version = {3.0.0}
 }
-```
 
 ---
 
