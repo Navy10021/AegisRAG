@@ -9,20 +9,12 @@ import functools
 import logging
 import time
 from collections import defaultdict, deque
-from dataclasses import dataclass
 from threading import Lock
 from typing import Any, Callable, Dict, Optional
 
+from .config import RateLimitConfig
+
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class RateLimitConfig:
-    """Rate limit configuration"""
-
-    max_requests: int = 60  # Maximum requests
-    time_window: int = 60  # Time window in seconds (1 minute)
-    burst_size: int = 10  # Allow burst of requests
 
 
 class RateLimitExceeded(Exception):

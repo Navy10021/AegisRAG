@@ -11,35 +11,9 @@ import random
 import time
 from typing import Any, Callable, Optional, Tuple, Type
 
+from .config import RetryConfig
+
 logger = logging.getLogger(__name__)
-
-
-class RetryConfig:
-    """Configuration for retry behavior"""
-
-    def __init__(
-        self,
-        max_attempts: int = 3,
-        base_delay: float = 1.0,
-        max_delay: float = 60.0,
-        exponential_base: float = 2.0,
-        jitter: bool = True,
-    ):
-        """
-        Initialize retry configuration.
-
-        Args:
-            max_attempts: Maximum number of retry attempts (including initial)
-            base_delay: Initial delay between retries in seconds
-            max_delay: Maximum delay between retries in seconds
-            exponential_base: Base for exponential backoff (2.0 = double each time)
-            jitter: Add random jitter to prevent thundering herd
-        """
-        self.max_attempts = max_attempts
-        self.base_delay = base_delay
-        self.max_delay = max_delay
-        self.exponential_base = exponential_base
-        self.jitter = jitter
 
 
 def calculate_delay(attempt: int, config: RetryConfig) -> float:

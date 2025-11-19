@@ -7,9 +7,11 @@ import json
 import logging
 import re
 from enum import Enum
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple, Union
 
 from .models import (
+    AnalysisResult,
+    SelfRAGResult,
     RetrievalNeed,
     RelevanceScore,
     SupportLevel,
@@ -584,7 +586,9 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
             logger.error(f"LLM request error: {type(e).__name__}: {e}")
             return RetrievalNeed.OPTIONAL
 
-    def assess_relevance(self, text: str, result) -> Dict[str, RelevanceScore]:
+    def assess_relevance(
+        self, text: str, result: Union[AnalysisResult, SelfRAGResult]
+    ) -> Dict[str, RelevanceScore]:
         """[Relevance] token: Assess relevance"""
         from .models import get_analysis_result
 
@@ -604,7 +608,11 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
                 relevance_scores[policy_id] = RelevanceScore.NOT_RELEVANT
         return relevance_scores
 
-    def assess_support(self, result, relevance_scores: Dict) -> SupportLevel:
+    def assess_support(
+        self,
+        result: Union[AnalysisResult, SelfRAGResult],
+        relevance_scores: Dict[str, RelevanceScore]
+    ) -> SupportLevel:
         """[Support] token: Assess support level"""
         from .models import get_analysis_result
 
@@ -629,7 +637,9 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         else:
             return SupportLevel.NO_SUPPORT
 
-    def assess_utility(self, result, support_level: SupportLevel) -> UtilityScore:
+    def assess_utility(
+        self, result: Union[AnalysisResult, SelfRAGResult], support_level: SupportLevel
+    ) -> UtilityScore:
         """[Utility] token: Assess utility"""
         from .models import get_analysis_result
 
@@ -652,7 +662,11 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         return UtilityScore(score)
 
     def generate_reflection(
-        self, retrieval_need, relevance_scores, support_level, utility_score
+        self,
+        retrieval_need: RetrievalNeed,
+        relevance_scores: Dict[str, RelevanceScore],
+        support_level: SupportLevel,
+        utility_score: UtilityScore
     ) -> List[str]:
         """Generate reflection notes"""
         notes = []
@@ -683,7 +697,10 @@ JSON: {{"need": "REQUIRED|OPTIONAL|NOT_NEEDED"}}"""
         return notes
 
     def calculate_confidence_boost(
-        self, relevance_scores, support_level, utility_score
+        self,
+        relevance_scores: Dict[str, RelevanceScore],
+        support_level: SupportLevel,
+        utility_score: UtilityScore
     ) -> float:
         """Calculate confidence boost"""
         boost = 0.0
