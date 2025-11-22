@@ -16,19 +16,19 @@ AegisRAG combines **Self-RAG meta-evaluation**, **hybrid semantic retrieval**, *
 
 ### 🚀 Key Features
 
-- *Self-Reflective RAG.* Five-stage meta-evaluation pipeline that critiques and refines model reasoning.
+- **Self-Reflective RAG.** Five-stage meta-evaluation pipeline that critiques and refines model reasoning.
 
-- *900+ Security Patterns.* Comprehensive threat and behavior pattern library enabling high-recall retrieval.
+- **900+ Security Patterns.** Comprehensive threat and behavior pattern library enabling high-recall retrieval.
 
-- *Policy-Aware Reasoning.* Automatic alignment with NIST 800-53, Zero-Trust, and DoD compliance frameworks.
+- **Policy-Aware Reasoning.** Automatic alignment with NIST 800-53, Zero-Trust, and DoD compliance frameworks.
 
-- *Context Memory Engine.* Dual-memory structure (short-/long-term) ensuring consistent multi-turn and historical analysis.
+- **Context Memory Engine.** Dual-memory structure (short-/long-term) ensuring consistent multi-turn and historical analysis.
 
-- *XAI Interpretability.* Clear retrieval evidence, critique outputs, and policy-alignment traces for transparent decision-making.
+- **XAI Interpretability.** Clear retrieval evidence, critique outputs, and policy-alignment traces for transparent decision-making.
 
-- *Self-Correction Loopback.* Automatic re-retrieval and refinement when low-confidence or inconsistent reasoning is detected.
+- **Self-Correction Loopback.** Automatic re-retrieval and refinement when low-confidence or inconsistent reasoning is detected.
 
-- *Modular Architecture.* Replaceable retrievers, evaluators, and LLM backends for flexible integration and extension.
+- **Modular Architecture.** Replaceable retrievers, evaluators, and LLM backends for flexible integration and extension.
 
 
 
