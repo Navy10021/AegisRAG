@@ -764,6 +764,20 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
+---
+
+📚 Citation
+
+@software{aegisrag2025,
+  author = {Lee, Yoonseop},
+  title = {AegisRAG v3.0: Self-Reflective Security Intelligence Framework},
+  year = {2025},
+  url = {https://github.com/Navy10021/AegisRAG},
+}
+
+
+---
+
 ## 📧 Contact
 
 - **Author:** Navy Lee
